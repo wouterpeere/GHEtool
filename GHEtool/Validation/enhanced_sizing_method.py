@@ -43,18 +43,18 @@ def test_monthly_quadrant_4():
     start = time.time()
 
     borefield.size_L3()
-    assert np.isclose(borefield.H, 93.24146806456535)
-    assert np.isclose(borefield.results.min_temperature, 0.0001600069660581127)
-    assert np.isclose(borefield.results.max_temperature, 15.739507592388385)
+    assert np.isclose(borefield.H, 93.07211168325443)
+    assert np.isclose(borefield.results.min_temperature, 0.0002468738488783373)
+    assert np.isclose(borefield.results.max_temperature, 15.572595961723243)
     print(f'Simulation time with speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = False
     start = time.time()
 
     borefield.size_L3()
-    assert np.isclose(borefield.H, 93.243081505459)
-    assert np.isclose(borefield.results.min_temperature, 0.00015381852217721814)
-    assert np.isclose(borefield.results.max_temperature, 15.739453158826853)
+    assert np.isclose(borefield.H, 93.07211168325443)
+    assert np.isclose(borefield.results.min_temperature, 0.0002462780022183253)
+    assert np.isclose(borefield.results.max_temperature, 15.572588425674457)
     print(f'Simulation time without speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = True
@@ -63,9 +63,9 @@ def test_monthly_quadrant_4():
 
     borefield.size_L3()
     borefield.calculation_setup(approximate_req_depth=True)
-    assert np.isclose(borefield.H, 93.24146806456535)
-    assert np.isclose(borefield.results.min_temperature, 0.0001600069660581127)
-    assert np.isclose(borefield.results.max_temperature, 15.739507592388385)
+    assert np.isclose(borefield.H, 93.07190954347438)
+    assert np.isclose(borefield.results.min_temperature, 0.0002468738488783373)
+    assert np.isclose(borefield.results.max_temperature, 15.572595961723243)
     print(f'Simulation time with speed up and approximate_req_depth {time.time() - start}s')
 
     borefield.calculation_setup(use_explicit_multipole=True)
@@ -73,18 +73,18 @@ def test_monthly_quadrant_4():
     start = time.time()
 
     borefield.size_L3()
-    assert np.isclose(borefield.H, 93.21459868840302)
-    assert np.isclose(borefield.results.min_temperature, 0.00016020852361098292)
-    assert np.isclose(borefield.results.max_temperature, 15.728080432710481)
+    assert np.isclose(borefield.H, 93.04522394124531)
+    assert np.isclose(borefield.results.min_temperature, 0.00024763561670226863)
+    assert np.isclose(borefield.results.max_temperature, 15.568308313315452)
     print(f'Simulation time with speed up and explicit models {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = False
     start = time.time()
 
     borefield.size_L3()
-    assert np.isclose(borefield.H, 93.21528026470325)
-    assert np.isclose(borefield.results.min_temperature, 0.00015743055001760098)
-    assert np.isclose(borefield.results.max_temperature, 15.728056277153398)
+    assert np.isclose(borefield.H, 93.04529252397683)
+    assert np.isclose(borefield.results.min_temperature, 0.0002470427444825063)
+    assert np.isclose(borefield.results.max_temperature, 15.568305763045862)
     print(f'Simulation time without speed up and explicit models {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = True
@@ -93,9 +93,9 @@ def test_monthly_quadrant_4():
 
     borefield.size_L3()
     borefield.calculation_setup(approximate_req_depth=True)
-    assert np.isclose(borefield.H, 93.21459868840302)
-    assert np.isclose(borefield.results.min_temperature, 0.00016020852361098292)
-    assert np.isclose(borefield.results.max_temperature, 15.728080432710481)
+    assert np.isclose(borefield.H, 93.04522394124531)
+    assert np.isclose(borefield.results.min_temperature, 0.00024763561670226863)
+    assert np.isclose(borefield.results.max_temperature, 15.568308313315452)
     print(f'Simulation time with speed up, approximate_req_depth and explicit models {time.time() - start}s')
 
 
@@ -122,18 +122,18 @@ def test_monthly_quadrant_1():
     start = time.time()
 
     borefield.size_L3()
-    assert np.isclose(borefield.H, 85.79127756099108)
-    assert np.isclose(borefield.results.min_temperature, 5.451954106073291)
-    assert np.isclose(borefield.results.max_temperature, 16.009933134246406)
+    assert np.isclose(borefield.H, 82.41177541437784)
+    assert np.isclose(borefield.results.min_temperature, 5.250350844132524)
+    assert np.isclose(borefield.results.max_temperature, 16.00214239323884)
     print(f'Simulation time with speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = False
     start = time.time()
 
     borefield.size_L3()
-    assert np.isclose(borefield.H, 86.04140068480496)
-    assert np.isclose(borefield.results.min_temperature, 5.459660593826807)
-    assert np.isclose(borefield.results.max_temperature, 15.999214960639087)
+    assert np.isclose(borefield.H, 82.4799174661786)
+    assert np.isclose(borefield.results.min_temperature, 5.254132865075517)
+    assert np.isclose(borefield.results.max_temperature, 15.998991197446832)
     print(f'Simulation time without speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = True
@@ -142,9 +142,9 @@ def test_monthly_quadrant_1():
 
     borefield.size_L3()
     borefield.calculation_setup(approximate_req_depth=True)
-    assert np.isclose(borefield.H, 85.79127756099108)
-    assert np.isclose(borefield.results.min_temperature, 5.451954106073291)
-    assert np.isclose(borefield.results.max_temperature, 16.009933134246406)
+    assert np.isclose(borefield.H, 82.41177541437784)
+    assert np.isclose(borefield.results.min_temperature, 5.250350844132524)
+    assert np.isclose(borefield.results.max_temperature, 16.00214239323884)
     print(f'Simulation time with speed up and approximate_req_depth {time.time() - start}s')
 
 
@@ -171,9 +171,9 @@ def test_monthly_quadrant_1_more_data_points():
     start = time.time()
 
     borefield.size_L3()
-    assert np.isclose(borefield.H, 85.79127756099108)
-    assert np.isclose(borefield.results.min_temperature, 5.451954106073291)
-    assert np.isclose(borefield.results.max_temperature, 16.009933134246406)
+    assert np.isclose(borefield.H, 82.41177541437784)
+    assert np.isclose(borefield.results.min_temperature, 5.250350844132524)
+    assert np.isclose(borefield.results.max_temperature, 16.00214239323884)
     print(f'Simulation time with speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = False
@@ -181,9 +181,9 @@ def test_monthly_quadrant_1_more_data_points():
     borefield.borehole._nb_of_data_points = 500
 
     borefield.size_L3()
-    assert np.isclose(borefield.H, 85.9223631352438)
-    assert np.isclose(borefield.results.min_temperature, 5.459485430207949)
-    assert np.isclose(borefield.results.max_temperature, 15.999114386583042)
+    assert np.isclose(borefield.H, 82.43767072911498)
+    assert np.isclose(borefield.results.min_temperature, 5.251929773005157)
+    assert np.isclose(borefield.results.max_temperature, 15.999110322935508)
     print(f'Simulation time without speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = True
@@ -192,9 +192,9 @@ def test_monthly_quadrant_1_more_data_points():
 
     borefield.size_L3()
     borefield.calculation_setup(approximate_req_depth=True)
-    assert np.isclose(borefield.H, 85.79127756099108)
-    assert np.isclose(borefield.results.min_temperature, 5.451954394523563)
-    assert np.isclose(borefield.results.max_temperature, 16.004510365189816)
+    assert np.isclose(borefield.H, 82.41177541437784)
+    assert np.isclose(borefield.results.min_temperature, 5.2503510707281285)
+    assert np.isclose(borefield.results.max_temperature, 16.000327510411708)
     print(f'Simulation time with speed up and approximate_req_depth {time.time() - start}s')
 
 
@@ -223,18 +223,18 @@ def test_monthly_quadrant_2():
     start = time.time()
 
     borefield.size_L3()
-    assert np.isclose(borefield.H, 117.42360117447696)
-    assert np.isclose(borefield.results.min_temperature, 8.448478389721295)
-    assert np.isclose(borefield.results.max_temperature, 17.000155792690094)
+    assert np.isclose(borefield.H, 115.2118575013218)
+    assert np.isclose(borefield.results.min_temperature, 8.389238430692593)
+    assert np.isclose(borefield.results.max_temperature, 16.999907039310955)
     print(f'Simulation time with speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = False
     start = time.time()
 
     borefield.size_L3()
-    assert np.isclose(borefield.H, 117.40961843257512)
-    assert np.isclose(borefield.results.min_temperature, 8.448073848783803)
-    assert np.isclose(borefield.results.max_temperature, 17.000585066710645)
+    assert np.isclose(borefield.H, 115.18928587456186)
+    assert np.isclose(borefield.results.min_temperature, 8.388569217689858)
+    assert np.isclose(borefield.results.max_temperature, 17.000634432631973)
     print(f'Simulation time without speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = True
@@ -243,9 +243,9 @@ def test_monthly_quadrant_2():
 
     borefield.size_L3()
     borefield.calculation_setup(approximate_req_depth=True)
-    assert np.isclose(borefield.H, 117.42360117447696)
-    assert np.isclose(borefield.results.min_temperature, 8.448478389721295)
-    assert np.isclose(borefield.results.max_temperature, 17.000155792690094)
+    assert np.isclose(borefield.H, 115.2118575013218)
+    assert np.isclose(borefield.results.min_temperature, 8.389238430692593)
+    assert np.isclose(borefield.results.max_temperature, 16.999907039310955)
     print(f'Simulation time with speed up and approximate_req_depth {time.time() - start}s')
 
 
@@ -269,18 +269,18 @@ def test_case_office():
     start = time.time()
 
     borefield.size_L4()
-    assert np.isclose(borefield.H, 141.8260314509059)
-    assert np.isclose(borefield.results.min_temperature, 8.639590082111738)
-    assert np.isclose(borefield.results.max_temperature, 17.004085075639395)
+    assert np.isclose(borefield.H, 130.66446763370453)
+    assert np.isclose(borefield.results.min_temperature, 8.318173729158907)
+    assert np.isclose(borefield.results.max_temperature, 17.038669695204497)
     print(f'Simulation time with speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = False
     start = time.time()
 
     borefield.size_L4()
-    assert np.isclose(borefield.H, 141.8253031514887)
-    assert np.isclose(borefield.results.min_temperature, 8.639548610885884)
-    assert np.isclose(borefield.results.max_temperature, 17.004118468404965)
+    assert np.isclose(borefield.H, 132.4673002791876)
+    assert np.isclose(borefield.results.min_temperature, 8.374020595608556)
+    assert np.isclose(borefield.results.max_temperature, 17.000729593255436)
     print(f'Simulation time without speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = True
@@ -289,9 +289,9 @@ def test_case_office():
 
     borefield.size_L4()
     borefield.calculation_setup(approximate_req_depth=True)
-    assert np.isclose(borefield.H, 141.8260314509059)
-    assert np.isclose(borefield.results.min_temperature, 8.639590082111738)
-    assert np.isclose(borefield.results.max_temperature, 17.004085075639395)
+    assert np.isclose(borefield.H, 130.66446763370453)
+    assert np.isclose(borefield.results.min_temperature, 8.318173729158907)
+    assert np.isclose(borefield.results.max_temperature, 17.038669695204497)
     print(f'Simulation time with speed up and approximate_req_depth {time.time() - start}s')
 
     borefield.calculation_setup(use_explicit_multipole=True)
@@ -299,18 +299,18 @@ def test_case_office():
     start = time.time()
 
     borefield.size_L4()
-    assert np.isclose(borefield.H, 141.81651520358378)
-    assert np.isclose(borefield.results.min_temperature, 8.639465457075499)
-    assert np.isclose(borefield.results.max_temperature, 17.004083766784767)
+    assert np.isclose(borefield.H, 130.66193708714195)
+    assert np.isclose(borefield.results.min_temperature, 8.318247857757454)
+    assert np.isclose(borefield.results.max_temperature, 17.003566759231216)
     print(f'Simulation time with speed up and explicit models {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = False
     start = time.time()
 
     borefield.size_L4()
-    assert np.isclose(borefield.H, 141.81706373160813)
-    assert np.isclose(borefield.results.min_temperature, 8.639480325288552)
-    assert np.isclose(borefield.results.max_temperature, 17.00407049072066)
+    assert np.isclose(borefield.H, 130.78132818358134)
+    assert np.isclose(borefield.results.min_temperature, 8.32197886166622)
+    assert np.isclose(borefield.results.max_temperature, 17.001305013407563)
     print(f'Simulation time without speed up and explicit models {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = True
@@ -319,9 +319,9 @@ def test_case_office():
 
     borefield.size_L4()
     borefield.calculation_setup(approximate_req_depth=True)
-    assert np.isclose(borefield.H, 141.81651520358378)
-    assert np.isclose(borefield.results.min_temperature, 8.639465457075499)
-    assert np.isclose(borefield.results.max_temperature, 17.004083766784767)
+    assert np.isclose(borefield.H, 130.66193708714195)
+    assert np.isclose(borefield.results.min_temperature, 8.318247857757454)
+    assert np.isclose(borefield.results.max_temperature, 17.003566759231216)
     print(f'Simulation time with speed up, approximate_req_depth and explicit models {time.time() - start}s')
 
 
@@ -346,18 +346,18 @@ def test_case_auditorium():
     start = time.time()
 
     borefield.size_L4()
-    assert np.isclose(borefield.H, 146.56466658711523)
-    assert np.isclose(borefield.results.min_temperature, 7.628897904040965)
-    assert np.isclose(borefield.results.max_temperature, 17.000558708547565)
+    assert np.isclose(borefield.H, 131.76269387938362)
+    assert np.isclose(borefield.results.min_temperature, 7.110055740728681)
+    assert np.isclose(borefield.results.max_temperature, 17.022233519266145)
     print(f'Simulation time with speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = False
     start = time.time()
 
     borefield.size_L4()
-    assert np.isclose(borefield.H, 146.56434784374707)
-    assert np.isclose(borefield.results.min_temperature, 7.62890725121998)
-    assert np.isclose(borefield.results.max_temperature, 17.00056637799696)
+    assert np.isclose(borefield.H, 133.02284452056082)
+    assert np.isclose(borefield.results.min_temperature, 7.159205196665665)
+    assert np.isclose(borefield.results.max_temperature, 17.001111980643916)
     print(f'Simulation time without speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = True
@@ -366,9 +366,9 @@ def test_case_auditorium():
 
     borefield.size_L4()
     borefield.calculation_setup(approximate_req_depth=True)
-    assert np.isclose(borefield.H, 146.56466658711523)
-    assert np.isclose(borefield.results.min_temperature, 7.628897904040965)
-    assert np.isclose(borefield.results.max_temperature, 17.000558708547565)
+    assert np.isclose(borefield.H, 131.76269387938362)
+    assert np.isclose(borefield.results.min_temperature, 7.110055740728681)
+    assert np.isclose(borefield.results.max_temperature, 17.022233519266145)
     print(f'Simulation time with speed up and approximate_req_depth {time.time() - start}s')
 
 
@@ -393,18 +393,20 @@ def test_case_swimming_pool():
     start = time.time()
 
     borefield.size_L4()
-    assert np.isclose(borefield.H, 301.7227470622562)
-    assert np.isclose(borefield.results.min_temperature, 3.0001872515499888)
-    assert np.isclose(borefield.results.max_temperature, 12.919492493925734)
+    assert np.isclose(borefield.H, 301.64200169879945)
+    assert np.isclose(borefield.results.min_temperature, 3.0001878903488888)
+    assert np.isclose(borefield.results.max_temperature, 12.91917014081557)
     print(f'Simulation time with speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = False
     start = time.time()
 
     borefield.size_L4()
-    assert np.isclose(borefield.H, 301.7227592617909)
-    assert np.isclose(borefield.results.min_temperature, 3.0001877071926537)
-    assert np.isclose(borefield.results.max_temperature, 12.919492619924261)
+    print(borefield.H, borefield.results.min_temperature, borefield.results.max_temperature)
+
+    assert np.isclose(borefield.H, 301.6420030473213)
+    assert np.isclose(borefield.results.min_temperature, 3.000187935887761)
+    assert np.isclose(borefield.results.max_temperature, 12.919170154744883)
     print(f'Simulation time without speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = True
@@ -413,9 +415,9 @@ def test_case_swimming_pool():
 
     borefield.size_L4()
     borefield.calculation_setup(approximate_req_depth=True)
-    assert np.isclose(borefield.H, 301.7227470622555)
-    assert np.isclose(borefield.results.min_temperature, 3.0001872515499928)
-    assert np.isclose(borefield.results.max_temperature, 12.919492493925727)
+    assert np.isclose(borefield.H, 301.64200169879945)
+    assert np.isclose(borefield.results.min_temperature, 3.0001878903488888)
+    assert np.isclose(borefield.results.max_temperature, 12.91917014081557)
     print(f'Simulation time with speed up and approximate_req_depth {time.time() - start}s')
 
 
@@ -440,16 +442,16 @@ def test_case_auditorium_active_passive():
     start = time.time()
 
     borefield.size_L4()
-    assert np.isclose(borefield.H, 51.676740693499106)
-    assert np.isclose(borefield.results.min_temperature, 3.0002733156958086)
-    assert np.isclose(borefield.results.max_temperature, 23.824518064283197)
+    assert np.isclose(borefield.H, 51.55180221798138)
+    assert np.isclose(borefield.results.min_temperature, 3.000432898708333)
+    assert np.isclose(borefield.results.max_temperature, 23.709306900929022)
     print(f'Simulation time with speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = False
     start = time.time()
 
     borefield.size_L4()
-    assert np.isclose(borefield.H, 51.676740693499106)
-    assert np.isclose(borefield.results.min_temperature, 3.0002733156958086)
-    assert np.isclose(borefield.results.max_temperature, 23.824518064283197)
+    assert np.isclose(borefield.H, 51.55180221798138)
+    assert np.isclose(borefield.results.min_temperature, 3.000432898708333)
+    assert np.isclose(borefield.results.max_temperature, 23.709306900929022)
     print(f'Simulation time without speed up {time.time() - start}s')

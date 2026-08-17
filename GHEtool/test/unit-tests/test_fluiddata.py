@@ -96,6 +96,15 @@ def test_multiple_temperature_dependent_fluid_data():
     fluid.k_f(temperature=np.array([-5, 0, 5, 10, 15, 40, 50, 60]))
 
 
+def test_conversion_factor():
+    assert np.isclose(TemperatureDependentFluidData('MEA', 20).freezing_point,
+                      TemperatureDependentFluidData('MEA', 24.47, mass_percentage=False).freezing_point)
+    assert np.isclose(TemperatureDependentFluidData('MEG', 20).freezing_point,
+                      TemperatureDependentFluidData('MEG', 18.1, mass_percentage=False).freezing_point)
+    assert np.isclose(TemperatureDependentFluidData('MPG', 20).freezing_point,
+                      TemperatureDependentFluidData('MPG', 19.4, mass_percentage=False).freezing_point)
+
+
 def test_unsupported_fluid():
     with pytest.raises(ValueError):
         TemperatureDependentFluidData('Ai', 30)

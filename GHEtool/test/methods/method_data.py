@@ -1254,4 +1254,4 @@ borefield.create_rectangular_borefield(1, 1, 6, 6, 100, 1, 0.07)
 borefield.set_min_fluid_temperature(0)
 borefield.set_max_fluid_temperature(18)
 
-list_of_test_objects.add(SizingObject(borefield, L3_output=86.6729785967073, name='Issue 435'))
+list_of_test_objects.add(SizingObject(borefield, L3_output=86.23481223412898, name='Issue 435'))
