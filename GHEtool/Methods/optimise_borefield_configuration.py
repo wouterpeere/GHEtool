@@ -227,7 +227,8 @@ def optimise_borefield_configuration(
 
         return total_length if optimise == 'length' else number
 
-    study = optuna.create_study()
+    sampler = optuna.samplers.TPESampler(seed=42)
+    study = optuna.create_study(sampler=sampler)
     study.optimize(objective, n_trials=nb_of_trials)
     results = []
 
