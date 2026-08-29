@@ -22,7 +22,6 @@ from GHEtool.VariableClasses import CustomGFunction, load_custom_gfunction, GFun
     EERCombined
 from GHEtool.VariableClasses.LoadData import *
 from GHEtool.VariableClasses.LoadData import _LoadData, _LoadDataBuilding
-from GHEtool.VariableClasses.PipeData import _PipeData
 from GHEtool.VariableClasses.BaseClass import BaseClass, UnsolvableDueToTemperatureGradient, MaximumNumberOfIterations
 from GHEtool.VariableClasses.GroundData._GroundData import _GroundData
 from GHEtool.VariableClasses.FluidData._FluidData import _FluidData
@@ -1960,6 +1959,8 @@ class Borefield(BaseClass):
                                             simulation_period=self.load.simulation_period,
                                             power=power, temperature_borehole_wall=temperature_borehole_wall)
 
+            hourly_load = None
+
             if not hourly:
                 if not self.borehole.use_constant_Rb and isinstance(self.borehole.flow_data, (VariableHourlyFlowRate,
                                                                                               VariableHourlyMultiyearFlowRate)):
@@ -2044,7 +2045,6 @@ class Borefield(BaseClass):
                 # check for hourly data if this is requested
                 if not self.load._hourly:
                     raise ValueError("There is no hourly resolution available!")
-
                 hourly_load = self.load.hourly_net_resulting_injection_power
                 max_idx = (len(hourly_load) - 1) if (indices is None or len(indices) == 0) else np.max(indices)
 
@@ -2117,14 +2117,7 @@ class Borefield(BaseClass):
                     results._Tf_extraction = Tb + hourly_load * 1000 * (
                             get_rb(results_temperature.peak_extraction, Tmin,
                                    hourly_load, temperature_borehole_wall=Tb) / self.number_of_boreholes / H_var)
-                if not self.borehole.use_constant_Rb:
-                    results._Tf_inlet, results._Tf_outlet = self.calculate_borefield_inlet_outlet_temperature(
-                        hourly_load, results.peak_injection, results.Tb, simulation_period=self.load.simulation_period)
-                    if sizing:
-                        results._Tf_extraction_inlet, results._Tf_extraction_outlet = self.calculate_borefield_inlet_outlet_temperature(
-                            hourly_load, results._Tf_extraction, results.Tb,
-                            simulation_period=self.load.simulation_period)
-            return results
+            return results, hourly_load
 
         def calculate_difference(
                 results_old: Union[ResultsMonthly, ResultsHourly], result_new: Union[ResultsMonthly, ResultsHourly],
@@ -2138,6 +2131,20 @@ class Borefield(BaseClass):
 
             return indices, injection_diff, extraction_diff
 
+        def update_results(results, hourly_load):
+            if not self.borehole.use_constant_Rb and isinstance(results, ResultsHourly):
+
+                Tf_inlet, Tf_outlet = self.calculate_borefield_inlet_outlet_temperature(
+                    hourly_load, results.peak_injection, results.Tb, simulation_period=self.load.simulation_period)
+
+                results._Tf_inlet, results._Tf_outlet = Tf_inlet, Tf_outlet
+
+                if sizing:
+                    results._Tf_extraction_inlet, results._Tf_extraction_outlet = self.calculate_borefield_inlet_outlet_temperature(
+                        hourly_load, results._Tf_extraction, results.Tb,
+                        simulation_period=self.load.simulation_period)
+            return results
+
         if isinstance(self.load, _LoadDataBuilding) or \
                 isinstance(self.borehole.fluid_data, TemperatureDependentFluidData):
             # when building load is given, the load should be updated after each temperature calculation.
@@ -2147,12 +2154,13 @@ class Borefield(BaseClass):
                 self.load.reset_results(Tmin, self.load.eer.threshold_temperature)
             else:
                 self.load.reset_results(Tmin, Tmax)
-            results_old = calculate_temperatures(H, hourly=hourly, indices=index_mask)
+            results_old, hourly_load = calculate_temperatures(H, hourly=hourly, indices=index_mask)
             self.load.set_results(results_old)
             if sizing and not variable_efficiency and self._calculation_setup.approximate_req_depth:
                 results = results_old
             else:
-                results = calculate_temperatures(H, hourly=hourly, results_temperature=results_old, indices=index_mask)
+                results, hourly_load = calculate_temperatures(H, hourly=hourly, results_temperature=results_old,
+                                                              indices=index_mask)
 
             # safety
             i = 0
@@ -2162,7 +2170,8 @@ class Borefield(BaseClass):
             while np.any(_differences) and i < self._calculation_setup.max_nb_of_iterations:
                 results_old = results
                 self.load.set_results(results)
-                results = calculate_temperatures(H, hourly=hourly, results_temperature=results, indices=_differences)
+                results, hourly_load = calculate_temperatures(H, hourly=hourly, results_temperature=results,
+                                                              indices=_differences)
                 i += 1
                 injection_old, extraction_old = injection_new, extraction_new
                 _differences, injection_new, extraction_new = calculate_difference(results_old, results,
@@ -2176,9 +2185,11 @@ class Borefield(BaseClass):
                 # results = results_old.__avg__(results)
             self.results = results
             self.load.set_results(results)
+            self.results = update_results(self.results, hourly_load)
             return
 
-        self.results = calculate_temperatures(H, hourly=hourly)
+        self.results, hourly_load = calculate_temperatures(H, hourly=hourly)
+        self.results = update_results(self.results, hourly_load)
 
     def set_options_gfunction_calculation(self, options: dict) -> None:
         """
