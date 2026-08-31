@@ -44,6 +44,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         self._hourly_heating_load: np.ndarray = np.zeros(8760)
         self._hourly_cooling_load: np.ndarray = np.zeros(8760)
         self._hourly_dhw_load: np.ndarray = None
+        self._hourly_load_cache: dict = {}
         self._set_dhw(dhw)
 
         # delete unnecessary variables
@@ -155,6 +156,72 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
             self.hourly_dhw_load = np.full(8760, dhw / 8760)
             return
         self.hourly_dhw_load = dhw
+
+    def _hourly_load_memo(self, key: str, load_array: np.ndarray, temperature_index: int, compute):
+        """
+        This function memoises the (expensive) conversion from a building load to a geothermal load.
+        The cached value is only returned when all the inputs which determine the result are unchanged:
+        the raw load array and the efficiency objects (compared by identity, they are replaced upon
+        assignment) and the temperature results (compared by value, so also in-place changes are
+        detected). During iterative calculations these properties are requested over and over with
+        unchanged inputs, so this saves a lot of time. Whenever any input changed, the value is
+        recomputed, so the result is always identical to an uncached calculation.
+
+        Parameters
+        ----------
+        key : str
+            Name of the cached property.
+        load_array : np.ndarray
+            The raw (building) load array the property is based on.
+        temperature_index : int
+            Index of the fixed temperature results relevant for this property
+            (0 for extraction/heating, 1 for injection/cooling).
+        compute : callable
+            Function without arguments that computes the property value.
+
+        Returns
+        -------
+        value : np.ndarray
+        """
+        if self._limit_to_max_heat_pump_power:
+            # this path also depends on the maximum heat pump power, do not cache
+            return compute()
+
+        if getattr(self, '_hourly_load_cache', None) is None:
+            self._hourly_load_cache = {}
+
+        # determine the temperature state the result depends upon
+        if isinstance(self.cop, SCOP) and isinstance(self.eer, SEER) and isinstance(self.cop_dhw, SCOP):
+            temperature_state = None  # result is independent of the temperature results
+        elif isinstance(self.results, tuple):
+            temperature_state = self.results[temperature_index]
+        elif isinstance(self.results, ResultsHourly):
+            temperature_state = self.results.Tf
+        else:
+            # monthly results; the computation itself raises a TypeError
+            return compute()
+
+        # nb. the simulation period of multiyear loads is captured by the identity of the load array
+        dependencies = (load_array, self._cop, self._eer, self._cop_dhw,
+                        getattr(self._eer, 'threshold_temperature', None),
+                        getattr(self, '_simulation_period', None), getattr(self, '_start_month', None),
+                        self._all_months_equal)
+
+        entry = self._hourly_load_cache.get(key)
+        if entry is not None:
+            old_dependencies, old_temperature, value = entry
+            if len(old_dependencies) == len(dependencies) \
+                    and all(old is new for old, new in zip(old_dependencies, dependencies)) \
+                    and (temperature_state is None if old_temperature is None else
+                         np.array_equal(old_temperature, temperature_state)):
+                return value.copy()
+
+        value = compute()
+        self._hourly_load_cache[key] = (
+            dependencies,
+            temperature_state.copy() if isinstance(temperature_state, np.ndarray) else temperature_state,
+            value.copy())
+        return value
 
     def _get_hourly_cop(self, power: np.ndarray = None) -> Union[float, np.ndarray]:
         """
@@ -338,14 +405,17 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         hourly injection : np.ndarray
             Hourly injection values [kWh/h] for the whole simulation period
         """
-        part_load = self.hourly_cooling_load_simulation_period
-        if self._limit_to_max_heat_pump_power:
+        def compute():
+            part_load = self.hourly_cooling_load_simulation_period
+            if self._limit_to_max_heat_pump_power:
+                return np.multiply(
+                    self._get_max_power_cooling,
+                    self.conversion_factor_secondary_to_primary_cooling(self._get_hourly_eer(part_load)))
             return np.multiply(
-                self._get_max_power_cooling,
+                self.hourly_cooling_load_simulation_period,
                 self.conversion_factor_secondary_to_primary_cooling(self._get_hourly_eer(part_load)))
-        return np.multiply(
-            self.hourly_cooling_load_simulation_period,
-            self.conversion_factor_secondary_to_primary_cooling(self._get_hourly_eer(part_load)))
+
+        return self._hourly_load_memo('injection', self._hourly_cooling_load, 1, compute)
 
     @property
     def hourly_extraction_load_simulation_period(self) -> np.ndarray:
@@ -357,6 +427,9 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         hourly extraction : np.ndarray
             Hourly extraction values [kWh/h] for the whole simulation period
         """
+        if not np.any(self.hourly_dhw_load_simulation_period):
+            # no DHW, so the (expensive) DHW extraction load calculation can be skipped
+            return self._hourly_extraction_load_heating_simulation_period
         return self._hourly_extraction_load_heating_simulation_period + self._hourly_extraction_load_dhw_simulation_period
 
     @property
@@ -369,14 +442,17 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         hourly extraction : np.ndarray
             Hourly extraction values [kWh/h] for the whole simulation period
         """
-        part_load = self.hourly_heating_load_simulation_period
-        if self._limit_to_max_heat_pump_power:
+        def compute():
+            part_load = self.hourly_heating_load_simulation_period
+            if self._limit_to_max_heat_pump_power:
+                return np.multiply(
+                    self._get_max_power_heating,
+                    self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop(part_load)))
             return np.multiply(
-                self._get_max_power_heating,
+                self.hourly_heating_load_simulation_period,
                 self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop(part_load)))
-        return np.multiply(
-            self.hourly_heating_load_simulation_period,
-            self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop(part_load)))
+
+        return self._hourly_load_memo('extraction_heating', self._hourly_heating_load, 0, compute)
 
     @property
     def _hourly_extraction_load_dhw_simulation_period(self) -> np.ndarray:
@@ -388,14 +464,17 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         hourly extraction : np.ndarray
             Hourly extraction values [kWh/h] for the whole simulation period
         """
-        part_load_dhw = self.hourly_dhw_load_simulation_period
-        if self._limit_to_max_heat_pump_power:
-            return np.multiply(self._get_max_power_dhw,
-                               self.conversion_factor_secondary_to_primary_heating(
-                                   self._get_hourly_cop_dhw(part_load_dhw)))
-        return np.multiply(
-            self.hourly_dhw_load_simulation_period,
-            self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop_dhw(part_load_dhw)))
+        def compute():
+            part_load_dhw = self.hourly_dhw_load_simulation_period
+            if self._limit_to_max_heat_pump_power:
+                return np.multiply(self._get_max_power_dhw,
+                                   self.conversion_factor_secondary_to_primary_heating(
+                                       self._get_hourly_cop_dhw(part_load_dhw)))
+            return np.multiply(
+                self.hourly_dhw_load_simulation_period,
+                self.conversion_factor_secondary_to_primary_heating(self._get_hourly_cop_dhw(part_load_dhw)))
+
+        return self._hourly_load_memo('extraction_dhw', self._hourly_dhw_load, 0, compute)
 
     @property
     def monthly_baseload_heating_simulation_period(self) -> np.ndarray:
