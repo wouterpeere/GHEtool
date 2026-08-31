@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Add _optimise_load_profile_lp_: the hybrid dispatch of a fixed borefield is solved globally as a single
+  linear program (maximum energy or minimum backup capacity) instead of by load-duration-curve clipping, with
+  the shadow prices of the binding temperature constraints exposed.
 - Function to get peak temperatures and baseload temperatures based on average, inlet or outlet.
 - Add pressure drop limitation to optimisation (issue #141).
 - Add groundwater filled boreholes (issue #470).
