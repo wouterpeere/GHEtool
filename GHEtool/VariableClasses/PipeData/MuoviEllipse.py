@@ -1,6 +1,4 @@
 import joblib
-import torch
-import torch.nn as nn
 
 import pygfunction as gt
 import matplotlib.pyplot as plt
@@ -11,33 +9,62 @@ from GHEtool.VariableClasses.PipeData.SingleUTube import SingleUTube
 from GHEtool.VariableClasses.FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
 
+# torch is only needed for the MuoviEllipse ANN model and is expensive to import,
+# so it is imported lazily upon first use
+_ellipse_ann_class = None
 
-class EllipseANN(nn.Module):
+
+def _get_ellipse_ann_class():
     """
-    Small MLP for 5-input, 2-output regression.
+    This function returns the EllipseANN class, importing torch upon first use.
 
-    Inputs:
-        r_b, spacing, R_fp, k_b, k_s
-
-    Outputs:
-        R_b, R_a
+    Returns
+    -------
+    EllipseANN class
     """
+    global _ellipse_ann_class
+    if _ellipse_ann_class is not None:
+        return _ellipse_ann_class
 
-    def __init__(self, n_inputs: int = 5, n_outputs: int = 2):
-        super().__init__()
+    import torch
+    import torch.nn as nn
 
-        self.net = nn.Sequential(
-            nn.Linear(n_inputs, 64),
-            nn.Tanh(),
-            nn.Linear(64, 64),
-            nn.Tanh(),
-            nn.Linear(64, 32),
-            nn.Tanh(),
-            nn.Linear(32, n_outputs),
-        )
+    class EllipseANN(nn.Module):
+        """
+        Small MLP for 5-input, 2-output regression.
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.net(x)
+        Inputs:
+            r_b, spacing, R_fp, k_b, k_s
+
+        Outputs:
+            R_b, R_a
+        """
+
+        def __init__(self, n_inputs: int = 5, n_outputs: int = 2):
+            super().__init__()
+
+            self.net = nn.Sequential(
+                nn.Linear(n_inputs, 64),
+                nn.Tanh(),
+                nn.Linear(64, 64),
+                nn.Tanh(),
+                nn.Linear(64, 32),
+                nn.Tanh(),
+                nn.Linear(32, n_outputs),
+            )
+
+        def forward(self, x: "torch.Tensor") -> "torch.Tensor":
+            return self.net(x)
+
+    _ellipse_ann_class = EllipseANN
+    return EllipseANN
+
+
+def __getattr__(name):
+    # keep `from GHEtool.VariableClasses.PipeData.MuoviEllipse import EllipseANN` working
+    if name == 'EllipseANN':
+        return _get_ellipse_ann_class()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 class MuoviEllipse(SingleUTube):
@@ -71,6 +98,7 @@ class MuoviEllipse(SingleUTube):
         self.a = a
         self.b = b
         self.wall_thickness = wall_thickness
+        self._ann_cache = None
 
         # check configuration
         if D_s < b / 2:
@@ -297,12 +325,16 @@ class MuoviEllipse(SingleUTube):
         R_b, R_a : np.ndarray
             Same shape as broadcasted inputs.
         """
-        model = EllipseANN()
-        model.load_state_dict(torch.load(self._model_path, map_location="cpu"))
-        model.eval()
+        import torch
 
-        X_scaler = joblib.load(self._x_scaler_path)
-        y_scaler = joblib.load(self._y_scaler_path)
+        # the model and scalers only depend on the (fixed) model paths,
+        # so they are loaded from disk only once
+        if getattr(self, '_ann_cache', None) is None:
+            model = _get_ellipse_ann_class()()
+            model.load_state_dict(torch.load(self._model_path, map_location="cpu"))
+            model.eval()
+            self._ann_cache = (model, joblib.load(self._x_scaler_path), joblib.load(self._y_scaler_path))
+        model, X_scaler, y_scaler = self._ann_cache
 
         # Convert to arrays
         r_b = np.asarray(r_b)
