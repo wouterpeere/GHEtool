@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Add _design_borefield_configuration_: an all-at-once optimisation of the borefield configuration, where the
+  number of boreholes in both directions, the spacing and the borehole length are optimised jointly through a
+  smooth physics-based surrogate NLP, after which every returned candidate is certified with exact sizings.
 - Function to get peak temperatures and baseload temperatures based on average, inlet or outlet.
 - Add pressure drop limitation to optimisation (issue #141).
 - Add groundwater filled boreholes (issue #470).
