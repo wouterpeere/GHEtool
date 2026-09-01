@@ -301,11 +301,7 @@ class PowerwaveCoax(BaseClass):
             fd = friction_factor_darcy_weisbach(self.Re(fluid_data, flow_rate_data, "inner", **kwargs), self.r_in_in,
                                                 1e-6, **kwargs)
 
-        bend = 0
-        if include_bend:
-            # add 0.2 for the local losses
-            # (source: https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html)
-            bend = 0.2
+        bend = 0.2
         return (((fd * borehole_length / (2 * self.r_in_in) + bend) * fluid_data.rho(**kwargs) * V_in ** 2 / 2) / 1000 +
                 ((f_corr_comb(self.Re(fluid_data, flow_rate_data, "outer", **kwargs)) * borehole_length / (
                         2 * self.r_eq) + bend) * fluid_data.rho(**kwargs) * V_an ** 2 / 2) / 1000)
@@ -326,7 +322,10 @@ class PowerwaveCoax(BaseClass):
         """
         # borehole
         borehole = gt.boreholes.Borehole(100, 1, r_b, 0, 0)
-        pipe = self.pipe_model(2, borehole)
+        pipe = gt.pipes.Coaxial(pos=(0., 0.),
+                                r_in=np.array([self.r_out_in, self.r_in_in]),
+                                r_out=np.array([self.r_out_out, self.r_in_out]),
+                                borehole=borehole, k_s=2, k_g=self.k_g, R_ff=1, R_fp=1, J=2)
 
         pipe.visualize_pipes()
         plt.show()
