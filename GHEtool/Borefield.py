@@ -2052,13 +2052,14 @@ class Borefield(BaseClass):
                     # convolution to get the hourly results
                     result_convolution = np.zeros_like(hourly_load, dtype=float)
 
-                    result_convolution[:max_idx + 1] = convolve(hourly_load[:max_idx + 1] * 1000, g_value_differences)[
-                        :max_idx + 1]
+                    result_convolution[:max_idx + 1] = convolve(hourly_load[:max_idx + 1] * 1000,
+                                                                g_value_differences[:max_idx + 1])[:max_idx + 1]
 
                     self._temp_results['result_convolution'] = result_convolution
-                    self._temp_results['hourly_load_prev'] = hourly_load.copy()
+                    self._temp_results['hourly_load_prev'] = hourly_load
                     self._temp_results['temperature_result'] = None
-                elif np.allclose(self._temp_results['hourly_load_prev'], hourly_load):
+
+                elif np.allclose(self._temp_results['hourly_load_prev'][:max_idx + 1], hourly_load[:max_idx + 1]):
                     pass
                 else:
                     mask = self._temp_results['hourly_load_prev'] != hourly_load
@@ -2078,7 +2079,7 @@ class Borefield(BaseClass):
 
                         self._temp_results['result_convolution'][first_idx:max_idx + 1] += update[
                             :max_idx - first_idx + 1]
-                        self._temp_results['hourly_load_prev'] = hourly_load.copy()
+                        self._temp_results['hourly_load_prev'] = hourly_load
                         self._temp_results['temperature_result'] = None
 
                 # calculation the borehole wall temperature for every month i
@@ -2092,7 +2093,7 @@ class Borefield(BaseClass):
                 if indices is not None and (not self.borehole.use_constant_Rb and
                                             not isinstance(self.borehole.flow_data, VariableHourlyFlowRate)):
                     if self._temp_results['temperature_result'] is None:
-                        self._temp_results['temperature_result'] = np.zeros_like(hourly_load, dtype=float)
+                        self._temp_results['temperature_result'] = np.empty_like(hourly_load, dtype=float)
 
                     if variable_efficiency and not (indices is None or len(indices) == 0):
                         # all indices are important up to the last one
@@ -2108,10 +2109,9 @@ class Borefield(BaseClass):
                     self._temp_results['temperature_result'] = Tb + hourly_load * 1000 * (
                             get_rb(results_temperature.peak_injection, Tmax,
                                    hourly_load, temperature_borehole_wall=Tb) / self.number_of_boreholes / H_var)
-
                 # reset other variables
                 results = ResultsHourly(borehole_wall_temp=Tb,
-                                        temperature_fluid=self._temp_results['temperature_result'].copy())
+                                        temperature_fluid=self._temp_results['temperature_result'].copy())  # .copy()
                 if sizing:
                     # do the same for extraction
                     results._Tf_extraction = Tb + hourly_load * 1000 * (
