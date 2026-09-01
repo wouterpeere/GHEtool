@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Evaluate the cylindrical correction once per borehole group and cache the CHS solution.
 - Move calculate_borefield_inlet_outlet_temperature to Borehole class (issue #464).
 - Change implementation ConicalProbe for speed improvement (issue #472).
 - Change implementation of interpolation for _Efficiency class to cope with non-gridded data input (issue #472).
