@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Add _DecoupledGFunction_: computes the cylindrically corrected g-function on pygfunction's public solvers,
+  adding the correction as a separable single-borehole early-time delta instead of monkeypatching
+  pygfunction's solver. Uses the Laplace-domain solver when the installed pygfunction has one.
 - Function to get peak temperatures and baseload temperatures based on average, inlet or outlet.
 - Add pressure drop limitation to optimisation (issue #141).
 - Add groundwater filled boreholes (issue #470).
