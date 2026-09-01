@@ -175,9 +175,6 @@ class _HourlyData(_LoadData, ABC):
 
         data = np.array_split(hourly_load, np.cumsum(np.tile(self.UPM, int(len(hourly_load) / 8760)))[:-1])
 
-        if self.all_months_equal:
-            return np.max(data, axis=1), np.sum(data, axis=1)
-
         return np.array([np.max(i) for i in data]), np.array([np.sum(i) for i in data])
 
     @property
