@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- Change the monthly resampling of hourly loads to a reshape when all months are equal.
+- Change the monthly resampling of hourly loads to a reshape when all months are equal (thanks to samuelduchesne).
 - MuoviELLIPSE borehole resistance ANN now runs in numpy (cached `.npz` weights). Drop torch, scikit-learn and joblib from install_requires (issue #483).
 - Move calculate_borefield_inlet_outlet_temperature to Borehole class (issue #464).
 - Change implementation ConicalProbe for speed improvement (issue #472).
@@ -29,7 +29,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- Fix resample_to_monthly raising a ValueError for loads that are not a multiple of 8760 hours.
 - Fix issue with pyparsing.tools (issue #460, thanks to helgakovacs).
 - Fix problem in optimisation for power/balance.
 - Fix monthly temperature profile and variable flow rate (issue #462).
