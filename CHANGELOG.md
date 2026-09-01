@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - Change the interpolation query points in the _Efficiency class to be built with np.column_stack.
+- MuoviELLIPSE borehole resistance ANN now runs in numpy (cached `.npz` weights). Drop torch, scikit-learn and joblib from install_requires (issue #483).
 - Move calculate_borefield_inlet_outlet_temperature to Borehole class (issue #464).
 - Change implementation ConicalProbe for speed improvement (issue #472).
 - Change implementation of interpolation for _Efficiency class to cope with non-gridded data input (issue #472).
