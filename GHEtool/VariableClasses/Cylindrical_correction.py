@@ -19,6 +19,13 @@ from scipy.interpolate import interp1d as interp1d
 from time import perf_counter
 
 
+# The CHS solution depends only on (time, alpha, r, r_b). During an iterative sizing
+# the borehole length changes but these do not, so it is requested repeatedly with
+# identical arguments. The results are memoised on those arguments.
+_CHS_CACHE: dict = {}
+_CHS_CACHE_MAX_SIZE: int = 32
+
+
 # update pygfunction
 def cylindrical_heat_source(
         time, alpha, r, r_b):
@@ -68,6 +75,12 @@ def cylindrical_heat_source(
     CHS_integrand = lambda u: (1. / (u ** 2 * np.pi ** 2) * (np.exp(-u ** 2 * Fo) - 1.0)
                                / (j1(u) ** 2 + y1(u) ** 2) * (j0(p * u) * y1(u) - j1(u) * y0(p * u)))
 
+    time_arr = np.asarray(time, dtype=np.float64)
+    key = (float(alpha), float(r), float(r_b), time_arr.shape, time_arr.tobytes())
+    cached = _CHS_CACHE.get(key)
+    if cached is not None:
+        return cached.copy() if isinstance(cached, np.ndarray) else cached
+
     # Fourier number
     Fo = alpha * time / r_b ** 2
     # Normalized distance from borehole axis
@@ -78,6 +91,10 @@ def cylindrical_heat_source(
     b = np.inf
     # Evaluate integral using Gauss-Kronrod
     G = quad_vec(CHS_integrand, a, b)[0]
+
+    if len(_CHS_CACHE) >= _CHS_CACHE_MAX_SIZE:
+        _CHS_CACHE.clear()
+    _CHS_CACHE[key] = G.copy() if isinstance(G, np.ndarray) else G
     return G
 
 
@@ -210,6 +227,15 @@ def thermal_response_factors(self, time, alpha, kind='linear'):
         h = finite_line_source_vectorized(
             time, alpha, dis, H1, D1, H2, D2,
             approximation=self.approximate_FLS, N=self.nFLS)
+        # The cylindrical correction depends only on the borehole dimensions, and the
+        # groups of borehole_to_self correspond to unique borehole dimensions (the
+        # representative group[0] is already used for H1, D1, H2, D2 and dis above).
+        # It is therefore evaluated once per group instead of once per borehole.
+        if self.cylindrical_correction:
+            r_b = self.boreholes[i].r_b
+            h_ils = infinite_line_source(time, alpha, dis)
+            h_chs = cylindrical_heat_source(time, alpha, r_b, r_b)
+            correction = 2 * np.pi * h_chs - 0.5 * h_ils
         # Broadcast values to h_ij matrix
         for i in group:
             i_segment = self._i0Segments[i] + i_pair
@@ -218,12 +244,9 @@ def thermal_response_factors(self, time, alpha, kind='linear'):
                 h_ij[j_segment, i_segment, 1:] + h[0, k_pair, :]
 
             if self.cylindrical_correction:
-                r_b = self.boreholes[i].r_b
                 ii_segment = j_segment[j_segment == i_segment]
-                h_ils = infinite_line_source(time, alpha, dis)
-                h_chs = cylindrical_heat_source(time, alpha, r_b, r_b)
                 h_ij[ii_segment, ii_segment, 1:] = (
-                        h_ij[ii_segment, ii_segment, 1:] + 2 * np.pi * h_chs - 0.5 * h_ils)
+                        h_ij[ii_segment, ii_segment, 1:] + correction)
 
     # Return 2d array if time is a scalar
     if np.isscalar(time):
