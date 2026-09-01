@@ -19,12 +19,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- MuoviELLIPSE borehole resistance ANN now runs in numpy (cached `.npz` weights). Drop torch, scikit-learn and joblib from install_requires (issue #483).
 - Move calculate_borefield_inlet_outlet_temperature to Borehole class (issue #464).
 - Change implementation ConicalProbe for speed improvement (issue #472).
 - Change implementation of interpolation for _Efficiency class to cope with non-gridded data input (issue #472).
 - Change implementation of combine n heat pumps (issue #472).
 - Change implementation for conversion volume to weight percentage (issue #481).
+- MuoviELLIPSE borehole resistance ANN now runs in numpy (cached `.npz` weights). Drop torch, scikit-learn and joblib
+  from install_requires (issue #483).
 - Fix seed size in optuna TPESampler so results are reproducible.
 
 ### Fixed
