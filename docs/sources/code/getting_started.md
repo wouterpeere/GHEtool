@@ -116,6 +116,11 @@ Concretely, the classes you can use are:
   found [here](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/muoviellipse.html).
   Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
   class.
+* _Powerwave coax_: The JANSEN powerwave coax is a coaxial heat exhanger from JANSEN with a corrugated design enhancing
+  the turbulence at lower flow rates. More information can be found on there
+  website [here](https://www.jansen.com/en/plastic-solutions/products/geothermal-energy/thermal-earth-probes/jansen-powerwave.html).
+  An example in GHEtool can be
+  found [here](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/powerwavecoax.html).
 
 Please note that it is possible to add your own pipe types by inheriting the attributes from the abstract _PipeData
 class.

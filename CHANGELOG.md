@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Add class for non-modulating heat pumps (issue #476).
 - Added default secondary temperature to EER and COP class (issue #476).
 - Added _get_min_power to _Efficiency class (issue #476).
+- JANSEN powerwave coax (issue #485).
 
 ### Changed
 
