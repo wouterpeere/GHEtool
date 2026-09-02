@@ -163,7 +163,7 @@ borefield = Borefield()
 borefield.ground_data = data
 borefield.Rb = 0.12
 borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 1, 0.075)
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), header=True,
+hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"), header=True,
                                 separator=";",
                                 col_extraction=0, col_injection=1)
 borefield.load = hourly_load
@@ -184,7 +184,7 @@ borefield.pipe_data = pipe_data
 borefield.calculation_setup(use_constant_Rb=False)
 borefield.set_max_fluid_temperature(17)
 borefield.set_min_fluid_temperature(3)
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True, separator=";",
+hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/auditorium.csv"), header=True, separator=";",
                                 col_injection=0, col_extraction=1)
 borefield.load = hourly_load
 list_of_test_objects.add(SizingObject(borefield, L2_output=142.001, L3_output=141.453, L4_output=103.761, quadrant=1,
@@ -252,7 +252,7 @@ borefield.calculation_setup(use_constant_Rb=False)
 borefield.set_max_fluid_temperature(17)
 borefield.set_min_fluid_temperature(3)
 hourly_load.simulation_period = 20
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\office.csv"), header=True, separator=";",
+hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/office.csv"), header=True, separator=";",
                                 col_injection=0, col_extraction=1)
 borefield.load = hourly_load
 list_of_test_objects.add(SizingObject(borefield, L2_output=113.955, L3_output=115.9884, L4_output=109.617, quadrant=2,
@@ -321,7 +321,7 @@ borefield.flow_data = flow_data
 borefield.calculation_setup(use_constant_Rb=False)
 borefield.set_max_fluid_temperature(17)
 borefield.set_min_fluid_temperature(3)
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\swimming_pool.csv"), header=True,
+hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/swimming_pool.csv"), header=True,
                                 separator=";",
                                 col_injection=0, col_extraction=1)
 borefield.load = hourly_load
@@ -438,12 +438,12 @@ list_of_test_objects.add(SizingObject(borefield, L2_output=120.913, L3_output=12
 borefield = Borefield()
 borefield.ground_data = data
 borefield.create_rectangular_borefield(10, 12, 6, 6, 110, 4, 0.075)
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"))
+hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"))
 borefield.load = hourly_load
 borefield.load.hourly_injection_load = np.zeros(8760)
 list_of_test_objects.add(SizingObject(borefield, L4_output=244.03137515188732, quadrant=4, name='No injection L4'))
 
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"))
+hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"))
 borefield.load = hourly_load
 borefield.load.hourly_extraction_load = np.zeros(8760)
 list_of_test_objects.add(SizingObject(borefield, L4_output=305.55338863384287, quadrant=2, name='No extraction L4'))
@@ -465,7 +465,7 @@ borefield.set_min_fluid_temperature(0)
 borefield.ground_data = data
 borefield.set_Rb(0.2)
 borefield.set_borefield(borefield_gt)
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"))
+hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"))
 borefield.load = hourly_load
 temp = hourly_load.hourly_extraction_load
 temp[0] = 100_000
@@ -473,7 +473,7 @@ borefield._borefield_load.hourly_extraction_load = temp
 list_of_test_objects.add(
     SizingObject(borefield, L4_output=18760.64149089075, quadrant=4, name='Hourly profile, quadrant 4'))
 
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_injection=0,
+hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"), col_injection=0,
                                 col_extraction=1)
 borefield.load = hourly_load
 list_of_test_objects.add(
@@ -485,7 +485,7 @@ borefield._borefield_load.hourly_extraction_load = temp
 list_of_test_objects.add(
     SizingObject(borefield, L4_output=18602.210559679363, quadrant=3, name='Hourly profile, quadrant 3'))
 hourly_load = HourlyBuildingLoad(efficiency_heating=10 ** 6, efficiency_cooling=10 ** 6)
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"))
+hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"))
 # set borefield depth to 150
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 87.506, 97.012,
                                                    305.842, 384.199888, 230.19356748567617, 292.2167663088656,
@@ -659,7 +659,7 @@ borefield.set_Rb(0.2)
 borefield.set_borefield(borefield_gt)
 borefield.set_max_fluid_temperature(16)
 borefield.set_min_fluid_temperature(0)
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=1,
+hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"), col_heating=1,
                                 col_cooling=0)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.976, 66.492,
                                                    643.137, 195.331, 33.28226963696875, 340.705,
@@ -770,7 +770,7 @@ borefield.set_min_fluid_temperature(3)
 borefield.set_max_fluid_temperature(16)
 borefield.load.peak_duration = 6
 load = HourlyBuildingLoad(efficiency_heating=4, efficiency_cooling=25)
-load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\problem_data.csv"), col_heating=0,
+load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/problem_data.csv"), col_heating=0,
                          col_cooling=1, header=True, decimal_seperator=',')
 load.simulation_period = 40
 borefield.load = load
@@ -814,7 +814,7 @@ borefield.calculation_setup(use_constant_Rb=False)
 borefield.set_max_fluid_temperature(17)
 borefield.set_min_fluid_temperature(3)
 hourly_load_building = HourlyBuildingLoad()
-hourly_load_building.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
+hourly_load_building.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/auditorium.csv"), header=True,
                                          separator=";", col_cooling=0, col_heating=1)
 hourly_load_building.hourly_cooling_load = hourly_load_building.hourly_cooling_load * 20 / 21
 hourly_load_building.hourly_heating_load = hourly_load_building.hourly_heating_load * 5 / 4
@@ -834,7 +834,7 @@ list_of_test_objects.add(
                  name='BS2023 Auditorium, (var temp and flow, outlet)'))
 borefield.calculation_setup(size_based_on='average')
 borefield.flow_data = ConstantDeltaTFlowRate(extraction=4, injection=4)
-hourly_load_building.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\office.csv"), header=True,
+hourly_load_building.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/office.csv"), header=True,
                                          separator=";", col_cooling=0, col_heating=1)
 borefield.load = hourly_load_building
 borefield.create_rectangular_borefield(10, 10, 6, 6, 110, 4, 0.075)
@@ -849,7 +849,7 @@ list_of_test_objects.add(SizingObject(borefield, L3_output=116.91234896711268, L
 
 borefield.calculation_setup(size_based_on='average')
 borefield.flow_data = ConstantDeltaTFlowRate(extraction=4, injection=4)
-hourly_load_building.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\swimming_pool.csv"), header=True,
+hourly_load_building.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/swimming_pool.csv"), header=True,
                                          separator=";", col_cooling=0, col_heating=1)
 borefield.load = hourly_load_building
 borefield.create_rectangular_borefield(20, 20, 6, 6, 110, 4, 0.075)
@@ -871,7 +871,7 @@ borefield.calculation_setup(use_constant_Rb=False)
 borefield.set_max_fluid_temperature(17)
 borefield.set_min_fluid_temperature(3)
 hourly_load_building.simulation_period = 20
-hourly_load_building.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\office.csv"), header=True,
+hourly_load_building.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/office.csv"), header=True,
                                          separator=";", col_cooling=0, col_heating=1)
 hourly_load_building.hourly_cooling_load = hourly_load_building.hourly_cooling_load * 20 / 21
 hourly_load_building.hourly_heating_load = hourly_load_building.hourly_heating_load * 5 / 4
@@ -890,7 +890,7 @@ borefield.flow_data = flow_data
 borefield.calculation_setup(use_constant_Rb=False)
 borefield.set_max_fluid_temperature(17)
 borefield.set_min_fluid_temperature(3)
-hourly_load_building.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\swimming_pool.csv"), header=True,
+hourly_load_building.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/swimming_pool.csv"), header=True,
                                          separator=";", col_cooling=0, col_heating=1)
 hourly_load_building.hourly_cooling_load = hourly_load_building.hourly_cooling_load * 20 / 21
 hourly_load_building.hourly_heating_load = hourly_load_building.hourly_heating_load * 5 / 4
@@ -906,7 +906,7 @@ borefield.set_max_fluid_temperature(16)
 borefield.load.peak_duration = 6
 load = HourlyBuildingLoad(efficiency_heating=4, efficiency_cooling=eer_combined)
 # column order is inverted
-load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=1, col_cooling=0)
+load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"), col_heating=1, col_cooling=0)
 load.simulation_period = 40
 borefield.load = load
 
@@ -951,7 +951,7 @@ borefield.ground_data = data
 borefield.Rb = 0.131
 borefield.create_rectangular_borefield(3, 5, 6, 6, 100, 1, 0.07)
 load = HourlyBuildingLoad(efficiency_heating=4.5, efficiency_cooling=20)
-load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True, separator=";",
+load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/auditorium.csv"), header=True, separator=";",
                          col_cooling=0, col_heating=1)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 100, 100.0, 92.62620369846371,
                                                    25.315, 42.119132843891755, 0.0, 64.4014083207306,
@@ -978,7 +978,7 @@ borefield.set_Rb(0.2)
 borefield.set_borefield(borefield_gt)
 borefield.set_max_fluid_temperature(16)
 borefield.set_min_fluid_temperature(0)
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=1,
+hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"), col_heating=1,
                                 col_cooling=0)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.976, 66.492,
                                                    643.137, 195.331, 33.28226963696875, 340.705,
@@ -1002,7 +1002,7 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    name='Optimise load profile 1, reversed (balance, hourly, dhw not preferential)',
                                                    power=3,
                                                    hourly=True, dhw_preferential=False))
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=1,
+hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"), col_heating=1,
                                 col_cooling=0, col_dhw=1)
 hourly_load.set_hourly_heating_load(np.zeros(8760))
 hourly_load.cop_dhw = 10 ** 6
@@ -1047,7 +1047,7 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    power=3,
                                                    hourly=True, dhw_preferential=True))
 
-hourly_load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=1,
+hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"), col_heating=1,
                                 col_cooling=0, col_dhw=1)
 hourly_load.cop_dhw = 10 ** 6
 hourly_load.exclude_DHW_from_peak = True
@@ -1093,7 +1093,7 @@ borefield.set_max_fluid_temperature(18)
 borefield.load.peak_duration = 6
 load = HourlyBuildingLoad(efficiency_heating=4, efficiency_cooling=eer_combined)
 # column order is inverted
-load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=1, col_cooling=0)
+load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"), col_heating=1, col_cooling=0)
 load.simulation_period = 40
 load.add_dhw(50000)
 borefield.load = load
@@ -1110,7 +1110,7 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 99.9999
                                                    511.59302, 89.29736, 0, 461.62167,
                                                    name='Optimise balance with EER and dhw preferential',
                                                    power=3, hourly=True, dhw_preferential=True))
-load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_dhw=0, col_cooling=1)
+load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"), col_dhw=0, col_cooling=1)
 load.hourly_heating_load = np.zeros(8760)
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 55.7643, 83.07401022525325,
                                                    115.882806, 251.9245113950794, 0, 466.47917767076717,
@@ -1131,7 +1131,7 @@ borefield.set_min_fluid_temperature(2)
 borefield.set_max_fluid_temperature(17)
 borefield.load.peak_duration = 6
 load = HourlyBuildingLoad(efficiency_heating=4, efficiency_cooling=20)
-load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\hourly_profile.csv"), col_heating=0, col_cooling=1)
+load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"), col_heating=0, col_cooling=1)
 load.simulation_period = 20
 borefield.load = load
 
