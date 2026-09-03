@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Change the L4 time vector creation to float32, since the float16 attempt always overflows.
 - MuoviELLIPSE borehole resistance ANN now runs in numpy (cached `.npz` weights). Drop torch, scikit-learn and joblib from install_requires (issue #483).
 - Move calculate_borefield_inlet_outlet_temperature to Borehole class (issue #464).
 - Change implementation ConicalProbe for speed improvement (issue #472).

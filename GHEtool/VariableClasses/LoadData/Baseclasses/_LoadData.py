@@ -447,13 +447,9 @@ class _LoadData(ABC, BaseClass):
         -------
         Times for the L4 sizing : np.ndarray
         """
-        # set the time constant for the L4 sizing while suppressing overflow warning
-        with np.errstate(over='ignore'):
-            time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float16)
-        if np.isinf(time_L4).any():
-            # 16 bit is not enough, go to 32
-            time_L4 = 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float32)
-        return time_L4
+        # 16 bit is never enough (float16 already overflows at 8760 * 3600 s,
+        # i.e. after one year), so the values are directly created in 32 bit
+        return 3600 * np.arange(1, 8760 * self.simulation_period + 1, dtype=np.float32)
 
     @staticmethod
     def get_month_index(peak_load, avg_load) -> int:
