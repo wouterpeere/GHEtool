@@ -19,7 +19,7 @@ class PowerwaveCoax(BaseClass):
 
     References
     ----------
-    .. [#PeereEtAl] Peere, W., Hidman, N., Hofstetter, R. (2026) Development of a thermohydraulic model for the JANSEN powerwave with direct numerical simulation and its impact on the thermal borehole resistance. In Proceedings of Der Geothermiekongress. Postdam (Germany), 20-22 October 2026.
+    .. [#PeereEtAl] Peere, W., Hidman, N., Hofstetter, R. (2026) Development of a thermohydraulic model for the JANSEN powerwave coax with direct numerical simulation and its impact on the thermal borehole resistance. In Proceedings of Der Geothermiekongress. Postdam (Germany), 20-22 October 2026.
     """
 
     def __init__(self, k_g: float = None):
@@ -187,6 +187,8 @@ class PowerwaveCoax(BaseClass):
 
         rv = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(**kwargs))
         n = rv / (2 * r_b) * (1 + 4 * r_b / r_a) ** (1 / 2)
+        self._r_a = r_a
+        self._r_b = r_b
         return r_b * n * np.cosh(n) / np.sinh(n)
 
     def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
@@ -289,7 +291,7 @@ class PowerwaveCoax(BaseClass):
 
         def f_corr_comb(Re):
             """
-            This function calculates the friction factor for the annulas part of the powerwave coax.
+            This function calculates the friction factor for the annulus part of the powerwave coax.
             """
             s = (1 + np.exp(- (2 * (Re - 1000) / (1400 - 1000) + 0))) ** (-1)
             return (1 - s) * f_lam(Re) + s * f_turb(Re)

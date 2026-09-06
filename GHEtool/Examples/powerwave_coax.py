@@ -5,7 +5,7 @@ Peere et al. (2026) [#PeereEtAl_].
 
 References
 ----------
-.. [#PeereEtAl] Peere, W., Hidman, N., Hofstetter, R. (2026) Development of a thermohydraulic model for the JANSEN powerwave with direct numerical simulation and its impact on the thermal borehole resistance. In Proceedings of Der Geothermiekongress. Postdam (Germany), 20-22 October 2026.
+.. [#PeereEtAl] Peere, W., Hidman, N., Hofstetter, R. (2026) Development of a thermohydraulic model for the JANSEN powerwave coax with direct numerical simulation and its impact on the thermal borehole resistance. In Proceedings of Der Geothermiekongress. Postdam (Germany), 20-22 October 2026.
 
 """
 import matplotlib.pyplot as plt
@@ -13,6 +13,161 @@ import numpy as np
 
 from GHEtool import *
 from GHEtool.VariableClasses.PipeData.PowerwaveCoax import PowerwaveCoax
+
+
+def potsdam():
+    mpg = TemperatureDependentFluidData('MPG', 25, mass_percentage=False)
+
+    flow_rates = np.arange(0.1, 1, 0.01)
+
+    # important parameters
+    k_g = 1.5
+    rb = 150e-3
+    depth = 50
+    list_rb_double, list_rb_powerwave, list_rb_coax, list_rb_powerwave_120 = [], [], [], []
+    list_dp_double, list_dp_powerwave, list_dp_coax = [], [], []
+
+    double = MultipleUTube(k_g, 0.013, 0.016, 0.4, (rb / 2) / 2, 2)
+    coax = CoaxialPipe(0.013, 0.016, 31.5e-3 - 2.9e-3, 0.0315, 0.4, k_g)
+    powerwave_coax = PowerwaveCoax(k_g)
+
+    for val in flow_rates:
+        flow = ConstantFlowRate(vfr=val)
+
+        borehole_double = Borehole(mpg, double, flow)
+        borehole_powerwave = Borehole(mpg, powerwave_coax, flow)
+        borehole_coax = Borehole(mpg, coax, flow)
+
+        list_rb_double.append(
+            borehole_double.calculate_Rb(depth, 0.7, rb / 2, 2, temperature=5,
+                                         use_explicit_models=True))
+        list_rb_powerwave_120.append(
+            borehole_powerwave.calculate_Rb(depth, 0.7, 110e-3 / 2, 2, temperature=5,
+                                            use_explicit_models=True))
+        list_rb_powerwave.append(
+            borehole_powerwave.calculate_Rb(depth, 0.7, rb / 2, 2, temperature=5, use_explicit_models=True))
+
+        list_rb_coax.append(
+            borehole_coax.calculate_Rb(depth, 0.7, rb / 2, 2, temperature=5, use_explicit_models=True))
+
+        list_dp_double.append(double.pressure_drop(mpg, flow, depth - 0.7, temperature=5))
+        list_dp_powerwave.append(powerwave_coax.pressure_drop(mpg, flow, depth - 0.7, temperature=5))
+        list_dp_coax.append(coax.pressure_drop(mpg, flow, depth - 0.7, temperature=5))
+
+    plt.figure()
+    plt.plot(flow_rates, list_rb_double, label="Double DN32")
+    plt.plot(flow_rates, list_rb_coax, label="Coax")
+    plt.plot(flow_rates, list_rb_powerwave, label="Powerwave coax")
+    plt.plot(flow_rates, list_rb_powerwave_120, label="Powerwave coax (110mm)")
+
+    plt.title(f'Borehole thermal resistance (depth {depth}m)')
+    plt.ylabel('Effective borehole thermal resistance [mK/W]')
+    plt.xlabel('Flow rate [l/s]')
+    plt.legend()
+    plt.figure()
+
+    plt.plot(flow_rates, list_dp_double, label="Double DN32")
+    plt.plot(flow_rates, list_dp_coax, label="Coax")
+    plt.plot(flow_rates, list_dp_powerwave, label="Powerwave coax")
+
+    plt.title(f'Pressure drop')
+    plt.ylabel('Pressure drop [kPa]')
+    plt.xlabel('Flow rate [l/s]')
+    plt.legend()
+    plt.show()
+
+
+def potsdam2():
+    mpg = TemperatureDependentFluidData('MPG', 25, mass_percentage=False)
+
+    flow_rates = np.arange(0.1, 1, 0.01)
+
+    # important parameters
+    k_g = 1.5
+    rb = 150e-3
+    depth = 100
+    list_rb_coax, list_ra_coax, list_rb_powerwave, list_ra_powerwave = [], [], [], []
+    list_rb_powerwave_120, list_ra_powerwave_120 = [], []
+    coax = CoaxialPipe(0.013, 0.016, 31.5e-3 - 2.9e-3, 0.0315, 0.4, k_g)
+    powerwave_coax = PowerwaveCoax(k_g)
+
+    for val in flow_rates:
+        flow = ConstantFlowRate(vfr=val)
+
+        borehole_powerwave = Borehole(mpg, powerwave_coax, flow)
+        borehole_coax = Borehole(mpg, coax, flow)
+
+        borehole_powerwave.calculate_Rb(depth, 0.7, rb / 2, 2, temperature=5, use_explicit_models=True)
+        list_rb_powerwave.append(borehole_powerwave.pipe_data._r_b)
+        list_ra_powerwave.append(borehole_powerwave.pipe_data._r_a)
+        borehole_powerwave.calculate_Rb(depth, 0.7, 0.065 / 2, 2, temperature=5, use_explicit_models=True)
+        list_rb_powerwave_120.append(borehole_powerwave.pipe_data._r_b)
+        list_ra_powerwave_120.append(borehole_powerwave.pipe_data._r_a)
+        borehole_coax.calculate_Rb(depth, 0.7, rb / 2, 2, temperature=5, use_explicit_models=True)
+        list_rb_coax.append(borehole_coax.pipe_data._r_b)
+        list_ra_coax.append(borehole_coax.pipe_data._r_a)
+
+    plt.figure()
+    plt.plot(flow_rates, list_rb_coax, label="Coax (Rb)")
+    plt.plot(flow_rates, list_ra_coax, label="Coax (Ra)")
+    plt.plot(flow_rates, list_rb_powerwave, label="Powerwave coax (Rb)")
+    plt.plot(flow_rates, list_ra_powerwave, label="Powerwave coax (Ra)")
+    plt.plot(flow_rates, list_rb_powerwave_120, label="Powerwave coax (110mm) (Rb)")
+    plt.title(f'Borehole thermal resistance')
+    plt.ylabel('Borehole thermal resistance [mK/W]')
+    plt.xlabel('Flow rate [l/s]')
+    plt.legend()
+    plt.show()
+
+
+def potsdam3():
+    mpg = TemperatureDependentFluidData('MPG', 25, mass_percentage=False)
+
+    depth_range = np.arange(20, 150, 1)
+
+    # important parameters
+    k_g = 1.5
+    rb = 150e-3
+    depth = 50
+    list_rb_double, list_rb_powerwave, list_rb_coax, list_rb_powerwave_120 = [], [], [], []
+    list_dp_double, list_dp_powerwave, list_dp_coax = [], [], []
+
+    double = MultipleUTube(k_g, 0.013, 0.016, 0.4, (rb / 2) / 2, 2)
+    coax = CoaxialPipe(0.013, 0.016, 31.5e-3 - 2.9e-3, 0.0315, 0.4, k_g)
+    powerwave_coax = PowerwaveCoax(k_g)
+    flow = ConstantFlowRate(vfr=0.3)
+    for depth in depth_range:
+        borehole_double = Borehole(mpg, double, flow)
+        borehole_powerwave = Borehole(mpg, powerwave_coax, flow)
+        borehole_coax = Borehole(mpg, coax, flow)
+
+        list_rb_double.append(
+            borehole_double.calculate_Rb(depth, 0.7, rb / 2, 2, temperature=5,
+                                         use_explicit_models=True))
+        list_rb_powerwave_120.append(
+            borehole_powerwave.calculate_Rb(depth, 0.7, 110e-3 / 2, 2, temperature=5,
+                                            use_explicit_models=True))
+        list_rb_powerwave.append(
+            borehole_powerwave.calculate_Rb(depth, 0.7, rb / 2, 2, temperature=5, use_explicit_models=True))
+
+        list_rb_coax.append(
+            borehole_coax.calculate_Rb(depth, 0.7, rb / 2, 2, temperature=5, use_explicit_models=True))
+
+        list_dp_double.append(double.pressure_drop(mpg, flow, depth - 0.7, temperature=5))
+        list_dp_powerwave.append(powerwave_coax.pressure_drop(mpg, flow, depth - 0.7, temperature=5))
+        list_dp_coax.append(coax.pressure_drop(mpg, flow, depth - 0.7, temperature=5))
+
+    plt.figure()
+    plt.plot(depth_range, list_rb_double, label="Double DN32")
+    plt.plot(depth_range, list_rb_coax, label="Coax")
+    plt.plot(depth_range, list_rb_powerwave, label="Powerwave coax")
+    plt.plot(depth_range, list_rb_powerwave_120, label="Powerwave coax (110mm)")
+
+    plt.title(f'Borehole thermal resistance (0.3 l/s)')
+    plt.ylabel('Effective borehole thermal resistance [mK/W]')
+    plt.xlabel('Depth [m]')
+    plt.legend()
+    plt.show()
 
 
 def create_graphs():
@@ -174,6 +329,9 @@ def realistic_case2():
 
 
 if __name__ == "__main__":  # pragma: no-cover
+    potsdam()
+    potsdam2()
+    potsdam3()
     create_graphs()
     realistic_case()
     realistic_case2()

@@ -237,6 +237,8 @@ class CoaxialPipe(_PipeData):
 
         rv = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(**kwargs))
         n = rv / (2 * r_b) * (1 + 4 * r_b / r_a) ** (1 / 2)
+        self._r_a = r_a
+        self._r_b = r_b
         return r_b * n * np.cosh(n) / np.sinh(n)
 
     def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
