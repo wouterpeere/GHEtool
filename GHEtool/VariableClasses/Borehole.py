@@ -5,6 +5,8 @@ import copy
 import numbers
 
 import pygfunction as gt
+import scipy
+from scipy.interpolate import RegularGridInterpolator
 
 from GHEtool.VariableClasses.BaseClass import BaseClass
 from GHEtool.VariableClasses.FluidData import _FluidData, ConstantFluidData
@@ -56,6 +58,8 @@ class Borehole(BaseClass):
         self._temperature_range = None
         self._use_stored_data = True
         self._nb_of_data_points = 50
+
+        self._interp = None
 
     @property
     def Rb(self) -> float:
@@ -142,6 +146,7 @@ class Borehole(BaseClass):
         None
         """
         self._fluid_data = fluid_data
+        self._interp = None
         if isinstance(self._pipe_data, _PipeData):
             self.pipe_data.R_f = 0
             self.pipe_data.R_p = 0
@@ -188,6 +193,7 @@ class Borehole(BaseClass):
         None
         """
         self._pipe_data = pipe_data
+        self._interp = None
         if isinstance(self._pipe_data, _PipeData):
             self.pipe_data.R_f = 0
             self.pipe_data.R_p = 0
@@ -234,6 +240,7 @@ class Borehole(BaseClass):
         None
         """
         self._flow_data = flow_data
+        self._interp = None
         if isinstance(self._pipe_data, _PipeData):
             self.pipe_data.R_f = 0
             self.pipe_data.R_p = 0
@@ -294,13 +301,25 @@ class Borehole(BaseClass):
         # initiate temporary borefield
         borehole = gt.boreholes.Borehole(H, D, r_b, 0, 0)
 
+        if self._interp is not None:
+            try:
+                mfr = self.flow_data.mfr_borehole(fluid_data=self.fluid_data, **kwargs)
+                temp = self._interp(np.column_stack(
+                    [kwargs.get('temperature') if not isinstance(kwargs.get('temperature'),
+                                                                 (float, int)) else np.full_like(
+                        mfr, kwargs.get('temperature')), mfr
+                     ]))
+                return temp
+            except:
+                pass
+
         if use_explicit_models:
             return np.nan_to_num(self.pipe_data.explicit_model_borehole_resistance(self.fluid_data, self.flow_data, (
                 k_s if isinstance(k_s, numbers.Real) else k_s(depth, D)), borehole, borehole_length=H, **kwargs))
 
         if isinstance(self.flow_data,
                       (VariableHourlyFlowRate, VariableHourlyMultiyearFlowRate, ConstantDeltaTFlowRate)):
-            raise ValueError('You can only use explicit models when working with an hourly flow rate.')
+            raise ValueError('You can only use explicit models when working with an constant flow rate.')
 
         def calculate(**kwargs):
             self.pipe_data.calculate_resistances(self.fluid_data, self.flow_data, borehole_length=H, **kwargs)
@@ -443,6 +462,55 @@ class Borehole(BaseClass):
 
         # power < 0 when in extraction
         return temperature + delta_temp / 2, temperature - delta_temp / 2
+
+    def set_interpolator(self, H: float, D: float, r_b: float, k_s: float, depth: float, nb_of_boreholes: int,
+                         mfr_range=(0.01, 5), n_mfr=500):
+        """
+        Precompute Rb on a (temperature x flow_rate) grid and return a fast interpolator.
+
+        Parameters
+        ----------
+        mfr_range : tuple
+            (min, max) flow rate per borehole in kg/s. Should comfortably span the
+            actual range produced by borefield.flow_data.mfr_borefield(...) / n_boreholes,
+            including the clamped minimum flow rate.
+
+        Returns
+        -------
+        interp : RegularGridInterpolator
+            Call as interp(np.column_stack([temp_query, mfr_query])).
+        temp_grid, mfr_grid : np.ndarray
+            The 1D axes used to build the grid (for bounds-checking / diagnostics).
+        """
+        from GHEtool import TemperatureDependentFluidData
+        if isinstance(self._fluid_data, TemperatureDependentFluidData):
+            temp_grid = self._fluid_data._spacing
+        else:
+            temp_grid = np.array([0])
+
+        mfr_grid = np.linspace(*mfr_range, n_mfr)
+
+        # Cartesian grid; 'ij' indexing keeps reshape consistent with (temperature, mfr) order.
+        T_mesh, MFR_mesh = np.meshgrid(temp_grid, mfr_grid, indexing='ij')
+        T_flat = T_mesh.ravel()
+        MFR_flat = MFR_mesh.ravel()
+
+        Rb_flat = self.get_Rb(H, D, r_b, k_s, depth, use_explicit_models=True, nb_of_boreholes=nb_of_boreholes,
+                              temperature=T_flat, mfr_borehole=MFR_flat)
+
+        Rb_grid = np.asarray(Rb_flat).reshape(len(temp_grid), n_mfr)
+
+        interp = RegularGridInterpolator(
+            (temp_grid, mfr_grid), Rb_grid,
+            method='linear',  # 'cubic'/'quintic' available if you want smoother Rb
+            bounds_error=False,  # extrapolate rather than raise outside the grid...
+            fill_value=None,  # ...set to np.nan instead if you'd rather be warned
+        )
+        self._interp = interp
+        return interp
+
+    def remove_interp(self):
+        self._interp = None
 
     def __eq__(self, other):
         if not isinstance(other, Borehole):
