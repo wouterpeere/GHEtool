@@ -611,7 +611,7 @@ def test_powerwave_coax():
                                                                 use_explicit_models=True, temperature=5))
     assert np.isclose(test.explicit_model_borehole_resistance(fluid, flow_borehole, 2, borehole,
                                                               use_explicit_models=True, temperature=5),
-                      0.16216592812472497)
+                      0.16211173226656925)
 
     # test array-model
     individual = []

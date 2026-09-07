@@ -67,13 +67,13 @@ class PowerwaveCoax(BaseClass):
             """
             This function calculates the laminar Nusselt nummer at the outer wall of the inner pipe.
             """
-            return np.sqrt(6.7 ** 2 + (4.80747200e-05 * (Re ** 1.5906) * (Pr ** 0.4184)) ** 2)
+            return np.sqrt(3.66 ** 2 + (4.80747200e-05 * (Re ** 1.5906) * (Pr ** 0.4184)) ** 2)
 
         def Nu_i_turb(Re, Pr):
             """
             This function calculates the turbulent Nusselt nummer at the outer wall of the inner pipe.
             """
-            return np.sqrt(6.7 ** 2 + (0.25400 * ((Re - 1000) ** 0.593377) * (Pr ** 0.312665)) ** 2)
+            return np.sqrt(3.66 ** 2 + (0.25400 * ((Re - 1000) ** 0.593377) * (Pr ** 0.312665)) ** 2)
 
         def Nu_i_corr_comb(Re, Pr):
             """
@@ -86,13 +86,13 @@ class PowerwaveCoax(BaseClass):
             """
             This function calculates the laminar Nusselt nummer at the inner wall of the corrugated pipe.
             """
-            return np.sqrt(6.7 ** 2 + (7.06256718e-09 * (Re ** 3.025891) * (Pr ** 0.4292)) ** 2)
+            return np.sqrt(3.66 ** 2 + (7.06256718e-09 * (Re ** 3.025891) * (Pr ** 0.4292)) ** 2)
 
         def Nu_o_turb(Re, Pr):
             """
             This function calculates the turbulent Nusselt nummer at the inner wall of the corrugated pipe.
             """
-            return np.sqrt(6.7 ** 2 + (4.85563 * ((Re - 1000) ** 0.34399) * (Pr ** 0.1793452)) ** 2)
+            return np.sqrt(3.66 ** 2 + (4.85563 * ((Re - 1000) ** 0.34399) * (Pr ** 0.1793452)) ** 2)
 
         def Nu_o_corr_comb(Re, Pr):
             """

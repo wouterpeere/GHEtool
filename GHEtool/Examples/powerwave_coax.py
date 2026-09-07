@@ -23,7 +23,7 @@ def potsdam():
     # important parameters
     k_g = 1.5
     rb = 150e-3
-    depth = 50
+    depth = 100
     list_rb_double, list_rb_powerwave, list_rb_coax, list_rb_powerwave_120 = [], [], [], []
     list_dp_double, list_dp_powerwave, list_dp_coax = [], [], []
 
