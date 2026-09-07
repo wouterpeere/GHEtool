@@ -11,7 +11,9 @@ You can use:
 #. Coaxial pipe
 #. Conical pipe (https://www.hakagerodur.ch/de/gerotherm-vario/)
 #. Separatus pipe (https://separatus.ch/en)
-#. Turbocollector pipe (https://www.muovitech.com/group/?page=turbo)
+#. TurboCollector pipe (https://www.muovitech.com/group/?page=turbo)
+#. MuoviELLIPSE pipe (https://www.muovitech.com/group/?page=MuoviELLIPSE)
+#. JANSEN powerwave coax (https://www.jansen.com/en/plastic-solutions/products/detail/jansen-powerwave-ground-source-heat-loops-coax.html)
 
 
 All of the classes above are children from the abstract _PipeData class.
@@ -50,5 +52,13 @@ All of the classes above are children from the abstract _PipeData class.
     :show-inheritance:
 
 .. automodule:: GHEtool.VariableClasses.PipeData.Turbocollector
+    :members:
+    :show-inheritance:
+
+.. automodule:: GHEtool.VariableClasses.PipeData.MuoviEllipse
+    :members:
+    :show-inheritance:
+
+.. automodule:: GHEtool.VariableClasses.PipeData.PowerwaveCoax
     :members:
     :show-inheritance:

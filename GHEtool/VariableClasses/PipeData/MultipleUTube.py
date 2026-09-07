@@ -515,6 +515,8 @@ class MultipleUTube(_PipeData):
         r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
             **kwargs) / self.number_of_pipes)
         n = r_v / (self.number_of_pipes * R_b * R_a) ** 0.5
+        self._r_a = R_a
+        self._r_b = R_b
         return R_b * n * np.cosh(n) / np.sinh(n)
 
     def __export__(self):

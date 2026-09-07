@@ -88,6 +88,18 @@ def test_separatus(monkeypatch):
     design_with_separatus()
 
 
+def test_powerwave_coax(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.powerwave_coax import potsdam, potsdam2, potsdam3, create_graphs, realistic_case, \
+        realistic_case2
+    potsdam()
+    potsdam2()
+    potsdam3()
+    create_graphs()
+    realistic_case()
+    realistic_case2()
+
+
 def test_tilted(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.tilted_borefield import tilted
