@@ -199,6 +199,11 @@ class Borefield(BaseClass):
         self._H = H
         self._borefield.H = np.full(self.number_of_boreholes, H)
 
+        if self.borehole._interp is not None:
+            self.borehole.remove_interp()
+            self.borehole.set_interpolator(H, self.D, self.r_b, self.ground_data.k_s(self.depth, self.D), self.depth,
+                                           self.number_of_boreholes)
+
         # the boreholes are equal in length
         self.gfunction_calculation_object.store_previous_values = \
             self.gfunction_calculation_object._store_previous_values_backup
@@ -641,6 +646,12 @@ class Borefield(BaseClass):
 
         # new ground data implies that a new g-function should be loaded
         self.custom_gfunction = None
+
+        if self.borehole._interp is not None:
+            self.borehole.remove_interp()
+            self.borehole.set_interpolator(self.H, self.D, self.r_b, self.ground_data.k_s(self.depth, self.D),
+                                           self.depth,
+                                           self.number_of_boreholes)
 
         # the stored gfunction data should be deleted
         self.gfunction_calculation_object.remove_previous_data()
