@@ -69,7 +69,6 @@ class SeparatusNew(_PipeData):
         self.pipe_inner_wall = 2.7 * 1e-3
         self.hydraulic_diameter = 26.5e-3
         self.cross_sectional_area = (np.pi * self.r_in ** 2 - self.pipe_inner_wall * 2 * self.r_in) / 2
-        print(self.cross_sectional_area)
 
     def calculate_conductive_resistance(self, **kwargs) -> tuple[float, float]:
         """
@@ -105,22 +104,18 @@ class SeparatusNew(_PipeData):
             ----------
             .. [#Niklas] Niklas Hidman. (2026). Thermohydraulic performance evaluation of internally finned elliptical geothermal collector pipes
             """
-        hydraulic_diameter = self.hydraulic_diameter
+        wetted_perimeter = np.pi * self.r_in + 2 * self.r_in
+        conv_circle = calculate_convective_resistance(
+            flow_rate_data, fluid_data, r_in=self.hydraulic_diameter / 2, nb_of_pipes=1, area=self.cross_sectional_area,
+            epsilon=self.epsilon,
+            wetted_perimeter=wetted_perimeter,  # include entire wetted perimeter in calculation
+            **kwargs)
 
-        if kwargs.get('new', True):
-            conv_circle = calculate_convective_resistance(
-                flow_rate_data, fluid_data, r_in=hydraulic_diameter / 2, nb_of_pipes=1, area=self.cross_sectional_area,
-                epsilon=self.epsilon, wetted_perimeter=np.pi * self.r_in,
-                **kwargs)  # only circular part for the wetted perimeter
-        else:
-            conv_circle = calculate_convective_resistance(
-                flow_rate_data, fluid_data, r_in=hydraulic_diameter / 2, nb_of_pipes=1,
-                epsilon=self.epsilon, wetted_perimeter=np.pi * self.r_in,
-                **kwargs)  # only circular part for the wetted perimeter
-        nu = hydraulic_diameter / conv_circle / (np.pi * self.r_in) / fluid_data.k_f(**kwargs)
-
+        # convert back to Nusselt number
+        nu = self.hydraulic_diameter / conv_circle / wetted_perimeter / fluid_data.k_f(**kwargs)
+        conv_circle = self.hydraulic_diameter / (nu * fluid_data.k_f(**kwargs) * self.r_in * np.pi)
         # Rconv = 1/(hP) = Dh/(Nu*kf*P) with P wetted area (separation wall)
-        plate = hydraulic_diameter / (nu * fluid_data.k_f(**kwargs) * self.r_in * 2)
+        plate = self.hydraulic_diameter / (nu * fluid_data.k_f(**kwargs) * self.r_in * 2)
         return plate * 2, conv_circle
 
     def predict_split_pipe_Rb_Ra_series(self, r_b, R_fp_pipe, R_fp_center, k_b, k_s, **kwargs):
@@ -218,10 +213,13 @@ class SeparatusNew(_PipeData):
             r_fp_center = R_p_cond_wall + R_p_conv_wall
             R_b, R_a = self.predict_split_pipe_Rb_Ra_series(borehole.r_b, r_fp_pipe, r_fp_center, self.k_g, k_s,
                                                             **kwargs)
-
+            # R_b, R_a = 0.212697, 0.457424  # 0.05 l/s
+            # R_b, R_a = 0.100366, 0.135208  # 0.8 l/s
             r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
                 **kwargs))
             n = r_v / (R_b * R_a) ** 0.5
+            self._Ra = R_a
+            self._Rb = R_b
             return R_b * n * np.cosh(n) / np.sinh(n)
 
     def pipe_model(self, k_s: float, borehole: gt.boreholes.Borehole) -> gt.pipes._BasePipe:
