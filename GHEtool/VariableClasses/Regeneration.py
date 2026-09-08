@@ -2,6 +2,8 @@ import numpy as np
 
 from typing import Union
 
+from sympy import discriminant
+
 
 class Regeneration:
 
@@ -19,7 +21,7 @@ class Regeneration:
         a1 : float
             First order heat loss coefficient [W/K]
         a2 : float
-            Second order heat loss coefficient [W/K]
+            Second order heat loss coefficient [W/K²]
         min_delta_T : float
             Minimum temperature difference between the average fluid temperature inside the regeneration object and
             the borefield [K]
@@ -29,50 +31,6 @@ class Regeneration:
         self.a1 = a1
         self.a2 = a2
         self.min_delta_T = min_delta_T
-
-    def get_regeneration_power(self, index: int, fluid_temperature: float) -> float:
-        """
-        This function returns the regeneration power at index index for a given temperature.
-        The regeneration power is positive for injection.
-
-        Parameters
-        ----------
-        index : int
-            Index for the power and temperature array
-        fluid_temperature : float
-            Average fluid temperature [°C]
-
-        Returns
-        -------
-        float
-            Regeneration power [W]
-
-        """
-
-        power = 0
-
-        # power due to constant power
-        if self.power is not None:
-            if isinstance(self.power, (int, float)):
-                power += power
-            else:
-                power += self.power[index]
-        if self.temperature is None:
-            return power
-
-        # power due to temperature difference
-        if isinstance(self.temperature, (int, float)):
-            ref_temp = self.temperature
-        else:
-            ref_temp = self.temperature[index]
-
-        if np.abs(ref_temp - fluid_temperature) < self.min_delta_T:
-            return power
-
-        # positive when ref temperature (eg. outside temperature) is higher than the fluid temperature, so injection
-        power += (ref_temp - fluid_temperature) * self.a1 + (ref_temp - fluid_temperature) ** 2 * self.a2
-
-        return power
 
     def get_regeneration_power_inlet(self, index: int, inlet_temperature: float, mfr: float, c_p: float) -> float:
         """
@@ -85,6 +43,10 @@ class Regeneration:
             Index for the power and temperature array
         inlet_temperature : float
             Inlet fluid temperature [°C]
+        mfr : float
+            Mass flow rate through the regeneration technology [kg/s]
+        c_p : float
+            Specific heat capacity of the fluid [J/(kgK)]
 
         Returns
         -------
@@ -98,7 +60,7 @@ class Regeneration:
         # power due to constant power
         if self.power is not None:
             if isinstance(self.power, (int, float)):
-                power += power
+                power += self.power
             else:
                 power += self.power[index]
         if self.temperature is None:
@@ -110,10 +72,36 @@ class Regeneration:
         else:
             ref_temp = self.temperature[index]
 
-        if np.abs(ref_temp - inlet_temperature) < self.min_delta_T:
+        delta_T = ref_temp - inlet_temperature
+
+        if abs(delta_T) <= self.min_delta_T and power == 0:
             return power
 
-        # positive when ref temperature (eg. outside temperature) is higher than the fluid temperature, so injection
-        power = (self.power[index] + self.a1 * (ref_temp - inlet_temperature)) / (1 + self.a1 / (2 * mfr * c_p))
+        effective_ref_temp = (ref_temp - np.sign(delta_T) * self.min_delta_T)
 
-        return power
+        effective_delta_T = effective_ref_temp - inlet_temperature
+
+        if self.a2 is not None and self.a2 != 0:
+            # second degree
+            alpha = power + (self.a1 + self.a2 * effective_delta_T) * effective_delta_T
+            beta = (-1) * self.a1 / (2 * mfr * c_p) - self.a2 / (mfr * c_p) * effective_delta_T - 1
+            gamma = self.a2 / (4 * mfr ** 2 * c_p ** 2)
+            D = beta ** 2 - 4 * alpha * gamma
+
+            x1 = ((-1) * beta + np.sqrt(D)) / (2 * gamma)
+            x2 = ((-1) * beta - np.sqrt(D)) / (2 * gamma)
+            regeneration_power = min((x1, x2), key=abs)
+
+            reference_power = mfr * c_p * effective_delta_T
+
+            regeneration_power = np.clip(regeneration_power, min(power, reference_power), max(power, reference_power))
+
+            return regeneration_power
+
+        # positive when ref temperature (e.g. outside temperature) is higher than the fluid temperature, so injection
+        regeneration_power = (power + self.a1 * effective_delta_T) / (1 + self.a1 / (2 * mfr * c_p))
+        reference_power = mfr * c_p * effective_delta_T
+
+        regeneration_power = np.clip(regeneration_power, min(power, reference_power), max(power, reference_power))
+
+        return regeneration_power
