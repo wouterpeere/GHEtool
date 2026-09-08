@@ -307,10 +307,10 @@ class Borehole(BaseClass):
                 temp = self._interp(np.column_stack(
                     [kwargs.get('temperature') if not isinstance(kwargs.get('temperature'),
                                                                  (float, int)) else np.full_like(
-                        mfr, kwargs.get('temperature')), mfr
+                        mfr, kwargs.get('temperature'), dtype=np.float64), mfr
                      ]))
                 return temp
-            except:
+            except:  # pragma no-cover
                 pass
 
         if use_explicit_models:

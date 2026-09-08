@@ -1456,3 +1456,29 @@ def test_with_cop():
     borefield.calculate_temperatures(hourly=True)
     result2 = copy.deepcopy(borefield.results)
     assert np.allclose(result.Tf, result2.Tf)
+
+
+def test_reset_borehole_interp():
+    borefield = Borefield()
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    load = HourlyBuildingLoad()
+    borefield.ground_data = GroundConstantTemperature(2, 10)
+    borefield.fluid_data = ConstantFluidData(0.5, 1200, 4000, 0.001)
+    borefield.flow_data = ConstantDeltaTFlowRate(delta_temp_injection=3, delta_flow_rate=3)
+    borefield.pipe_data = pipeData
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    borefield.load = load
+    borefield.create_rectangular_borefield(10, 4, 6, 6, 100, 1, 0.075)
+    borefield.H = 100
+    assert borefield.borehole._interp is None
+    borefield.borehole.set_interpolator(100, 1, 0.075, 2, 101, 2)
+    assert borefield.borehole._interp is not None
+    temp = borefield.borehole._interp
+    borefield.ground_data = GroundConstantTemperature(3, 10)
+    assert temp([1, 5]) != borefield.borehole._interp([1, 5])
+    borefield.ground_data = GroundConstantTemperature(2, 10)
+    assert temp([1, 5]) == borefield.borehole._interp([1, 5])
+    borefield.H = 110
+    assert temp([1, 5]) != borefield.borehole._interp([1, 5])
+    borefield.H = 100
+    assert temp([1, 5]) == borefield.borehole._interp([1, 5])

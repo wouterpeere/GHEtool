@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from GHEtool import FluidData, DoubleUTube, SingleUTube, MultipleUTube, ConstantFluidData, ConstantFlowRate, \
-    TemperatureDependentFluidData, ConicalPipe, VariableHourlyFlowRate
+    TemperatureDependentFluidData, ConicalPipe, VariableHourlyFlowRate, ConstantDeltaTFlowRate
 from GHEtool.VariableClasses import Borehole
 
 fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
@@ -39,6 +39,7 @@ def test_fluid_data_with_pipe_first_added():
     assert borehole.pipe_data.R_f == 0
     borehole.pipe_data.calculate_resistances(fluid_data, flow_data)
     assert np.isclose(0.01663038005086118, borehole.pipe_data.R_f)
+    assert borehole._interp is None
 
 
 def test_fluid_data_with_pipe_later_added():
@@ -328,3 +329,119 @@ def test_with_inlet_outlet():
     assert np.allclose(
         borehole._calculate_borefield_inlet_outlet_temperature(-10, -1, borehole_wall=0, nb_of_boreholes=1),
         (-2, 0.))
+
+
+def test_borehole_interp_reset():
+    borehole = Borehole()
+    borehole.pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    borehole.fluid_data = ConstantFluidData(0.5, 1200, 4000, 0.001)
+    borehole.flow_data = ConstantFlowRate(mfr=1)
+    assert borehole._interp is None
+    borehole._interp = 2
+    assert borehole._interp == 2
+    borehole.pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    assert borehole._interp is None
+    borehole._interp = 2
+    assert borehole._interp == 2
+    borehole.fluid_data = ConstantFluidData(0.5, 1200, 4000, 0.001)
+    assert borehole._interp is None
+    borehole._interp = 2
+    assert borehole._interp == 2
+    borehole.flow_data = ConstantFlowRate(mfr=1)
+    assert borehole._interp is None
+    borehole._interp = 2
+    assert borehole._interp == 2
+
+
+def test_borehole_set_interpolator():
+    borehole = Borehole()
+    borehole.pipe_data = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
+    constant_fluid = ConstantFluidData(0.5, 1200, 4000, 0.001)
+    variable_fluid = TemperatureDependentFluidData('MEG', 25)
+    constant_flow = ConstantFlowRate(mfr=1)
+    variable_flow = ConstantDeltaTFlowRate(delta_temp_extraction=3, delta_temp_injection=3)
+
+    # both constant
+    borehole.fluid_data = constant_fluid
+    borehole.flow_data = constant_flow
+    borehole2 = copy.deepcopy(borehole)
+    borehole.set_interpolator(100, 1, 0.075, 2, 101, 1)
+    assert np.isclose(borehole._interp([0, 1]),
+                      borehole.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1, temperature=1))
+    assert np.allclose(borehole._interp(np.column_stack([[0, 5], [1, 1]])),
+                       [borehole.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1, temperature=5)] * 2)
+    assert np.isclose(borehole._interp([0, 1]),
+                      borehole2.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1, temperature=1))
+    assert np.allclose(borehole._interp(np.column_stack([[0, 5], [1, 1]])),
+                       [borehole2.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1, temperature=5)] * 2)
+
+    # variable fluid, constant flow
+    borehole.fluid_data = variable_fluid
+    borehole.flow_data = constant_flow
+    borehole2 = copy.deepcopy(borehole)
+
+    borehole.set_interpolator(100, 1, 0.075, 2, 101, 1)
+    assert np.isclose(borehole._interp([variable_fluid._spacing[0], 1]),
+                      borehole.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1, temperature=variable_fluid._spacing[0]))
+    assert np.allclose(
+        borehole._interp(np.column_stack([[variable_fluid._spacing[0], variable_fluid._spacing[20]], [1, 1]])),
+        borehole2.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1,
+                         temperature=np.array([variable_fluid._spacing[0], variable_fluid._spacing[20]])))
+    assert np.isclose(borehole._interp([variable_fluid._spacing[0], 1]),
+                      borehole.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1, temperature=variable_fluid._spacing[0]))
+    assert np.allclose(
+        borehole._interp(np.column_stack([[variable_fluid._spacing[0], variable_fluid._spacing[20]], [1, 1]])),
+        borehole2.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1,
+                         temperature=np.array([variable_fluid._spacing[0], variable_fluid._spacing[20]])))
+
+    # variable fluid, variable flow
+    borehole.fluid_data = variable_fluid
+    borehole.flow_data = variable_flow
+    borehole2 = copy.deepcopy(borehole)
+
+    power = np.array([-5, 3])
+    flows = variable_flow.mfr_borehole(borehole.fluid_data, 1, power=power,
+                                       temperature=np.array([variable_fluid._spacing[0], variable_fluid._spacing[20]]))
+    borehole.set_interpolator(100, 1, 0.075, 2, 101, 1, n_mfr=5000)
+    assert np.isclose(borehole._interp([variable_fluid._spacing[0], flows[0]]),
+                      borehole.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1, temperature=variable_fluid._spacing[0],
+                                      use_explicit_models=True, power=power[0]))
+    assert np.allclose(
+        borehole._interp(np.column_stack([[variable_fluid._spacing[0], variable_fluid._spacing[20]], flows])),
+        borehole.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1,
+                        temperature=np.array([variable_fluid._spacing[0], variable_fluid._spacing[20]]),
+                        use_explicit_models=True, power=power))
+    assert np.isclose(borehole._interp([variable_fluid._spacing[0], flows[0]]),
+                      borehole2.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1, temperature=variable_fluid._spacing[0],
+                                       use_explicit_models=True, power=power[0]))
+    assert np.allclose(
+        borehole._interp(np.column_stack([[variable_fluid._spacing[0], variable_fluid._spacing[20]], flows])),
+        borehole2.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1,
+                         temperature=np.array([variable_fluid._spacing[0], variable_fluid._spacing[20]]),
+                         use_explicit_models=True, power=power))
+
+    # constant fluid, variable flow
+    borehole.fluid_data = constant_fluid
+    borehole.flow_data = variable_flow
+    borehole2 = copy.deepcopy(borehole)
+
+    power = np.array([-5, 3])
+    flows = variable_flow.mfr_borehole(borehole.fluid_data, 1, power=power,
+                                       temperature=np.array([variable_fluid._spacing[0], variable_fluid._spacing[20]]))
+    borehole.set_interpolator(100, 1, 0.075, 2, 101, 1, n_mfr=5000)
+    assert np.isclose(borehole._interp([variable_fluid._spacing[0], flows[0]]),
+                      borehole.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1, temperature=variable_fluid._spacing[0],
+                                      use_explicit_models=True, power=power[0]))
+    assert np.allclose(
+        borehole._interp(np.column_stack([[variable_fluid._spacing[0], variable_fluid._spacing[20]], flows])),
+        borehole.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1,
+                        temperature=np.array([variable_fluid._spacing[0], variable_fluid._spacing[20]]),
+                        use_explicit_models=True, power=power))
+    assert np.isclose(borehole._interp([variable_fluid._spacing[0], flows[0]]),
+                      borehole2.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1, temperature=variable_fluid._spacing[0],
+                                       use_explicit_models=True, power=power[0]))
+    assert np.allclose(
+        borehole._interp(np.column_stack([[variable_fluid._spacing[0], variable_fluid._spacing[20]], flows])),
+        borehole2.get_Rb(100, 1, 0.075, 2, 101, nb_of_boreholes=1,
+                         temperature=np.array([variable_fluid._spacing[0], variable_fluid._spacing[20]]),
+                         use_explicit_models=True, power=power))
