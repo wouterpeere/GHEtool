@@ -71,9 +71,6 @@ mentioned are the ones with which the code is tested)
 * scipy >= 1.8.1
 * secondarycoolantprops >= 1.1
 * optuna >= 3.6.1
-* joblib >= 1.5.3
-* torch >= 2.11.0
-* scikit-learn == 1.8.0
 
 For the tests
 
@@ -388,7 +385,7 @@ Please do contact us at [info@ghetool.eu](mailto:info@ghetool.eu).
 
 Please cite GHEtool using the JOSS paper.
 
-Peere, W., Blanke, T.(2022). GHEtool: An open-source tool for borefield sizing in Python. _Journal of Open Source
+Peere, W., Blanke, T. (2022). GHEtool: An open-source tool for borefield sizing in Python. _Journal of Open Source
 Software, 7_(76), 4406, https://doi.org/10.21105/joss.04406
 
 For more information on how to cite GHEtool, please visit the ReadTheDocs
