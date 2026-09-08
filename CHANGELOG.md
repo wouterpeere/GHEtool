@@ -10,7 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - Function to get peak temperatures and baseload temperatures based on average, inlet or outlet.
-- Add pressure drop limitation to optimisation (issue #141).
+- Add regeneration (issue #328).
+- Add pressure drop limitation to optimisation (issue #441).
 - Add groundwater filled boreholes (issue #470).
 - Add class for non-modulating heat pumps (issue #476).
 - Added default secondary temperature to EER and COP class (issue #476).
@@ -21,7 +22,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Change the monthly resampling of hourly loads to a reshape when all months are equal (thanks to samuelduchesne).
 - Change the L4 time vector creation to float32, since the float16 attempt always overflows.
 - Change the interpolation query points in the _Efficiency class to be built with np.column_stack.
-- MuoviELLIPSE borehole resistance ANN now runs in numpy (cached `.npz` weights). Drop torch, scikit-learn and joblib from install_requires (issue #483).
+- MuoviELLIPSE borehole resistance ANN now runs in numpy (cached `.npz` weights). Drop torch, scikit-learn and joblib
+  from install_requires (issue #483).
 - Move calculate_borefield_inlet_outlet_temperature to Borehole class (issue #464).
 - Change implementation ConicalProbe for speed improvement (issue #472).
 - Change implementation of interpolation for _Efficiency class to cope with non-gridded data input (issue #472).
