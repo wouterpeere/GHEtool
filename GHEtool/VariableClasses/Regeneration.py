@@ -2,8 +2,6 @@ import numpy as np
 
 from typing import Union
 
-from sympy import discriminant
-
 
 class Regeneration:
 
