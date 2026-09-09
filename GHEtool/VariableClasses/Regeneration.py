@@ -6,7 +6,7 @@ from typing import Union
 class Regeneration:
 
     def __init__(self, power: Union[float, np.ndarray] = None, temperature: Union[float, np.ndarray] = None,
-                 a1: float = 0, a2: float = 0, min_delta_T: float = 0):
+                 a1: float = 0, a2: float = 0, min_delta_T: float = 0, surface: float = 1.0):
         """
         This defines the regeneration object.
 
@@ -29,6 +29,7 @@ class Regeneration:
         self.a1 = a1
         self.a2 = a2
         self.min_delta_T = min_delta_T
+        self.surface = surface
 
     def get_regeneration_power_inlet(self, index: int, inlet_temperature: float, mfr: float, c_p: float) -> float:
         """
@@ -54,13 +55,15 @@ class Regeneration:
         """
 
         power = 0
+        a1 = self.a1 * self.surface
+        a2 = self.a2 * self.surface
 
         # power due to constant power
         if self.power is not None:
             if isinstance(self.power, (int, float)):
-                power += self.power
+                power += self.power * self.surface
             else:
-                power += self.power[index]
+                power += self.power[index] * self.surface
         if self.temperature is None:
             return power
 
@@ -79,11 +82,11 @@ class Regeneration:
 
         effective_delta_T = effective_ref_temp - inlet_temperature
 
-        if self.a2 is not None and self.a2 != 0:
+        if a2 is not None and a2 != 0:
             # second degree
-            alpha = power + (self.a1 + self.a2 * effective_delta_T) * effective_delta_T
-            beta = (-1) * self.a1 / (2 * mfr * c_p) - self.a2 / (mfr * c_p) * effective_delta_T - 1
-            gamma = self.a2 / (4 * mfr ** 2 * c_p ** 2)
+            alpha = power + (a1 + a2 * effective_delta_T) * effective_delta_T
+            beta = (-1) * a1 / (2 * mfr * c_p) - a2 / (mfr * c_p) * effective_delta_T - 1
+            gamma = a2 / (4 * mfr ** 2 * c_p ** 2)
             D = beta ** 2 - 4 * alpha * gamma
 
             x1 = ((-1) * beta + np.sqrt(D)) / (2 * gamma)
@@ -97,7 +100,7 @@ class Regeneration:
             return regeneration_power
 
         # positive when ref temperature (e.g. outside temperature) is higher than the fluid temperature, so injection
-        regeneration_power = (power + self.a1 * effective_delta_T) / (1 + self.a1 / (2 * mfr * c_p))
+        regeneration_power = (power + a1 * effective_delta_T) / (1 + a1 / (2 * mfr * c_p))
         reference_power = mfr * c_p * effective_delta_T
 
         regeneration_power = np.clip(regeneration_power, min(power, reference_power), max(power, reference_power))

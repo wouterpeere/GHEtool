@@ -248,7 +248,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                 max_reg = min(max_power, max_reg)
 
             # 3. Make sure future limits are not crossed
-            if 3 in rules:
+            if 3 in rules and i % 8760 > 0:
                 diff_array = borefield.Tf_max - Tf_avg[i % 8760:]
                 impact_array = diff_array / g_value_differences_horizon[:-i % 8760] * corr
                 # if min(impact_array) < max_reg:
@@ -265,7 +265,6 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
         # print(f'{i % 8760}: {remaining_imbalance / 1000.:0f}, {np.sum(regeneration_array) / 1000.:0f}')
         if (injection_dominated and algorithm != 'proceeding_extra' or algorithm == 'proceeding_extra') \
                 and possible_regen_power < 0 and (remaining_imbalance > 0 or 1 not in rules):
-            print(i, possible_regen_power, remaining_imbalance)
             # calculate new load based on regeneration
             new_load = load[i % 8760] + possible_regen_power  # W
             Tf_avg_new = Tb[i % 8760] + new_load * (
@@ -325,16 +324,6 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
         borefield.load.hourly_dhw_load_simulation_period,
         borefield.load.cop_dhw
     )
-    print(borefield.load.imbalance, np.sum(regeneration_array[:8760]))
-    # plt.figure()
-    # plt.plot(range(8760), borefield.load.hourly_net_resulting_injection_power[:8760], label='building demand')
-    # plt.plot(range(8760), regeneration_array[:8760] / 1000, label='regeneration')
-    # plt.ylabel('Ground load [kW]')
-    # plt.xlabel('Time [hours]')
-    # plt.xlim(0, 8760)
-    # plt.legend()
-    # plt.show()
-    # set regeneration array in (kW)
     multiyear_load.hourly_regeneration_load_simulation_period = regeneration_array / 1000
 
     return multiyear_load, regeneration_array / 1000
@@ -352,7 +341,7 @@ if __name__ == "__main__":
     borefield.flow_data = flow_data
     borefield.pipe_data = pipe_data
     borefield.calculation_setup(use_constant_Rb=False)
-    borefield.set_max_fluid_temperature(25)
+    borefield.set_max_fluid_temperature(30)
     borefield.set_min_fluid_temperature(5.5)
     hourly_load_building = HourlyBuildingLoad(efficiency_cooling=7, efficiency_heating=6)
     hourly_load_building.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
@@ -375,7 +364,7 @@ if __name__ == "__main__":
 
     surface = 200  # m²
 
-    regeneration_object = Regeneration(power=solar * a0 * surface, temperature=temperature, a1=a1 * surface)
+    regeneration_object = Regeneration(power=solar * a0 * surface * 2, temperature=temperature, a1=a1 * surface)
 
     # three_rules, regeneration_inlet = calculate_regeneration(
     #     borefield=copy.deepcopy(borefield),
@@ -406,21 +395,21 @@ if __name__ == "__main__":
         regen_obj=regeneration_object,
         rules=(1, 2, 3),
         algorithm='total')
-    # proceeding_my, proceeding = calculate_regeneration(
-    #     borefield=copy.deepcopy(borefield),
-    #     regen_obj=regeneration_object,
-    #     rules=(1, 2, 3),
-    #     algorithm='proceeding')
-    # proceeding_extra_my, proceeding_extra = calculate_regeneration(
-    #     borefield=copy.deepcopy(borefield),
-    #     regen_obj=regeneration_object,
-    #     rules=(1, 2, 3),
-    #     algorithm='proceeding_extra')
+    proceeding_my, proceeding = calculate_regeneration(
+        borefield=copy.deepcopy(borefield),
+        regen_obj=regeneration_object,
+        rules=(1, 2, 3),
+        algorithm='proceeding')
+    proceeding_extra_my, proceeding_extra = calculate_regeneration(
+        borefield=copy.deepcopy(borefield),
+        regen_obj=regeneration_object,
+        rules=(1, 2, 3),
+        algorithm='proceeding_extra')
     plt.figure()
     plt.plot(total, label='Total')
     plt.plot(yearly, label='Yearly')
-    # plt.plot(proceeding, label='Proceeding')
-    # plt.plot(proceeding_extra, label='Proceeding extra')
+    plt.plot(proceeding, label='Proceeding')
+    plt.plot(proceeding_extra, label='Proceeding extra')
 
     plt.xlabel('Time [hours]')
     plt.ylabel('Regeneration power [kW]')
@@ -434,8 +423,8 @@ if __name__ == "__main__":
     data = {
         'Yearly': yearly_my,
         'Total': total_my,
-        # 'Proceeding w/o': proceeding_my,
-        # 'Proceeding': proceeding_extra_my
+        'Proceeding w/o': proceeding_my,
+        'Proceeding': proceeding_extra_my
     }
 
     fig, axes = plt.subplots(
