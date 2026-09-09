@@ -92,7 +92,56 @@ def design_with_separatus():
     borefield.print_temperature_profile()
 
 
+def comparison():
+    """
+    This function validates the explicit multipole model for the single U (zeroth, first and second order).
+    Returns
+    -------
+    None
+    """
+    fluid_data = TemperatureDependentFluidData('MEG', 25, mass_percentage=False).create_constant(0)
+    from GHEtool.VariableClasses.PipeData.SeparatusNew import SeparatusNew
+    separatus = SeparatusNew(2)
+    separatus_old = Separatus(2)
+    double_pipe = DoubleUTube(1, 0.013, 0.016, 0.4, 0.035)
+
+    separatus_140 = []
+    separatus_90 = []
+    separatus_90_old = []
+    double = []
+    flow_range = np.linspace(0.05, 2, 200)
+    depth = 100
+
+    for flow in flow_range:
+        borehole = Borehole(fluid_data, separatus, ConstantFlowRate(mfr=flow))
+        separatus_140.append(borehole.calculate_Rb(depth, 0, 0.07, 2, use_explicit_models=True))
+        borehole = Borehole(fluid_data, separatus, ConstantFlowRate(mfr=flow))
+        separatus_90.append(borehole.calculate_Rb(depth, 0, 0.045, 2, use_explicit_models=True))
+        borehole = Borehole(fluid_data, separatus_old, ConstantFlowRate(mfr=flow))
+        separatus_90_old.append(borehole.calculate_Rb(depth, 0, 0.045, 2, use_explicit_models=True))
+        borehole = Borehole(fluid_data, double_pipe, ConstantFlowRate(mfr=flow))
+        double.append(borehole.calculate_Rb(depth, 0, 0.07, 2, use_explicit_models=True))
+    import matplotlib.pyplot as plt
+
+    plt.figure()
+    plt.plot(flow_range, separatus_140, label="Separatus (2026) (d=140mm, kg=2W/(mK))")
+    plt.plot(flow_range, separatus_90, label="Separatus (2026) (d=90mm, kg=2W/(mK))")
+    plt.plot(flow_range, separatus_90_old, label="Separatus (2025) (d=90mm, kg=2W/(mK))")
+    plt.plot(flow_range, double, label="Double DN32 (d=140mm, kg=1W/(mK))")
+
+    plt.legend()
+    plt.xlabel('Mass flow rate per borehole [kg/s]')
+    plt.ylabel('Borehole effective thermal resistance [mK/W]')
+    plt.title(f'Borehole depth 100m @ 25v/v% MEG')
+    # plt.plot(flow_range, (np.array(original_model) - np.array(new_model)) / np.array(original_model) * 100,
+    #          label="diff %")
+    # plt.xlabel('Mass flow rate per borehole [kg/s]')
+    # plt.ylabel('Difference in borehole effective thermal resistance [%]')
+    plt.show()
+
+
 if __name__ == "__main__":
+    comparison()
     design_with_single_U()
     design_with_double_U()
     design_with_separatus()
