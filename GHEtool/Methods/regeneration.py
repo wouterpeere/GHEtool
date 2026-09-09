@@ -92,7 +92,8 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
         borefield.flow_data.mfr_borehole(power=(-1) * max_power, fluid_data=borefield.fluid_data,
                                          nb_of_boreholes=borefield.number_of_boreholes, temperature=25))
     min_flow = max_flow * (
-        borefield.flow_data._min_flow_percentage if isinstance(borefield.flow_data, ConstantDeltaTFlowRate) else 1)
+        borefield.flow_data._min_flow_percentage / 100 if isinstance(borefield.flow_data,
+                                                                     ConstantDeltaTFlowRate) else 1)
 
     # set the interpolation function for the borehole resistance
     borefield.borehole.set_interpolator(
@@ -102,7 +103,8 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
     def get_Rb(borefield, power, temp) -> np.ndarray:
         return borefield.borehole.get_Rb(borefield.H, borefield.D, borefield.r_b,
                                          borefield.ground_data.k_s(borefield.depth, borefield.D),
-                                         borefield.depth, temperature=temp, power=power, use_explicit_models=True,
+                                         borefield.depth, temperature=temp, power=power / 1000,
+                                         use_explicit_models=True,
                                          nb_of_boreholes=borefield.number_of_boreholes)
 
     # START OF THE ACTUAL SIMULATION
@@ -161,7 +163,6 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
             # iterate to converge for the fluid temperature
             for _ in range(2):  # 3 more than enough to converge
                 Tf_avg = Tb + load * (get_Rb(borefield, load, Tf_avg) / borefield.number_of_boreholes / borefield.H)
-                print('max', max(load), min(get_Rb(borefield, load, Tf_avg)))
                 if position_regeneration == 'inlet':
                     Tf_to_regeneration = borefield.calculate_borefield_inlet_outlet_temperature(load, Tf_avg, Tb)[0]
                 else:
@@ -242,17 +243,16 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                 resistance = get_Rb(borefield, new_load, borefield.Tf_max)[0]
                 max_delta = borefield.Tf_max - Tf_avg[i % 8760]
                 max_power = max_delta / resistance * borefield.number_of_boreholes * borefield.H
-                if max_power < max_reg:
-                    print('uh')
+                # if max_power < max_reg:
+                #     print('2', i % 8760, max_power, max_reg, remaining_imbalance)
                 max_reg = min(max_power, max_reg)
 
             # 3. Make sure future limits are not crossed
             if 3 in rules:
                 diff_array = borefield.Tf_max - Tf_avg[i % 8760:]
                 impact_array = diff_array / g_value_differences_horizon[:-i % 8760] * corr
-                print(min(diff_array))
-                if min(impact_array) < max_reg:
-                    print(i, min(impact_array), max_reg)
+                # if min(impact_array) < max_reg:
+                #     print('3', i % 8760, min(impact_array), max_reg, remaining_imbalance)
                 max_reg = min(min(impact_array), max_reg)
 
             # set regeneration
@@ -262,10 +262,10 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
             # When there was regeneration, the borehole wall temperature should be recalculated
             if max_reg != 0:
                 recalculate = True
-
+        # print(f'{i % 8760}: {remaining_imbalance / 1000.:0f}, {np.sum(regeneration_array) / 1000.:0f}')
         if (injection_dominated and algorithm != 'proceeding_extra' or algorithm == 'proceeding_extra') \
                 and possible_regen_power < 0 and (remaining_imbalance > 0 or 1 not in rules):
-
+            print(i, possible_regen_power, remaining_imbalance)
             # calculate new load based on regeneration
             new_load = load[i % 8760] + possible_regen_power  # W
             Tf_avg_new = Tb[i % 8760] + new_load * (
@@ -296,8 +296,8 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
 
             # 2. Make sure current limit is not crossed
             if 2 in rules:
-                resistance = get_Rb(borefield, new_load, borefield.Tf_max)[0]
-                max_delta = Tb[i % 8760] - borefield.Tf_min
+                resistance = get_Rb(borefield, new_load, borefield.Tf_min)[0]
+                max_delta = Tf_avg[i % 8760] - borefield.Tf_min
                 max_power = max_delta / resistance * borefield.number_of_boreholes * borefield.H
                 max_reg = min(max_power, max_reg)
 
@@ -325,14 +325,15 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
         borefield.load.hourly_dhw_load_simulation_period,
         borefield.load.cop_dhw
     )
-    plt.figure()
-    plt.plot(range(8760), borefield.load.hourly_net_resulting_injection_power[:8760], label='building demand')
-    plt.plot(range(8760), regeneration_array[:8760] / 1000, label='regeneration')
-    plt.ylabel('Ground load [kW]')
-    plt.xlabel('Time [hours]')
-    plt.xlim(0, 8760)
-    plt.legend()
-    plt.show()
+    print(borefield.load.imbalance, np.sum(regeneration_array[:8760]))
+    # plt.figure()
+    # plt.plot(range(8760), borefield.load.hourly_net_resulting_injection_power[:8760], label='building demand')
+    # plt.plot(range(8760), regeneration_array[:8760] / 1000, label='regeneration')
+    # plt.ylabel('Ground load [kW]')
+    # plt.xlabel('Time [hours]')
+    # plt.xlim(0, 8760)
+    # plt.legend()
+    # plt.show()
     # set regeneration array in (kW)
     multiyear_load.hourly_regeneration_load_simulation_period = regeneration_array / 1000
 
@@ -357,7 +358,7 @@ if __name__ == "__main__":
     hourly_load_building.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
                                              separator=";", col_cooling=0, col_heating=1)
     borefield.load = hourly_load_building
-    borefield.load.simulation_period = 1
+    borefield.load.simulation_period = 5
     # borefield.print_temperature_profile(plot_hourly=True)
     # get weather data
     weather_file = open(FOLDER.joinpath("test/unit-tests/data/test_epw.epw"), 'rb')
@@ -400,11 +401,11 @@ if __name__ == "__main__":
         regen_obj=regeneration_object,
         rules=(1, 2, 3),
         algorithm='yearly')
-    # total_my, total = calculate_regeneration(
-    #     borefield=copy.deepcopy(borefield),
-    #     regen_obj=regeneration_object,
-    #     rules=(1, 2, 3),
-    #     algorithm='total')
+    total_my, total = calculate_regeneration(
+        borefield=copy.deepcopy(borefield),
+        regen_obj=regeneration_object,
+        rules=(1, 2, 3),
+        algorithm='total')
     # proceeding_my, proceeding = calculate_regeneration(
     #     borefield=copy.deepcopy(borefield),
     #     regen_obj=regeneration_object,
@@ -415,62 +416,62 @@ if __name__ == "__main__":
     #     regen_obj=regeneration_object,
     #     rules=(1, 2, 3),
     #     algorithm='proceeding_extra')
-    # plt.figure()
-    # plt.plot(total, label='Total')
-    # plt.plot(yearly, label='Yearly')
+    plt.figure()
+    plt.plot(total, label='Total')
+    plt.plot(yearly, label='Yearly')
     # plt.plot(proceeding, label='Proceeding')
     # plt.plot(proceeding_extra, label='Proceeding extra')
-    #
-    # plt.xlabel('Time [hours]')
-    # plt.ylabel('Regeneration power [kW]')
-    # plt.title('Different regeneration strategies')
-    # plt.legend()
-    # plt.show()
-    #
-    borefield.load = yearly_my
-    borefield.print_temperature_profile(plot_hourly=True)
 
-    # data = {
-    #     'Yearly': yearly_my,
-    #     'Total': total_my,
-    #     'Proceeding w/o': proceeding_my,
-    #     'Proceeding': proceeding_extra_my
-    # }
+    plt.xlabel('Time [hours]')
+    plt.ylabel('Regeneration power [kW]')
+    plt.title('Different regeneration strategies')
+    plt.legend()
+    plt.show()
     #
-    # fig, axes = plt.subplots(
-    #     nrows=len(data),
-    #     ncols=1,
-    #     figsize=(9, 10),
-    #     sharex=True,
-    # )
-    #
-    # for ax, (key, value) in zip(axes, data.items()):
-    #     borefield.load = value
-    #     borefield.calculate_temperatures(hourly=True)
-    #     tf = borefield.results.Tf
-    #     time_array = borefield.load.time_L4 / 12 / 3600 / 730
-    #
-    #     ax.plot(time_array, tf, linewidth=0.7)
-    #     ax.set_title(key)
-    #     ax.set_ylabel('Fluid temperature [°C]')
-    #
-    #     ax.axhline(
-    #         borefield.Tf_min,
-    #         color='black',
-    #         linestyle='dashed',
-    #         linewidth=0.7,
-    #     )
-    #     ax.axhline(
-    #         borefield.Tf_max,
-    #         color='black',
-    #         linestyle='dashed',
-    #         linewidth=0.7,
-    #     )
-    #
-    #     ax.set_xlim(0, borefield.simulation_period)
-    #
-    # axes[-1].set_xlabel('Time [year]')
-    # axes[-1].set_xticks(range(0, borefield.simulation_period + 1, 2))
-    #
-    # fig.tight_layout()
-    # plt.show()
+    # borefield.load = proceeding_extra_my
+    # borefield.print_temperature_profile(plot_hourly=True)
+
+    data = {
+        'Yearly': yearly_my,
+        'Total': total_my,
+        # 'Proceeding w/o': proceeding_my,
+        # 'Proceeding': proceeding_extra_my
+    }
+
+    fig, axes = plt.subplots(
+        nrows=len(data),
+        ncols=1,
+        figsize=(9, 10),
+        sharex=True,
+    )
+
+    for ax, (key, value) in zip(axes, data.items()):
+        borefield.load = value
+        borefield.calculate_temperatures(hourly=True)
+        tf = borefield.results.Tf
+        time_array = borefield.load.time_L4 / 12 / 3600 / 730
+
+        ax.plot(time_array, tf, linewidth=0.7)
+        ax.set_title(key)
+        ax.set_ylabel('Fluid temperature [°C]')
+
+        ax.axhline(
+            borefield.Tf_min,
+            color='black',
+            linestyle='dashed',
+            linewidth=0.7,
+        )
+        ax.axhline(
+            borefield.Tf_max,
+            color='black',
+            linestyle='dashed',
+            linewidth=0.7,
+        )
+
+        ax.set_xlim(0, borefield.simulation_period)
+
+    axes[-1].set_xlabel('Time [year]')
+    axes[-1].set_xticks(range(0, borefield.simulation_period + 1, 2))
+
+    fig.tight_layout()
+    plt.show()
