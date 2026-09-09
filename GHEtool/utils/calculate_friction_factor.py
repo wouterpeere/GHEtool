@@ -222,7 +222,7 @@ def calculate_convective_resistance(flow_data: _FlowData, fluid_data: _FluidData
             # no array here to get a better fit with pygfunction (see validation file)
             f = friction_factor_Haaland(high_re, r_in, epsilon, **kwargs)
         else:
-            f = friction_factor_darcy_weisbach(re[transitional], r_in, epsilon, **kwargs)
+            f = friction_factor_darcy_weisbach(high_re, r_in, epsilon, **kwargs)
         nu_high = turbulent_nusselt(fluid_data, high_re, f, array=transitional, **kwargs)
 
         re_t = re[transitional]
