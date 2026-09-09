@@ -161,6 +161,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
             # iterate to converge for the fluid temperature
             for _ in range(2):  # 3 more than enough to converge
                 Tf_avg = Tb + load * (get_Rb(borefield, load, Tf_avg) / borefield.number_of_boreholes / borefield.H)
+                print('max', max(load), min(get_Rb(borefield, load, Tf_avg)))
                 if position_regeneration == 'inlet':
                     Tf_to_regeneration = borefield.calculate_borefield_inlet_outlet_temperature(load, Tf_avg, Tb)[0]
                 else:
@@ -207,7 +208,6 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                 fluid_data=borefield.fluid_data)),
             borefield.fluid_data.cp(
                 temperature=Tf_to_regeneration[i % 8760]))
-
         if (extraction_dominated and algorithm != 'proceeding_extra' or algorithm == 'proceeding_extra') \
                 and possible_regen_power > 0 and (remaining_imbalance < 0 or 1 not in rules):
             # calculate new load based on regeneration
@@ -242,7 +242,6 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                 resistance = get_Rb(borefield, new_load, borefield.Tf_max)[0]
                 max_delta = borefield.Tf_max - Tf_avg[i % 8760]
                 max_power = max_delta / resistance * borefield.number_of_boreholes * borefield.H
-                print(i, max_power, max_reg, possible_regen_power)
                 if max_power < max_reg:
                     print('uh')
                 max_reg = min(max_power, max_reg)
@@ -251,6 +250,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
             if 3 in rules:
                 diff_array = borefield.Tf_max - Tf_avg[i % 8760:]
                 impact_array = diff_array / g_value_differences_horizon[:-i % 8760] * corr
+                print(min(diff_array))
                 if min(impact_array) < max_reg:
                     print(i, min(impact_array), max_reg)
                 max_reg = min(min(impact_array), max_reg)
@@ -325,7 +325,14 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
         borefield.load.hourly_dhw_load_simulation_period,
         borefield.load.cop_dhw
     )
-
+    plt.figure()
+    plt.plot(range(8760), borefield.load.hourly_net_resulting_injection_power[:8760], label='building demand')
+    plt.plot(range(8760), regeneration_array[:8760] / 1000, label='regeneration')
+    plt.ylabel('Ground load [kW]')
+    plt.xlabel('Time [hours]')
+    plt.xlim(0, 8760)
+    plt.legend()
+    plt.show()
     # set regeneration array in (kW)
     multiyear_load.hourly_regeneration_load_simulation_period = regeneration_array / 1000
 
