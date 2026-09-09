@@ -140,7 +140,9 @@ class SeparatusNew(_PipeData):
         model_path = pathlib.Path(__file__).parent.joinpath(f"./ANN/separatus/separatus.pt")
         x_scaler_path = pathlib.Path(__file__).parent.joinpath(f"./ANN/separatus/separatus_x.joblib")
         y_scaler_path = pathlib.Path(__file__).parent.joinpath(f"./ANN/separatus/separatus_y.joblib")
-
+        model_path = pathlib.Path(__file__).parent.joinpath(f"./ANN/separatus/split_pipe_two_rfp_ann.pt")
+        x_scaler_path = pathlib.Path(__file__).parent.joinpath(f"./ANN/separatus/split_pipe_two_rfp_x_scaler.joblib")
+        y_scaler_path = pathlib.Path(__file__).parent.joinpath(f"./ANN/separatus/split_pipe_two_rfp_y_scaler.joblib")
         model = SplitPipeANN()
         model.load_state_dict(torch.load(model_path, map_location="cpu"))
         model.eval()
@@ -213,8 +215,6 @@ class SeparatusNew(_PipeData):
             r_fp_center = R_p_cond_wall + R_p_conv_wall
             R_b, R_a = self.predict_split_pipe_Rb_Ra_series(borehole.r_b, r_fp_pipe, r_fp_center, self.k_g, k_s,
                                                             **kwargs)
-            # R_b, R_a = 0.212697, 0.457424  # 0.05 l/s
-            # R_b, R_a = 0.100366, 0.135208  # 0.8 l/s
             r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
                 **kwargs))
             n = r_v / (R_b * R_a) ** 0.5
