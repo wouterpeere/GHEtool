@@ -44,6 +44,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
     ----------
     .. [#Peere] Peere, W. (2027) Validated combined first and last year borefield sizing methodology. In Proceedings of GeoTHERM 2027. Offenburg (Germany), 25-26 February 2027. [abstract submitted]
     """
+    borefield = copy.deepcopy(borefield)
 
     simulation_horizon: int = 8760
 
