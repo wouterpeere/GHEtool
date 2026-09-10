@@ -14,7 +14,9 @@ from GHEtool.test.general_tests.test_GHEtool import borefield_custom_data
 def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                            algorithm: str = 'yearly',
                            position_regeneration: str = "inlet",
-                           rules=(1, 2, 3)) -> tuple[HourlyBuildingLoadMultiYear, np.ndarray]:
+                           rules=(1, 2, 3),
+                           simulation_horizon: int = 8760
+                           ) -> tuple[HourlyBuildingLoadMultiYear, np.ndarray]:
     """
     This function calculates the possible regeneration for a certain borefield a regeneration object.
     The updated hourly load profile as well as the regeneration array are returned.
@@ -45,8 +47,6 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
     .. [#Peere] Peere, W. (2027) Validated combined first and last year borefield sizing methodology. In Proceedings of GeoTHERM 2027. Offenburg (Germany), 25-26 February 2027. [abstract submitted]
     """
     borefield = copy.deepcopy(borefield)
-
-    simulation_horizon: int = 8760
 
     if borefield.borehole.use_constant_Rb:
         raise ValueError('This function does not work with a constant borehole resistance')
@@ -139,12 +139,16 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
         remaining_imbalance = 0
 
     building_imbalance = remaining_imbalance
-
+    recalculation_index = 0
     for i in range(8760 * borefield.load.simulation_period):
-
         # start a new year
         if i % 8760 == 0 and i > 0:
             year += 1
+
+        # force recalculate
+        if i == recalculation_index:
+            recalculation_index += simulation_horizon
+            recalculate = True
 
         # change offset
         if year > 0 and i % 8760 == 0:
@@ -157,9 +161,10 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
         if recalculate:
             # calculate borehole wall temperature
             Tf_avg = np.full(simulation_horizon, borefield.Tf_min if injection_dominated else borefield.Tf_max)
-            load = (hourly_load[year * 8760:(year + 1) * 8760] * 1000 +
-                    regeneration_array[year * 8760:(year + 1) * 8760])
-            Tb = ((convolve(load, g_value_differences_horizon)[:8760] + offset) / corr + borefield._Tg(borefield.H))
+            load = (hourly_load[year * 8760:year * 8760 + simulation_horizon] * 1000 +
+                    regeneration_array[year * 8760:year * 8760 + simulation_horizon])
+            Tb = ((convolve(load, g_value_differences_horizon)[:simulation_horizon] + offset) / corr + borefield._Tg(
+                borefield.H))
 
             # iterate to converge for the fluid temperature
             for _ in range(2):  # 3 more than enough to converge
@@ -171,9 +176,10 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
 
                 # with variable efficiency, the ground load should be updated as well
                 if variable_efficiency:
-                    Tb = convolve(
-                        hourly_load[i:min(8760 * borefield.load.simulation_period, i + simulation_horizon)] * 1000,
-                        g_value_differences_horizon)[:8760] / corr + borefield._Tg(borefield.H)
+                    load = (hourly_load[year * 8760:year * 8760 + simulation_horizon] * 1000 +
+                            regeneration_array[year * 8760:year * 8760 + simulation_horizon])
+                    Tb = convolve(load, g_value_differences_horizon)[:simulation_horizon] / corr + borefield._Tg(
+                        borefield.H)
                     borefield.load.set_results(ResultsHourly(np.tile(Tb, borefield.load.simulation_period),
                                                              np.tile(Tf_avg, borefield.load.simulation_period)))
                     hourly_load = borefield.load.hourly_net_resulting_injection_power
@@ -195,6 +201,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                 building_imbalance = remaining_imbalance
 
             recalculate = False
+            recalculation_index = i + simulation_horizon
 
         # calculate the imbalance from the previous hours until now
         if algorithm in ('proceeding', 'proceeding_extra'):
