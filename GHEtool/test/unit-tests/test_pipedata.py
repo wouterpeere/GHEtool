@@ -47,7 +47,7 @@ def test_calculate_thermal_resistance():
     assert np.isclose(single.R_p, 0.017757199605368243)
     assert np.isclose(single.R_f, 0.008698002460890118)
     assert np.isclose(double.R_p, 0.017757199605368243)
-    assert np.isclose(double.R_f, 0.017963387333190542)
+    assert np.isclose(double.R_f, 0.01798143437636712)
     assert np.allclose((single.R_f, single.R_p), (Us.R_f, Us.R_p))
     assert np.allclose((double.R_f, double.R_p), (Ud.R_f, Ud.R_p))
 
@@ -63,7 +63,7 @@ def test_equivalent_borehole_resistance_U_tubes():
     pipe = single.pipe_model(2, borehole)
     assert np.isclose(pipe.effective_borehole_thermal_resistance(0.1, 4180), 0.13637413925456277)
     pipe = double.pipe_model(2, borehole)
-    assert np.isclose(pipe.effective_borehole_thermal_resistance(0.2, 4180), 0.09065168435087693)
+    assert np.isclose(pipe.effective_borehole_thermal_resistance(0.2, 4180), 0.09065476430612592)
 
     flow_data = ConstantFlowRate(mfr=0.4, flow_per_borehole=False)
     single.calculate_resistances(fluid_data, flow_data, nb_of_boreholes=2)

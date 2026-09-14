@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from GHEtool.VariableClasses.PipeData.SeparatusNew import SeparatusNew
+from GHEtool.VariableClasses.PipeData.Separatus import SeparatusNew
 
 GOLDEN = Path(__file__).parent / "data" / "separatus_ann_golden.npz"
 

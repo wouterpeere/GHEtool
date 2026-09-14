@@ -100,7 +100,7 @@ def comparison():
     None
     """
     fluid_data = TemperatureDependentFluidData('MEG', 25, mass_percentage=False).create_constant(0)
-    from GHEtool.VariableClasses.PipeData.SeparatusNew import SeparatusNew
+    from GHEtool.VariableClasses.PipeData.Separatus import SeparatusNew
     separatus = SeparatusNew(2)
     separatus_old = Separatus(2)
     double_pipe = DoubleUTube(1, 0.013, 0.016, 0.4, 0.035)
