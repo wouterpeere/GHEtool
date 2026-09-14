@@ -247,13 +247,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                     Tb = convolve(load, g_value_differences[:window.length])[:window.length] + future_offset[
                         window.window_start:window.window_end]
                     Tb = Tb / corr + borefield._Tg(borefield.H)
-                    # NOTE: this mirrors the original implementation, which broadcasts the freshly computed
-                    # window's Tb/Tf_avg over the *entire* simulation period to re-derive an approximate,
-                    # temperature-dependent building load. That broadcast implicitly assumed the window was
-                    # exactly one full year (8760 hours). With simulation_horizon != 8760 this is only an
-                    # approximation (it now tiles/truncates a window of a different length); if you rely on
-                    # variable_efficiency together with a short simulation_horizon, this part is worth
-                    # revisiting/validating separately.
+ 
                     borefield.load.set_results(
                         ResultsHourly(np.resize(Tb, total_length), np.resize(Tf_avg, total_length)))
                     hourly_load = borefield.load.hourly_net_resulting_injection_power
@@ -424,7 +418,7 @@ if __name__ == "__main__":
     borefield.flow_data = flow_data
     borefield.pipe_data = pipe_data
     borefield.calculation_setup(use_constant_Rb=False)
-    borefield.set_max_fluid_temperature(30)
+    borefield.set_max_fluid_temperature(20)
     borefield.set_min_fluid_temperature(5.5)
     hourly_load_building = HourlyBuildingLoad(efficiency_cooling=7, efficiency_heating=6)
     hourly_load_building.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
@@ -476,15 +470,6 @@ if __name__ == "__main__":
         regen_obj=regeneration_object,
         rules=(1, 2, 3),
         algorithm='proceeding')
-    print(time.time() - start)
-    start = time.time()
-
-    proceeding_my, proceeding = calculate_regeneration(
-        borefield=copy.deepcopy(borefield),
-        regen_obj=regeneration_object,
-        rules=(1, 2, 3),
-        algorithm='proceeding', simulation_horizon=int(8760 / 2))
-    print(time.time() - start)
     yearly_my, yearly = calculate_regeneration(
         borefield=copy.deepcopy(borefield),
         regen_obj=regeneration_object,
@@ -495,11 +480,6 @@ if __name__ == "__main__":
         regen_obj=regeneration_object,
         rules=(1, 2, 3),
         algorithm='total')
-    proceeding_my, proceeding = calculate_regeneration(
-        borefield=copy.deepcopy(borefield),
-        regen_obj=regeneration_object,
-        rules=(1, 2, 3),
-        algorithm='proceeding')
     proceeding_extra_my, proceeding_extra = calculate_regeneration(
         borefield=copy.deepcopy(borefield),
         regen_obj=regeneration_object,
