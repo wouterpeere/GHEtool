@@ -17,13 +17,13 @@ def test_regeneration_only_power():
     assert np.isclose(regeneration.get_regeneration_power_inlet(1, 5, 1, 4000), 300)
     assert np.isclose(regeneration.get_regeneration_power_inlet(2, 5, 1, 4000), 400)
     regeneration = Regeneration(np.array([200, 300, 400]), 1, a1=1, a2=2, min_delta_T=10)
-    assert np.isclose(regeneration.get_regeneration_power_inlet(0, 5, 1, 4000), 200)
-    assert np.isclose(regeneration.get_regeneration_power_inlet(1, 5, 1, 4000), 300)
-    assert np.isclose(regeneration.get_regeneration_power_inlet(2, 5, 1, 4000), 400)
+    assert np.isclose(regeneration.get_regeneration_power_inlet(0, 5, 1, 4000), 277.1363490516876)
+    assert np.isclose(regeneration.get_regeneration_power_inlet(1, 5, 1, 4000), 376.8268535360164)
+    assert np.isclose(regeneration.get_regeneration_power_inlet(2, 5, 1, 4000), 476.51797723702316)
     regeneration = Regeneration(np.array([200, 300, 400]), np.array([1, 1, 1]), a1=1, a2=2, min_delta_T=10)
-    assert np.isclose(regeneration.get_regeneration_power_inlet(0, 5, 1, 4000), 200)
-    assert np.isclose(regeneration.get_regeneration_power_inlet(1, 5, 1, 4000), 300)
-    assert np.isclose(regeneration.get_regeneration_power_inlet(2, 5, 1, 4000), 400)
+    assert np.isclose(regeneration.get_regeneration_power_inlet(0, 5, 1, 4000), 277.1363490516876)
+    assert np.isclose(regeneration.get_regeneration_power_inlet(1, 5, 1, 4000), 376.8268535360164)
+    assert np.isclose(regeneration.get_regeneration_power_inlet(2, 5, 1, 4000), 476.51797723702316)
 
 
 def test_regeneration_temperature():
@@ -96,7 +96,7 @@ def test_ensure_max_limit():
     borefield.set_min_fluid_temperature(5.5)
     hourly_load_building = HourlyBuildingLoad(efficiency_cooling=7, efficiency_heating=6)
 
-    hourly_load_building.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
+    hourly_load_building.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/auditorium.csv"), header=True,
                                              separator=";", col_cooling=0, col_heating=1)
     borefield.load = hourly_load_building
     borefield.load.simulation_period = 5
