@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from GHEtool import *
 
@@ -155,3 +156,76 @@ def test_ensure_max_limit():
         algorithm='proceeding', simulation_horizon=100)
     # way more regeneration due to smaller time horizon
     assert np.isclose(np.sum(proceeding[:8760]), 18933.931812094048)
+
+    # 100 hours simulation horizon
+    proceeding_my, proceeding = calculate_regeneration(
+        borefield=borefield,
+        regen_obj=regeneration_object,
+        rules=(1, 2, 3),
+        algorithm='proceeding', simulation_horizon=100, position_regeneration='outlet')
+
+    # way more regeneration due to smaller time horizon, but smaller than for inlet
+    assert np.isclose(np.sum(proceeding[:8760]), 18634.19248501228)
+
+
+def test_regeneration_error():
+    ground_data = GroundFluxTemperature(2, 10)
+    fluid_data = TemperatureDependentFluidData('MPG', 0, mass_percentage=False)
+    flow_data = ConstantDeltaTFlowRate(delta_temp_extraction=3, delta_temp_injection=3)
+    pipe_data = DoubleUTube(1, 0.013, 0.016, 0.4, 0.035)
+    borefield = Borefield()
+    borefield.create_rectangular_borefield(4, 3, 6, 6, 105, 0.7, 0.07)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.flow_data = flow_data
+    borefield.pipe_data = pipe_data
+    borefield.calculation_setup(use_constant_Rb=False)
+    borefield.set_max_fluid_temperature(20)
+    borefield.set_min_fluid_temperature(5.5)
+    hourly_load_building = HourlyBuildingLoad(efficiency_cooling=7, efficiency_heating=6)
+
+    hourly_load_building.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/auditorium.csv"), header=True,
+                                             separator=";", col_cooling=0, col_heating=1)
+    borefield.load = hourly_load_building
+    borefield.load.simulation_period = 5
+
+    # get weather data
+    weather_file = open(FOLDER.joinpath("test/unit-tests/data/test_epw.epw"), 'rb')
+    weather_file.seek(0)
+    TMY: pd.DataFrame = pd.read_csv(weather_file, sep=",", header=None, skiprows=8)
+
+    TMY.drop(columns=TMY.columns[:5], inplace=True)
+    solar: np.ndarray = np.tile(np.array(TMY.iloc[:, 8]), 20)
+    temperature: np.ndarray = np.tile(np.array(TMY.iloc[:, 1]), 20)
+
+    # initiate regeneration object
+    a0 = 0.45
+    a1 = 24.76  # W/K/m²
+
+    surface = 200  # m²
+
+    regeneration_object = Regeneration(power=solar * a0 * surface * 2, temperature=temperature, a1=a1 * surface)
+    borefield.borehole.use_constant_Rb = True
+    with pytest.raises(ValueError):
+        calculate_regeneration(
+            borefield=borefield,
+            regen_obj=regeneration_object,
+            rules=(1, 2, 3),
+            algorithm='proceeding',
+            simulation_horizon=8760 * 2)
+    borefield.borehole.use_constant_Rb = False
+    with pytest.raises(ValueError):
+        calculate_regeneration(
+            borefield=borefield,
+            regen_obj=regeneration_object,
+            rules=(1, 2, 3),
+            algorithm='proceeding',
+            simulation_horizon=8760 * 2, position_regeneration='outlett')
+    borefield.borehole.flow_data = VariableHourlyFlowRate(mfr=np.ones(8760))
+    with pytest.raises(ValueError):
+        calculate_regeneration(
+            borefield=borefield,
+            regen_obj=regeneration_object,
+            rules=(1, 2, 3),
+            algorithm='proceeding',
+            simulation_horizon=8760 * 2)

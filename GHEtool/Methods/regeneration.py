@@ -125,6 +125,9 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
         injection_dominated = borefield.load.imbalance > 0
         extraction_dominated = not injection_dominated
 
+    if position_regeneration not in ('inlet', 'outlet'):
+        raise ValueError('Position_regeneration must be either "inlet" or "outlet"')
+
     # calculate the maximum power based on the maximum temperature difference that can be achieved
     if isinstance(borefield.borehole.flow_data, ConstantDeltaTFlowRate):
         max_delta = borefield.Tf_max - borefield.Tf_min
@@ -247,7 +250,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                     Tb = convolve(load, g_value_differences[:window.length])[:window.length] + future_offset[
                         window.window_start:window.window_end]
                     Tb = Tb / corr + borefield._Tg(borefield.H)
- 
+
                     borefield.load.set_results(
                         ResultsHourly(np.resize(Tb, total_length), np.resize(Tf_avg, total_length)))
                     hourly_load = borefield.load.hourly_net_resulting_injection_power
@@ -406,7 +409,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
     return multiyear_load, regeneration_array / 1000
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma no-cover
     ground_data = GroundFluxTemperature(2, 10)
     fluid_data = TemperatureDependentFluidData('MPG', 0, mass_percentage=False)
     flow_data = ConstantDeltaTFlowRate(delta_temp_extraction=3, delta_temp_injection=3)
