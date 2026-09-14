@@ -13,6 +13,9 @@ def test_regeneration_only_power():
     regeneration = Regeneration(200)
     assert regeneration.power == 200
     assert np.isclose(regeneration.get_regeneration_power_inlet(0, 5, 1, 4000), 200)
+    regeneration.surface = 10
+    assert np.isclose(regeneration.get_regeneration_power_inlet(0, 5, 1, 4000), 2000)
+    regeneration.surface = 1
     regeneration = Regeneration(np.array([200, 300, 400]))
     assert np.isclose(regeneration.get_regeneration_power_inlet(0, 5, 1, 4000), 200)
     assert np.isclose(regeneration.get_regeneration_power_inlet(1, 5, 1, 4000), 300)
@@ -289,3 +292,102 @@ def test_yearly_multiyearly():
     assert np.allclose(yearly, total)
 
     np.allclose(_.hourly_regeneration_load_simulation_period, total)
+
+
+def test_proceeding_extra():
+    ground_data = GroundFluxTemperature(2, 10)
+    fluid_data = TemperatureDependentFluidData('MPG', 0, mass_percentage=False)
+    flow_data = ConstantDeltaTFlowRate(delta_temp_extraction=3, delta_temp_injection=3)
+    pipe_data = DoubleUTube(1, 0.013, 0.016, 0.4, 0.035)
+    borefield = Borefield()
+    borefield.create_rectangular_borefield(4, 3, 6, 6, 105, 0.7, 0.07)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.flow_data = flow_data
+    borefield.pipe_data = pipe_data
+    borefield.calculation_setup(use_constant_Rb=False)
+    borefield.set_max_fluid_temperature(30)
+    borefield.set_min_fluid_temperature(5.5)
+    hourly_load_building = HourlyBuildingLoad(efficiency_cooling=7, efficiency_heating=6)
+
+    hourly_load_building.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/auditorium.csv"), header=True,
+                                             separator=";", col_cooling=0, col_heating=1)
+    borefield.load = hourly_load_building
+    borefield.load.simulation_period = 5
+
+    # get weather data
+    weather_file = open(FOLDER.joinpath("test/unit-tests/data/test_epw.epw"), 'rb')
+    weather_file.seek(0)
+    TMY: pd.DataFrame = pd.read_csv(weather_file, sep=",", header=None, skiprows=8)
+
+    TMY.drop(columns=TMY.columns[:5], inplace=True)
+    solar: np.ndarray = np.tile(np.array(TMY.iloc[:, 8]), 20)
+    temperature: np.ndarray = np.tile(np.array(TMY.iloc[:, 1]), 20)
+
+    # initiate regeneration object
+    a0 = 0.45
+    a1 = 24.76  # W/K/m²
+
+    surface = 200  # m²
+
+    regeneration_object = Regeneration(power=solar * a0 * surface * 2, temperature=temperature, a1=a1 * surface)
+
+    _, proceeding_extra = calculate_regeneration(
+        borefield=borefield,
+        regen_obj=regeneration_object,
+        rules=(1, 2, 3),
+        algorithm='proceeding_extra',
+        simulation_horizon=8760)
+
+    assert np.any(proceeding_extra < 0)
+    _, proceeding = calculate_regeneration(
+        borefield=borefield,
+        regen_obj=regeneration_object,
+        rules=(1, 2, 3),
+        algorithm='proceeding',
+        simulation_horizon=8760)
+
+    # more regeneration with proceeding extra
+    assert np.isclose(np.sum(proceeding_extra[proceeding_extra >= 0]), 129587.40836822524)
+    assert np.isclose(np.sum(proceeding), 129243.70464857337)
+
+
+def test_equal_with_different_horizons():
+    # get weather data
+    weather_file = open(FOLDER.joinpath("Examples/BEL_Brussels.064510_IWEC.epw"), 'rb')
+    weather_file.seek(0)
+    TMY: pd.DataFrame = pd.read_csv(weather_file, sep=",", header=None, skiprows=8)
+
+    TMY.drop(columns=TMY.columns[:5], inplace=True)
+    solar: np.ndarray = np.tile(np.array(TMY.iloc[:, 8]), 20)
+    temperature: np.ndarray = np.tile(np.array(TMY.iloc[:, 1]), 20)
+
+    a0 = 0.47
+    a1 = 22.9  # W/k/m²
+    triple_solar = Regeneration(power=solar * a0, temperature=temperature, a1=a1)
+
+    ground_data = GroundFluxTemperature(2, 10)
+    fluid_data = TemperatureDependentFluidData('MPG', 0, mass_percentage=False)
+    flow_data = ConstantDeltaTFlowRate(delta_temp_extraction=3, delta_temp_injection=3)
+    pipe_data = DoubleUTube(1, 0.013, 0.016, 0.4, 0.035)
+
+    borefield = Borefield()
+    borefield.create_rectangular_borefield(20, 20, 6, 6, 200, 4, 0.075)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.pipe_data = pipe_data
+    borefield.flow_data = flow_data
+    borefield.calculation_setup(use_constant_Rb=False)
+    borefield.set_max_fluid_temperature(17)
+    borefield.set_min_fluid_temperature(3)
+    hourly_load = HourlyBuildingLoad(efficiency_dhw=3.5)
+    hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/swimming_pool.csv"), header=True,
+                                    separator=";", col_cooling=0, col_heating=1, col_dhw=2)
+    borefield.load = hourly_load
+    borefield.load.simulation_period = 5
+    triple_solar.surface = 200
+    _, regen_8760 = calculate_regeneration(borefield, triple_solar, algorithm='proceeding',
+                                           simulation_horizon=8760)
+    _, regen_100 = calculate_regeneration(borefield, triple_solar, algorithm='proceeding',
+                                          simulation_horizon=100)
+    assert np.allclose(regen_8760, regen_100)
