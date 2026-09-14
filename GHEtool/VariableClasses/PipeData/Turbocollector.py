@@ -18,7 +18,7 @@ class Turbocollector(MultipleUTube):
     """
 
     def __init__(self, k_g: float = None, r_in: float = None, r_out: float = None,
-                 D_s: float = None, number_of_pipes: int = None):
+                 D_s: float = None, number_of_pipes: int = None, groundwater_filled: bool = False):
         """
 
         Parameters
@@ -33,8 +33,11 @@ class Turbocollector(MultipleUTube):
             Distance of the pipe until center [m]
         number_of_pipes : int
             Number of pipes [#] (single U-tube: 1, double U-tube:2)
+        groundwater_filled : bool
+            Filled with groundwater (overwrites the grout conductivity)
         """
-        super().__init__(k_g=k_g, r_in=r_in, r_out=r_out, k_p=0.4, D_s=D_s, number_of_pipes=number_of_pipes)
+        super().__init__(k_g=k_g, r_in=r_in, r_out=r_out, k_p=0.4, D_s=D_s, number_of_pipes=number_of_pipes,
+                         groundwater_filled=groundwater_filled)
 
     def calculate_convective_resistance(self, flow_data: _FlowData, fluid_data: _FluidData, **kwargs):
         """

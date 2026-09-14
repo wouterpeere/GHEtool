@@ -167,10 +167,13 @@ class _HourlyData(_LoadData, ABC):
         peak loads [kW], monthly energy demand [kWh/month] : np.ndarray, np.ndarray
         """
 
-        data = np.array_split(hourly_load, np.cumsum(np.tile(self.UPM, int(len(hourly_load) / 8760)))[:-1])
-
-        if self.all_months_equal:
+        if self.all_months_equal and len(hourly_load) % 8760 == 0 and len(hourly_load) > 0:
+            # all months have the same length, so a simple (and much faster) reshape
+            # gives the same result as splitting the array per month
+            data = np.reshape(hourly_load, (-1, _LoadData.AVG_UPM))
             return np.max(data, axis=1), np.sum(data, axis=1)
+
+        data = np.array_split(hourly_load, np.cumsum(np.tile(self.UPM, int(len(hourly_load) / 8760)))[:-1])
 
         return np.array([np.max(i) for i in data]), np.array([np.sum(i) for i in data])
 

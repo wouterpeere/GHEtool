@@ -17,7 +17,8 @@ class EER(_Efficiency):
                  part_load: bool = False,
                  secondary: bool = False,
                  reference_nominal_power: float = None,
-                 nominal_power: float = None):
+                 nominal_power: float = None,
+                 default_secondary_temperature: float = None, ):
         """
 
         Parameters
@@ -38,6 +39,9 @@ class EER(_Efficiency):
             The nominal power at which to define the current efficiency class. This converts the provided efficiency data
             from the reference_nominal_power to the nominal_power. This is only relevant when part load data is available
             and the reference_nominal_power is provided.
+        default_secondary_temperature : float
+            Default average temperature at the secondary side of the heat pump. This is used to calculate the correct efficiency
+            in for example heating or dhw [°C]
 
         Raises
         ------
@@ -45,7 +49,8 @@ class EER(_Efficiency):
             When the shape of the data does not equal the provided ranges.
 
         """
-        super().__init__(data, coordinates, part_load, secondary, reference_nominal_power, nominal_power)
+        super().__init__(data, coordinates, part_load, secondary, reference_nominal_power, nominal_power,
+                         default_secondary_temperature)
 
     def get_EER(self,
                 primary_temperature: Union[float, np.ndarray],

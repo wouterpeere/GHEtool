@@ -56,7 +56,7 @@ def test_sizing_with_building_load(monkeypatch):
         size_with_part_load_data
     assert np.allclose(size_with_scop(), (95.94350214711557, 4.072466974615784))
     assert np.allclose(size_with_variable_ground_temperature(), (94.91607600186884, 4.140667366915088))
-    assert np.allclose(size_with_part_load_data(), (97.40238165884419, 4.633232724880249))
+    assert np.allclose(size_with_part_load_data(), (97.40386192373523, 4.633234909628379))
 
 
 def test_sizing_with_building_load_hourly(monkeypatch):
@@ -69,8 +69,8 @@ def test_sizing_with_building_load_hourly(monkeypatch):
 def test_sizing_with_building_load_hourly_limit(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.sizing_with_building_load_hourly_limit import L3_sizing, L4_sizing
-    assert np.allclose(L3_sizing(), 111.8121680540246)
-    assert np.allclose(L4_sizing(), (144.11894710530277, 5.027207193115156))
+    assert np.allclose(L3_sizing(), 111.90952430960704)
+    assert np.allclose(L4_sizing(), (144.0530102876856, 5.016673877768159))
 
 
 def test_combined_active_and_passive_cooling(monkeypatch):
@@ -139,3 +139,9 @@ def test_variable_flow(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.variable_flow_rate import sizing
     sizing()
+
+
+def test_groundwater_filled_borehole(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.groundwater_filled_boreholes import graphs
+    graphs()

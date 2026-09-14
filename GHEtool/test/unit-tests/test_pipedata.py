@@ -694,7 +694,7 @@ def test_conical_resistances():
 
     pipe.calculate_resistances(fluid, flow, 200)
     assert np.isclose(0.07358834823796871, pipe.R_p)
-    assert np.isclose(0.1787639520941072, pipe.R_f)
+    assert np.isclose(0.17827314935787522, pipe.R_f)
 
 
 def test_conical_convective_resistance():
@@ -768,7 +768,7 @@ def test_conical_pressure_drop_total():
     # this is significantly lower than the approximation, since there is a laminar-transient boundary crossed
     # in the approximation, this causes the whole conical section to become transient, where the more accurate method
     # only makes part of it transient, leading to a lower pressure drop in the end
-    assert np.isclose(28.880311539363454, pipe.pressure_drop(fluid, flow, 180))
+    assert np.isclose(28.719002126170835, pipe.pressure_drop(fluid, flow, 180))
     assert np.isclose(pipe_double._top_pipe.pressure_drop(fluid, flow, 60), pipe_double.pressure_drop(fluid, flow, 60))
     assert np.isclose(6.640568081247919, pipe_double.pressure_drop(fluid, flow, 100))
     assert np.isclose(12.539012292217867, pipe_double.pressure_drop(fluid, flow, 180))
@@ -958,6 +958,22 @@ def test_explicit_models_double_U():
                       pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 0, R_p=0.05))
     assert np.isclose(0.0595478420593229,
                       pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, 1, R_p=0.05))
+
+
+def test_groundwater_filled():
+    fluid = TemperatureDependentFluidData('MEA', 25)
+    flow = ConstantFlowRate(vfr=1.5 * 2 / 3.6)
+    pipe = MultipleUTube(1.5, 0.0354 / 2, 0.02, 0.4, 0.035, number_of_pipes=1, groundwater_filled=True)
+    borehole = gt.boreholes.Borehole(80, 0, 0.110 / 2, 0, 0)
+
+    pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, temperature_borehole_wall=10, temperature=10,
+                                            power=-30 * 80 * 9 / 1000, nb_of_boreholes=9)
+
+    with pytest.raises(ValueError):
+        pipe.explicit_model_borehole_resistance(fluid, flow, 3, borehole, temperature=10,
+                                                power=-30 * 80 * 9 / 1000, nb_of_boreholes=9)
+    with pytest.raises(ValueError):
+        pipe.pipe_model(2, borehole)
 
 
 def test_convective_resistance_variable_flow_constant_fluid():

@@ -11,7 +11,8 @@ class SingleUTube(MultipleUTube):
                  r_out: float = None,
                  k_p: float = None,
                  D_s: float = None,
-                 epsilon: float = 1e-6):
+                 epsilon: float = 1e-6,
+                 groundwater_filled: bool = False):
         """
 
         Parameters
@@ -28,5 +29,7 @@ class SingleUTube(MultipleUTube):
             Distance of the pipe until center [m]
         epsilon : float
             Pipe roughness [m]
+        groundwater_filled : bool
+            Filled with groundwater (overwrites the grout conductivity)
         """
-        super().__init__(k_g, r_in, r_out, k_p, D_s, 1, epsilon)
+        super().__init__(k_g, r_in, r_out, k_p, D_s, 1, epsilon, groundwater_filled=groundwater_filled)

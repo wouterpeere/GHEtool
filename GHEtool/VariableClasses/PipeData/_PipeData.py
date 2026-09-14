@@ -15,7 +15,8 @@ class _PipeData(BaseClass, ABC):
 
     def __init__(self, k_g: float = None,
                  k_p: float = None,
-                 epsilon: float = 1e-6):
+                 epsilon: float = 1e-6,
+                 groundwater_filled: bool = False) -> None:
         """
 
         Parameters
@@ -26,11 +27,14 @@ class _PipeData(BaseClass, ABC):
             Pipe thermal conductivity [W/mK]
         epsilon : float
             Pipe roughness [m]
+        groundwater_filled : bool
+            Filled with groundwater (overwrites the grout conductivity)
         """
 
         self.k_g = k_g  # grout thermal conductivity W/mK
         self.k_p = k_p  # pipe thermal conductivity W/mK
         self.epsilon = epsilon  # pipe roughness m
+        self.groundwater_filled = groundwater_filled
 
     @abc.abstractmethod
     def calculate_resistances(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,

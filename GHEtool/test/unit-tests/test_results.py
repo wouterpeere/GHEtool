@@ -36,13 +36,39 @@ def test_delta():
     results = ResultsMonthly()
     results._peak_extraction_outlet = np.array([5, 5])
     results._peak_extraction_inlet = np.array([4, 4])
+    results._peak_extraction = np.array([3, 3])
     assert np.allclose([1, 1], results.peak_extraction_delta)
+    assert np.allclose([4, 4], results.peak_extraction_inlet)
+    assert np.allclose([5, 5], results.peak_extraction_outlet)
+    assert np.allclose([4, 4], results.get_peak_extraction('inlet'))
+    assert np.allclose([5, 5], results.get_peak_extraction('outlet'))
+    assert np.allclose([3, 3], results.get_peak_extraction('average'))
+
     results._peak_injection_outlet = np.array([5, 5])
     results._peak_injection_inlet = np.array([4, 4])
+    results._peak_injection = np.array([3, 3])
     assert np.allclose([1, 1], results.peak_injection_delta)
+    assert np.allclose([4, 4], results.peak_injection_inlet)
+    assert np.allclose([5, 5], results.peak_injection_outlet)
+    assert np.allclose([4, 4], results.get_peak_injection('inlet'))
+    assert np.allclose([5, 5], results.get_peak_injection('outlet'))
+    assert np.allclose([3, 3], results.get_peak_injection('average'))
+
     results._baseload_temp_outlet = np.array([5, 5])
     results._baseload_temp_inlet = np.array([4, 4])
+    results._baseload_temp = np.array([3, 3])
     assert np.allclose([1, 1], results.baseload_temperature_delta)
+    assert np.allclose([4, 4], results.baseload_temperature_inlet)
+    assert np.allclose([5, 5], results.baseload_temperature_outlet)
+    assert np.allclose([4, 4], results.get_baseload('inlet'))
+    assert np.allclose([5, 5], results.get_baseload('outlet'))
+    assert np.allclose([3, 3], results.get_baseload('average'))
+    with pytest.raises(ValueError):
+        results.get_peak_injection('test')
+    with pytest.raises(ValueError):
+        results.get_peak_extraction('test')
+    with pytest.raises(ValueError):
+        results.get_baseload('test')
 
     results = ResultsHourly()
     results._Tf_outlet = np.array([5, 5])
@@ -50,6 +76,10 @@ def test_delta():
     assert np.allclose([1, 1], results.Tf_delta)
     assert np.allclose([1, 1], results.peak_injection_delta)
     assert np.allclose([1, 1], results.peak_extraction_delta)
+    assert np.allclose([4, 4], results.get_peak_injection('inlet'))
+    assert np.allclose([5, 5], results.get_peak_injection('outlet'))
+    assert np.allclose([4, 4], results.get_peak_extraction('inlet'))
+    assert np.allclose([5, 5], results.get_peak_extraction('outlet'))
 
 
 def test_monthly():

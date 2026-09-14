@@ -13,6 +13,15 @@ from GHEtool.VariableClasses.FlowData import _FlowData
 from scipy.integrate import quad_vec
 
 
+def _simpson_weights(z):
+    h = np.diff(z)
+    # for uniform spacing this reduces to the classic 1-4-2-4-...-4-1 pattern * h/3
+    w = np.ones(len(z))
+    w[1:-1:2] = 4
+    w[2:-1:2] = 2
+    return w * h[0] / 3  # only valid if spacing is uniform
+
+
 class ConicalPipe(MultipleUTube):
     """
     This class contains the data for a conical pipe, where the wall thickness varies over the length of the pipe.
@@ -156,10 +165,11 @@ class ConicalPipe(MultipleUTube):
                 else:
                     return self.r_in_stop
 
-            def r_f_func(length):
+            def r_f_func(length, haaland=False):
                 # Film thermal resistance [m.K/W]
                 return calculate_convective_resistance(flow_data, fluid_data, r_in=calc_r_in(length),
-                                                       epsilon=self.epsilon, nb_of_pipes=self.number_of_pipes, **kwargs)
+                                                       epsilon=self.epsilon, nb_of_pipes=self.number_of_pipes,
+                                                       haaland=haaland, **kwargs)
 
             # Lengths of the three regions
             L1 = max(0.0, min(self.begin_conical, borehole_length))
@@ -175,11 +185,13 @@ class ConicalPipe(MultipleUTube):
             # Contribution in conical section
             R2 = 0.0
             if L2 > 0:
-                z_cone = np.linspace(self.begin_conical, min(self.end_conical, borehole_length), 9)
-                rf_cone = np.array([r_f_func(z) for z in z_cone])
-                R2 = scipy.integrate.simpson(rf_cone, x=z_cone, axis=0)
+                z_cone = np.linspace(self.begin_conical, min(self.end_conical, borehole_length), 3)
+                rf_cone = np.array([r_f_func(z, True) for z in z_cone])
 
-            # Contribution after conical section
+                weights = _simpson_weights(z_cone)
+                R2 = weights @ rf_cone
+
+                # Contribution after conical section
             R3 = 0.0
             if L3 > 0:
                 rf_stop = r_f_func(borehole_length)
@@ -425,7 +437,6 @@ class ConicalPipe(MultipleUTube):
 
         # use the average integral theorem
         if not self.use_approx:
-            # rate increase in wall thickness of conical part
             a = (self.r_in_start - self.r_in_stop) / (self.end_conical - self.begin_conical)
 
             def calc_r_in(length):
@@ -436,25 +447,50 @@ class ConicalPipe(MultipleUTube):
                 else:
                     return self.r_in_stop
 
-            def calc_pressure(length):
-                # calculate inner radius at the borehole length
-                r_in = calc_r_in(length)
+            # hoist length-independent quantities out of the integrand
+            rho = fluid_data.rho(**kwargs)
+            mu = fluid_data.mu(**kwargs)
+            vfr = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000 / self.number_of_pipes
+            haaland = kwargs.get('haaland', False)
 
+            def calc_pressure(r_in):
                 A = pi * r_in ** 2
-                V = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000 / A / self.number_of_pipes
-                Re = fluid_data.rho(**kwargs) * V * r_in * 2 / fluid_data.mu(**kwargs)
-                if kwargs.get('haaland', False):
-                    fd = friction_factor_Haaland(Re, calc_r_in(length), self.epsilon, **kwargs)
+                V = vfr / A
+                Re = rho * V * r_in * 2 / mu
+                if haaland:
+                    fd = friction_factor_Haaland(Re, r_in, self.epsilon, **kwargs)
                 else:
-                    fd = friction_factor_darcy_weisbach(Re, calc_r_in(length), self.epsilon, **kwargs)
+                    fd = friction_factor_darcy_weisbach(Re, r_in, self.epsilon, **kwargs)
+                return ((fd / (r_in * 2)) * rho * V ** 2 / 2) / 1000
 
-                return ((fd / (r_in * 2)) * fluid_data.rho(**kwargs) * V ** 2 / 2) / 1000
+            # same L1 / L2 / L3 split as calculate_convective_resistance
+            L1 = max(0.0, min(self.begin_conical, borehole_length))
+            L2 = max(0.0, min(self.end_conical, borehole_length) - self.begin_conical)
+            L3 = max(0.0, borehole_length - max(self.end_conical, 0.0))
 
-            A = 3.1415 * calc_r_in(borehole_length) ** 2
-            V = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / 1000 / A / self.number_of_pipes
+            result = 0.0
+
+            # straight section before cone: r_in constant -> integrand constant
+            if L1 > 0:
+                result += calc_pressure(self.r_in_start) * L1
+
+            # conical section: only region that actually needs quadrature
+            if L2 > 0:
+                z = np.linspace(self.begin_conical, min(self.end_conical, borehole_length), 3)
+                r_in_z = self.r_in_start - a * (z - self.begin_conical)
+                p_z = [calc_pressure(i) for i in
+                       r_in_z]  # only works if calc_pressure's body broadcasts over r_in as an array
+
+                result += _simpson_weights(z) @ p_z
+
+            # straight section after cone
+            if L3 > 0:
+                result += calc_pressure(self.r_in_stop) * L3
+
+            A = pi * calc_r_in(borehole_length) ** 2
+            V = vfr / A
             bend = 0.2
-            return quad_vec(calc_pressure, 0, borehole_length)[0] * 2 + bend * V ** 2 * fluid_data.rho(
-                **kwargs) / 2 / 1000
+            return result * 2 + bend * V ** 2 * rho / 2 / 1000
 
         if borehole_length <= self.begin_conical:
             # only the first part

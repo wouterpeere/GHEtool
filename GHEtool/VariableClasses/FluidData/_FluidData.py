@@ -105,6 +105,17 @@ class _FluidData(ABC, BaseClass):
         """
         return self.cp(**kwargs) * self.mu(**kwargs) / self.k_f(**kwargs)
 
+    def alpha(self, **kwargs) -> float:
+        """
+        This function returns the thermal diffusivity of the fluid.
+
+        Returns
+        -------
+        float
+            Thermal diffusivity [m^2/s]
+        """
+        return self.k_f(**kwargs) / self.rho(**kwargs) / self.cp(**kwargs)
+
     def test_freezing(self, temperature: Union[float, int, np.ndarray]) -> bool:
         """
         This function returns false if all the temperatures are above the freezing point and true otherwise.

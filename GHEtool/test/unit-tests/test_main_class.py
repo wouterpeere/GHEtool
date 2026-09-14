@@ -1418,3 +1418,41 @@ def test_hourly_flow_rate():
     with pytest.raises(ValueError):
         optimise_load_profile_energy(borefield, load)
     borefield.size_L4()
+
+
+def test_with_cop():
+    cop1 = COP(np.array(
+        [3.86, 4.28, 3.93, 4.08, 4.6, 4.18, 4.53, 5.12, 4.7, 5.04, 5.72, 5.3, 5.41, 6.17, 5.63, 2.53, 2.89, 2.52, 2.88,
+         3.02, 2.68, 3.14, 3.25, 2.89, 3.61, 3.52, 3.12, 3.83, 3.68, 3.32]),
+        np.array(
+            [[-4.5, 32.5, 53.6], [-4.5, 32.5, 39.8], [-4.5, 32.5, 23.2], [-1.5, 32.5, 58.7], [-1.5, 32.5, 43.7],
+             [-1.5, 32.5, 25.5], [3.5, 32.5, 67.9], [3.5, 32.5, 50.7], [3.5, 32.5, 29.6], [8.5, 32.5, 77.6],
+             [8.5, 32.5, 58.3], [8.5, 32.5, 33.9], [11.5, 32.5, 83.9], [11.5, 32.5, 62.9], [11.5, 32.5, 36.6],
+             [-4.5, 52.5, 44.8], [-4.5, 52.5, 34.1], [-4.5, 52.5, 18.9], [-1.5, 52.5, 49.3], [-1.5, 52.5, 37.4],
+             [-1.5, 52.5, 20.9], [3.5, 52.5, 57.2], [3.5, 52.5, 43.2], [3.5, 52.5, 24.3], [8.5, 52.5, 62.5],
+             [8.5, 52.5, 49.7], [8.5, 52.5, 28.1], [11.5, 52.5, 67.8], [11.5, 52.5, 53.7], [11.5, 52.5, 30.5]]),
+        secondary=True, part_load=True, default_secondary_temperature=32.5)
+    cop2 = COP(np.array(
+        [3.86, 4.28, 3.93, 4.08, 4.6, 4.18, 4.53, 5.12, 4.7, 5.04, 5.72, 5.3, 5.41, 6.17, 5.63]),
+        np.array(
+            [[-4.5, 53.6], [-4.5, 39.8], [-4.5, 23.2], [-1.5, 58.7], [-1.5, 43.7],
+             [-1.5, 25.5], [3.5, 67.9], [3.5, 50.7], [3.5, 29.6], [8.5, 77.6],
+             [8.5, 58.3], [8.5, 33.9], [11.5, 83.9], [11.5, 62.9], [11.5, 36.6]]),
+        part_load=True)
+
+    ground = GroundConstantTemperature(2, 11.73, 2.6e6)
+    borefield = Borefield()
+    borefield.ground_data = ground
+    load = HourlyBuildingLoad(efficiency_heating=cop1, efficiency_cooling=20)
+    # quadrant 1
+    borefield.borefield = copy.deepcopy(borefield_gt)
+    load.load_hourly_profile(FOLDER.joinpath("Examples/auditorium.csv"), col_heating=1, col_cooling=0)
+    borefield.load = load
+    borefield.create_rectangular_borefield(5, 4, 6, 6, 120, 1, 0.075)
+    borefield.calculate_temperatures(hourly=True)
+    result = copy.deepcopy(borefield.results)
+
+    borefield.load.cop = cop2
+    borefield.calculate_temperatures(hourly=True)
+    result2 = copy.deepcopy(borefield.results)
+    assert np.allclose(result.Tf, result2.Tf)

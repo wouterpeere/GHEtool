@@ -1,7 +1,4 @@
-import joblib
-import torch
-import torch.nn as nn
-
+import numpy as np
 import pygfunction as gt
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -12,32 +9,14 @@ from GHEtool.VariableClasses.FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
 
 
-class EllipseANN(nn.Module):
-    """
-    Small MLP for 5-input, 2-output regression.
-
-    Inputs:
-        r_b, spacing, R_fp, k_b, k_s
-
-    Outputs:
-        R_b, R_a
-    """
-
-    def __init__(self, n_inputs: int = 5, n_outputs: int = 2):
-        super().__init__()
-
-        self.net = nn.Sequential(
-            nn.Linear(n_inputs, 64),
-            nn.Tanh(),
-            nn.Linear(64, 64),
-            nn.Tanh(),
-            nn.Linear(64, 32),
-            nn.Tanh(),
-            nn.Linear(32, n_outputs),
-        )
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.net(x)
+def _predict_rb_ra_numpy(ann: dict, X: np.ndarray) -> np.ndarray:
+    """5→64→64→32→2 Tanh MLP + StandardScaler, no torch."""
+    Xs = (X - ann["x_mean"]) / ann["x_scale"]
+    h = np.tanh(Xs @ ann["w0"].T + ann["b0"])
+    h = np.tanh(h @ ann["w1"].T + ann["b1"])
+    h = np.tanh(h @ ann["w2"].T + ann["b2"])
+    ys = h @ ann["w3"].T + ann["b3"]
+    return ys * ann["y_scale"] + ann["y_mean"]
 
 
 class MuoviEllipse(SingleUTube):
@@ -49,7 +28,8 @@ class MuoviEllipse(SingleUTube):
     More information on this technology and its advantages can be found here: https://www.muovitech.com/group/?page=MuoviELLIPSE.
     """
 
-    def __init__(self, k_g: float, a: float, b: float, wall_thickness: float, D_s: float = None):
+    def __init__(self, k_g: float, a: float, b: float, wall_thickness: float, D_s: float = None,
+                 groundwater_filled: bool = False):
         """
 
         Parameters
@@ -64,6 +44,8 @@ class MuoviEllipse(SingleUTube):
             Wall thickness [m]
         D_s : float
             Distance of the pipe until center [m]
+        groundwater_filled : bool
+            Filled with groundwater (overwrites the grout conductivity)
         """
         self.k_g = k_g
         self.a = a
@@ -75,12 +57,13 @@ class MuoviEllipse(SingleUTube):
             raise ValueError(f'The distance of the pipe until the center should at least be {b / 2} m.')
 
         # load correct ANN model
+        self._ann = None
         self._load_model(a, b)
 
         self.area_outer = np.pi * a * b / 4
         h = (a / 2 - b / 2) ** 2 / ((a / 2 + b / 2) ** 2)
-        perimeter_outer = np.pi * (a / 2 + b / 2) * (1 + (3 * h) / (10 + np.sqrt(4 - 3 * h)))
-        self.hydraulic_diameter_outer = 4 * self.area_outer / perimeter_outer
+        self.perimeter_outer = np.pi * (a / 2 + b / 2) * (1 + (3 * h) / (10 + np.sqrt(4 - 3 * h)))
+        self.hydraulic_diameter_outer = 4 * self.area_outer / self.perimeter_outer
 
         self.area_inner = np.pi * (a - wall_thickness * 2) * (b - wall_thickness * 2) / 4
         h = (((a - wall_thickness * 2) / 2 - (b - wall_thickness * 2) / 2) ** 2 /
@@ -89,7 +72,8 @@ class MuoviEllipse(SingleUTube):
                 1 + (3 * h) / (10 + np.sqrt(4 - 3 * h)))
         self.hydraulic_diameter_inner = 4 * self.area_inner / perimeter_inner
 
-        super().__init__(k_g, self.hydraulic_diameter_inner / 2, self.hydraulic_diameter_outer / 2, 0.4, D_s)
+        super().__init__(k_g, self.hydraulic_diameter_inner / 2, self.hydraulic_diameter_outer / 2, 0.4, D_s,
+                         groundwater_filled=groundwater_filled)
 
     def _load_model(self, a, b) -> None:
         """
@@ -107,34 +91,22 @@ class MuoviEllipse(SingleUTube):
         from GHEtool import FOLDER
 
         if np.isclose(a, 37e-3) and np.isclose(b, 26e-3):
-            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE32/borehole_ann.pt")
-            self._x_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE32/X_scaler.joblib")
-            self._y_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE32/y_scaler.joblib")
+            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE32/borehole_ann.npz")
 
         elif np.isclose(a, 46e-3) and np.isclose(b, 33e-3):
-            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE40/borehole_ann.pt")
-            self._x_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE40/X_scaler.joblib")
-            self._y_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE40/y_scaler.joblib")
+            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE40/borehole_ann.npz")
 
         elif np.isclose(a, 51e-3) and np.isclose(b, 37e-3):
-            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE45/borehole_ann.pt")
-            self._x_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE45/X_scaler.joblib")
-            self._y_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE45/y_scaler.joblib")
+            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE45/borehole_ann.npz")
 
         elif np.isclose(a, 58e-3) and np.isclose(b, 41e-3):
-            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE50/borehole_ann.pt")
-            self._x_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE50/X_scaler.joblib")
-            self._y_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE50/y_scaler.joblib")
+            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE50/borehole_ann.npz")
 
         elif np.isclose(a, 64e-3) and np.isclose(b, 45e-3):
-            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE55/borehole_ann.pt")
-            self._x_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE55/X_scaler.joblib")
-            self._y_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE55/y_scaler.joblib")
+            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE55/borehole_ann.npz")
 
         elif np.isclose(a, 73e-3) and np.isclose(b, 52e-3):
-            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE63/borehole_ann.pt")
-            self._x_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE63/X_scaler.joblib")
-            self._y_scaler_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE63/y_scaler.joblib")
+            self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/MuoviELLIPSE63/borehole_ann.npz")
 
         else:
             raise ValueError(
@@ -276,6 +248,13 @@ class MuoviEllipse(SingleUTube):
 
         raise NotImplementedError('The MuoviELLIPSE can only be simulated with the explicit methods.')
 
+    def _load_ann(self) -> dict:
+        """Load and cache weights + scalers from the size-specific .npz."""
+        if self._ann is None:
+            with np.load(self._model_path) as data:
+                self._ann = {key: np.asarray(data[key]) for key in data.files}
+        return self._ann
+
     def predict_Rb_Ra_series(self, r_b, spacing, R_fp, k_b, k_s):
         """
         Vectorized prediction of R_b and R_a based on the ANN-model.
@@ -294,13 +273,6 @@ class MuoviEllipse(SingleUTube):
         R_b, R_a : np.ndarray
             Same shape as broadcasted inputs.
         """
-        model = EllipseANN()
-        model.load_state_dict(torch.load(self._model_path, map_location="cpu"))
-        model.eval()
-
-        X_scaler = joblib.load(self._x_scaler_path)
-        y_scaler = joblib.load(self._y_scaler_path)
-
         # Convert to arrays
         r_b = np.asarray(r_b)
         spacing = np.asarray(spacing)
@@ -326,14 +298,7 @@ class MuoviEllipse(SingleUTube):
             ]
         )
 
-        # Scale inputs
-        X_s = X_scaler.transform(X)
-
-        # Predict
-        with torch.no_grad():
-            y_s = model(torch.tensor(X_s, dtype=torch.float32)).numpy()
-
-        y = y_scaler.inverse_transform(y_s)
+        y = _predict_rb_ra_numpy(self._load_ann(), X)
 
         # Restore original shape
         R_b = y[:, 0].reshape(shape)

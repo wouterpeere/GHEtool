@@ -12,9 +12,6 @@ mentioned are the ones with which the code is tested)
 * scipy >= 1.8.1
 * secondarycoolantprops >= 1.1
 * optuna >= 3.6.1
-* joblib >= 1.5.3
-* torch >= 2.11.0
-* scikit-learn == 1.8.0
 
 For the tests
 
@@ -147,6 +144,8 @@ These efficiencies can be used in the Building load classes (cf. infra). The dif
 * _COP_: Instant efficiency for heating, with inlet temperature, outlet temperature and part load dependency
 * _EER_: Instant efficiency for cooling, with inlet temperature, outlet temperature and part load dependency
 * _EERCombined_: EER for combined active and passive cooling
+* _COPNonModulating_: COP for non-modulating heat pumps
+* _EERNonModulating_: EER for non-modulating heat pumps
 
 ### Load data
 
