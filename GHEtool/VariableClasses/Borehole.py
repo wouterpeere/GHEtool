@@ -310,7 +310,7 @@ class Borehole(BaseClass):
                         mfr, kwargs.get('temperature'), dtype=np.float64), mfr
                      ]))
                 return temp
-            except:  # pragma no-cover
+            except:  # pragma: no cover
                 pass
 
         if use_explicit_models:

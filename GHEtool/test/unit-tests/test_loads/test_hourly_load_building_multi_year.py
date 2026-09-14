@@ -36,6 +36,9 @@ def test_set_hourly_load_multi_year():
     load._hourly_cooling_load = load._hourly_cooling_load - 20
     assert np.allclose(load.hourly_net_resulting_injection_power,
                        load._hourly_cooling_load * 21 / 20 - load._hourly_heating_load * 4 / 5)
+    load.hourly_regeneration_load_simulation_period = np.ones(8760 * 2)
+    assert np.allclose(load.hourly_net_resulting_injection_power,
+                       load._hourly_cooling_load * 21 / 20 - load._hourly_heating_load * 4 / 5 + 1)
 
 
 def test_imbalance_multi_year():
