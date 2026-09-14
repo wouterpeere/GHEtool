@@ -274,8 +274,7 @@ atol and rtol is chosen when sizing. The options are:
 To show how all the pieces of GHEtool work together, below you can find a step-by-step example of how, traditionally,
 one would work with GHEtool.
 Start by importing all the relevant classes. In this case we are going to work with a ground model which assumes a
-constant ground temperature (e.g. from a TRT-test),
-and we will provide the load with a monthly resolution.
+constant ground temperature (e.g. from a TRT-test), and we will provide the load with a monthly resolution.
 
 ```Python
 from GHEtool import Borefield, GroundConstantTemperature, MonthlyGeothermalLoadAbsolute
@@ -394,6 +393,9 @@ at [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en
 ## References
 
 ### Development of GHEtool
+
+Peere, W. (2027). Validated combined first and last year borefield sizing methodology. In Proceedings of GeoTHERM 2027.
+Offenburg (Germany), 25-26 February 2027. [abstract submitted]
 
 Peere, W. (2025). Integrating Temperature and Part-Load Dependent COP in Shallow Geothermal Borefield Design. In
 _Proceedings of German Geothermal Congress DGK 2025_. Frankfurt (Germany), 18-20 November 2025.
