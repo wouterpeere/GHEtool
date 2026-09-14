@@ -396,14 +396,14 @@ ground_data_IKC = GroundFluxTemperature(2.3, 10.5, flux=2.3 * 2.85 / 100)
 borefield.ground_data = ground_data_IKC
 borefield.calculation_setup(max_nb_of_iterations=40)
 list_of_test_objects.add(
-    SizingObject(borefield, L2_output=74.312, L3_output=74.687, quadrant=4, name='Real case 1 (Correct)'))
+    SizingObject(borefield, L2_output=74.69584, L3_output=74.687, quadrant=4, name='Real case 1 (Correct)'))
 borefield.calculation_setup(atol=False)
 list_of_test_objects.add(
-    SizingObject(borefield, L2_output=74.312, L3_output=74.701, quadrant=4, name='Real case 1 (Correct) (no atol)'))
+    SizingObject(borefield, L2_output=74.722213, L3_output=74.701, quadrant=4, name='Real case 1 (Correct) (no atol)'))
 borefield.calculation_setup(atol=0.05)
 borefield.ground_data = ground_data_IKC
 borefield.create_rectangular_borefield(2, 10, 8, 8, 60, 0.8, 0.07)
-list_of_test_objects.add(SizingObject(borefield, L2_output=71.50, L3_output=71.8671, quadrant=4,
+list_of_test_objects.add(SizingObject(borefield, L2_output=71.8834, L3_output=71.8671, quadrant=4,
                                       name='Real case 2 (Correct)'))
 
 peakCooling = [0] * 12

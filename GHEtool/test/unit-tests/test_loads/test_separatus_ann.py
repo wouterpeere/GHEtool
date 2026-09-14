@@ -5,9 +5,6 @@ import importlib.util
 from pathlib import Path
 
 import numpy as np
-import pytest
-
-from GHEtool.VariableClasses.PipeData.Separatus import SeparatusNew
 
 GOLDEN = Path(__file__).parent / "data" / "separatus_ann_golden.npz"
 
@@ -24,7 +21,7 @@ def test_predict_split_pipe_rb_ra_series_matches_torch_golden():
     gold = np.load(GOLDEN)
     X = gold["X"]
     y_ref = gold["y"]
-    pipe = SeparatusNew(k_g=1.5)
+    pipe = Separatus(k_g=1.5)
     Rb, Ra = pipe.predict_split_pipe_Rb_Ra_series(X[:, 0], X[:, 1], X[:, 2], X[:, 3], X[:, 4])
     y = np.column_stack([np.asarray(Rb).ravel(), np.asarray(Ra).ravel()])
     # float32 torch vs float64 numpy: ~1e-7 absolute on Rb/Ra (issue #483)
@@ -34,7 +31,7 @@ def test_predict_split_pipe_rb_ra_series_matches_torch_golden():
 def test_predict_split_pipe_rb_ra_series_vectorized_matches_scalar():
     gold = np.load(GOLDEN)
     X = gold["X"]
-    pipe = SeparatusNew(k_g=1.5)
+    pipe = Separatus(k_g=1.5)
     Rb_v, Ra_v = pipe.predict_split_pipe_Rb_Ra_series(X[:, 0], X[:, 1], X[:, 2], X[:, 3], X[:, 4])
     Rb_s = []
     Ra_s = []
@@ -47,7 +44,7 @@ def test_predict_split_pipe_rb_ra_series_vectorized_matches_scalar():
 
 
 def test_ann_weights_cached_on_pipe():
-    pipe = SeparatusNew(k_g=1.5)
+    pipe = Separatus(k_g=1.5)
     assert getattr(pipe, "_ann", None) is None
     pipe.predict_split_pipe_Rb_Ra_series(0.075, 0.05, 0.03, 1.5, 2.5)
     first = pipe._ann

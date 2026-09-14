@@ -82,10 +82,8 @@ def test_combined_active_and_passive_cooling(monkeypatch):
 
 def test_separatus(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
-    from GHEtool.Examples.separatus import design_with_single_U, design_with_double_U, design_with_separatus
-    design_with_single_U()
-    design_with_double_U()
-    design_with_separatus()
+    from GHEtool.Examples.separatus import create_graphs
+    create_graphs()
 
 
 def test_tilted(monkeypatch):

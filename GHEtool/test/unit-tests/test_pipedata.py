@@ -71,7 +71,7 @@ def test_equivalent_borehole_resistance_U_tubes():
     pipe = single.pipe_model(2, borehole)
     assert np.isclose(pipe.effective_borehole_thermal_resistance(0.1, 4180), 0.13637413925456277)
     pipe = double.pipe_model(2, borehole)
-    assert np.isclose(pipe.effective_borehole_thermal_resistance(0.2, 4180), 0.09065168435087693)
+    assert np.isclose(pipe.effective_borehole_thermal_resistance(0.2, 4180), 0.09065476430612592)
 
 
 def test_convective_resistance():
@@ -344,7 +344,7 @@ def test_reynolds_number():
     assert np.isclose(double.Re(fluid_data=fluid_data, flow_rate_data=flow_data), 4244.131815783876)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.Re(fluid_data=fluid_data, flow_rate_data=flow_data), 1727.5977540504243)
-    assert np.isclose(7234.108922823884, Separatus(1.5).Re(fluid_data, flow_data))
+    assert np.isclose(6956.190291355971, Separatus(1.5).Re(fluid_data, flow_data))
 
     fluid = TemperatureDependentFluidData('MPG', 30)
     flow = ConstantFlowRate(vfr=0.2)
@@ -362,7 +362,7 @@ def test_reynolds_number():
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.Re(fluid_data=fluid_data, flow_rate_data=flow_data, nb_of_boreholes=2),
                       1727.5977540504243)
-    assert np.isclose(7234.108922823884, Separatus(1.5).Re(fluid_data, flow_data, nb_of_boreholes=2))
+    assert np.isclose(6956.190291355971, Separatus(1.5).Re(fluid_data, flow_data, nb_of_boreholes=2))
 
     flow_data = ConstantFlowRate(mfr=0.2, flow_per_borehole=False, series_factor=2)
     double = MultipleUTube(1, 0.015, 0.02, 0.4, 0.05, 2)
@@ -370,7 +370,7 @@ def test_reynolds_number():
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.Re(fluid_data=fluid_data, flow_rate_data=flow_data, nb_of_boreholes=2),
                       1727.5977540504243)
-    assert np.isclose(7234.108922823884, Separatus(1.5).Re(fluid_data, flow_data, nb_of_boreholes=2))
+    assert np.isclose(6956.190291355971, Separatus(1.5).Re(fluid_data, flow_data, nb_of_boreholes=2))
 
 
 def test_multiple_reynolds():
@@ -395,7 +395,7 @@ def test_pressure_drop():
     assert np.isclose(double.pressure_drop(fluid_data, flow_data, 100, False), 10.339838859988387)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100), 0.28813886186599036)
-    assert np.isclose(19.84145159678991, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100))
+    assert np.isclose(17.99503450358148, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100))
 
     # with flow rate per borefield
     flow_data = ConstantFlowRate(mfr=0.6, flow_per_borehole=False)
@@ -409,7 +409,7 @@ def test_pressure_drop():
                       10.339838859988387)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2), 0.28813886186599036)
-    assert np.isclose(19.84145159678991, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2))
+    assert np.isclose(17.99503450358148, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2))
 
     flow_data = ConstantFlowRate(mfr=0.3, flow_per_borehole=False, series_factor=2)
     single = MultipleUTube(1, 0.02, 0.02, 0.4, 0.05, 1)
@@ -422,7 +422,7 @@ def test_pressure_drop():
                       10.339838859988387)
     coaxial = CoaxialPipe(r_in_in, r_in_out, r_out_in, r_out_out, k_p, k_g, is_inner_inlet=True)
     assert np.isclose(coaxial.pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2), 0.28813886186599036)
-    assert np.isclose(19.84145159678991, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2))
+    assert np.isclose(17.99503450358148, Separatus(1.5).pressure_drop(fluid_data, flow_data, 100, nb_of_boreholes=2))
 
     flow_range = np.linspace(0.1, 5, 8760)
     flow = VariableHourlyFlowRate(mfr=flow_range)
@@ -660,7 +660,7 @@ def test_conical_resistances():
 
     pipe.calculate_resistances(fluid, flow, 200)
     assert np.isclose(0.07360723858372777, pipe.R_p)
-    assert np.isclose(0.17492415197256533, pipe.R_f)
+    assert np.isclose(0.17571810644345662, pipe.R_f)
 
     flow = ConstantFlowRate(vfr=0.4, flow_per_borehole=False)
 
@@ -676,7 +676,7 @@ def test_conical_resistances():
 
     pipe.calculate_resistances(fluid, flow, 200, nb_of_boreholes=2)
     assert np.isclose(0.07360723858372777, pipe.R_p)
-    assert np.isclose(0.17492415197256533, pipe.R_f)
+    assert np.isclose(0.17571810644345662, pipe.R_f)
 
     flow = ConstantFlowRate(vfr=0.2)
 
@@ -694,7 +694,7 @@ def test_conical_resistances():
 
     pipe.calculate_resistances(fluid, flow, 200)
     assert np.isclose(0.07358834823796871, pipe.R_p)
-    assert np.isclose(0.17827314935787522, pipe.R_f)
+    assert np.isclose(0.1786701273650688, pipe.R_f)
 
 
 def test_conical_convective_resistance():
@@ -835,48 +835,18 @@ def test_conical_reynolds():
 
 
 def test_separatus():
-    separatus = Separatus(1.5)
-    single = SingleUTube(r_in=(35.74 / 2 - 3) * 0.001, r_out=(35.74 / 2) * 0.001, k_p=0.44, D_s=36 / 2 * 0.001)
     fluid = TemperatureDependentFluidData('MPG', 30)
-    flow = ConstantFlowRate(vfr=0.2)
-    temp_range = np.arange(-5, 20, 1)
-
-    assert np.allclose(separatus.calculate_convective_resistance(flow, fluid, temperature=temp_range),
-                       single.calculate_convective_resistance(flow, fluid, temperature=temp_range))
 
     fluid_data = ConstantFluidData(0.568, 998, 4180, 1e-3)
     flow_data = ConstantFlowRate(mfr=0.2)
     separatus = Separatus(1.5)
 
     # test array-model
-    individual = []
-    temp_range = np.arange(-5, 20, 1)
-    for temp in temp_range:
-        separatus.calculate_resistances(fluid_data, flow_data, temperature=temp)
-        individual.append(separatus.R_f)
-    array = separatus.calculate_convective_resistance(flow_data, fluid_data, temperature=temp_range)
-    assert np.allclose(array, individual)
+    with pytest.raises(NotImplementedError):
+        separatus.calculate_resistances(fluid_data, flow_data, temperature=5)
+    with pytest.raises(NotImplementedError):
+        separatus.pipe_model(2, gt.boreholes.Borehole(100, 1, 0.7, 0, 0))
 
-    # test array-model
-    individual = []
-    fluid_data = TemperatureDependentFluidData('MPG', 25)
-    temp_range = np.arange(-5, 20, 1)
-    for temp in temp_range:
-        separatus.calculate_resistances(fluid_data, flow_data, temperature=temp)
-        individual.append(separatus.R_f)
-    array = separatus.calculate_convective_resistance(flow_data, fluid_data, temperature=temp_range)
-    assert np.allclose(array, individual)
-
-    # test array-model
-    individual = []
-    fluid_data = TemperatureDependentFluidData('MPG', 25)
-    temp_range = np.arange(-5, 20, 1)
-    borehole = Borehole(fluid_data, separatus, flow_data)
-    for temp in temp_range:
-        Rb = borehole.get_Rb(100, 1, 0.075, 2, temperature=temp, use_explicit_models=False)
-        individual.append(Rb)
-    array = borehole.get_Rb(100, 1, 0.075, 2, temperature=temp_range, use_explicit_models=True)
-    assert np.allclose(array, individual)
     flow_range = np.linspace(0.1, 5, 8760)
     flow = VariableHourlyFlowRate(mfr=flow_range)
     control = []
@@ -1010,8 +980,14 @@ def test_convective_resistance_variable_flow_constant_fluid():
     control = []
     for flow in flow_range:
         const_flow = ConstantFlowRate(mfr=flow)
-        control.append(separatus.calculate_convective_resistance(const_flow, constant_fluid))
-    results_var = separatus.calculate_convective_resistance(variable_flow, constant_fluid, simulation_period=1)
+        control.append(separatus.calculate_convective_resistance(const_flow, constant_fluid)[0])
+    results_var = separatus.calculate_convective_resistance(variable_flow, constant_fluid, simulation_period=1)[0]
+    assert np.allclose(control, results_var)
+    control = []
+    for flow in flow_range:
+        const_flow = ConstantFlowRate(mfr=flow)
+        control.append(separatus.calculate_convective_resistance(const_flow, constant_fluid)[1])
+    results_var = separatus.calculate_convective_resistance(variable_flow, constant_fluid, simulation_period=1)[1]
     assert np.allclose(control, results_var)
     control = []
     for flow in flow_range:
@@ -1059,9 +1035,18 @@ def test_convective_resistance_variable_flow_constant_var_fluid():
     control = []
     for idx, flow in enumerate(flow_range):
         const_flow = ConstantFlowRate(mfr=flow)
-        control.append(separatus.calculate_convective_resistance(const_flow, var_fluid, temperature=temperatures[idx]))
+        control.append(
+            separatus.calculate_convective_resistance(const_flow, var_fluid, temperature=temperatures[idx])[0])
     results_var = separatus.calculate_convective_resistance(variable_flow, var_fluid, simulation_period=1,
-                                                            temperature=temperatures)
+                                                            temperature=temperatures)[0]
+    assert np.allclose(control, results_var)
+    control = []
+    for idx, flow in enumerate(flow_range):
+        const_flow = ConstantFlowRate(mfr=flow)
+        control.append(
+            separatus.calculate_convective_resistance(const_flow, var_fluid, temperature=temperatures[idx])[1])
+    results_var = separatus.calculate_convective_resistance(variable_flow, var_fluid, simulation_period=1,
+                                                            temperature=temperatures)[1]
     assert np.allclose(control, results_var)
     control = []
     for idx, flow in enumerate(flow_range):

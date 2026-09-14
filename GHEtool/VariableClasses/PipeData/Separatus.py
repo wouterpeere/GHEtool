@@ -48,7 +48,8 @@ class Separatus(_PipeData):
         self.epsilon = 1e-6
         self.pipe_inner_wall = 2.7 * 1e-3
         self.hydraulic_diameter = 26.5e-3
-        
+        self.cross_sectional_area = (np.pi * self.r_in ** 2 - self.pipe_inner_wall * 2 * self.r_in) / 2
+
         self._ann = None
 
         from GHEtool import FOLDER
@@ -244,7 +245,7 @@ class Separatus(_PipeData):
         Reynolds number : float
         """
         u = flow_rate_data.vfr_borehole(fluid_data=fluid_data, **kwargs) / self.cross_sectional_area / 1000
-        return fluid_data.rho(**kwargs) * u * self.d_hydraulic / fluid_data.mu(**kwargs)
+        return fluid_data.rho(**kwargs) * u * self.hydraulic_diameter / fluid_data.mu(**kwargs)
 
     def pressure_drop(self, fluid_data: _FluidData, flow_rate_data: _FlowData, borehole_length: float,
                       **kwargs) -> float:
