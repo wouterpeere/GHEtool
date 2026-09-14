@@ -1,8 +1,7 @@
+import numpy as np
 import pygfunction as gt
-import pathlib
-import torch
-import torch.nn as nn
-import joblib
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 from GHEtool import FOLDER
 from GHEtool.utils.calculate_friction_factor import *
@@ -11,32 +10,14 @@ from GHEtool.VariableClasses.FluidData import _FluidData
 from GHEtool.VariableClasses.FlowData import _FlowData
 
 
-class SplitPipeANN(nn.Module):
-    """
-    Small MLP for 5-input, 2-output regression.
-
-    Inputs:
-        r_b, R_fp_pipe, R_fp_center, k_b, k_s
-
-    Outputs:
-        R_b, R_a
-    """
-
-    def __init__(self, n_inputs: int = 5, n_outputs: int = 2):
-        super().__init__()
-
-        self.net = nn.Sequential(
-            nn.Linear(n_inputs, 64),
-            nn.Tanh(),
-            nn.Linear(64, 64),
-            nn.Tanh(),
-            nn.Linear(64, 32),
-            nn.Tanh(),
-            nn.Linear(32, n_outputs),
-        )
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.net(x)
+def _predict_rb_ra_numpy(ann: dict, X: np.ndarray) -> np.ndarray:
+    """5→64→64→32→2 Tanh MLP + StandardScaler, no torch."""
+    Xs = (X - ann["x_mean"]) / ann["x_scale"]
+    h = np.tanh(Xs @ ann["w0"].T + ann["b0"])
+    h = np.tanh(h @ ann["w1"].T + ann["b1"])
+    h = np.tanh(h @ ann["w2"].T + ann["b2"])
+    ys = h @ ann["w3"].T + ann["b3"]
+    return ys * ann["y_scale"] + ann["y_mean"]
 
 
 class SeparatusNew(_PipeData):
@@ -68,6 +49,9 @@ class SeparatusNew(_PipeData):
         self.epsilon = 1e-6
         self.pipe_inner_wall = 2.7 * 1e-3
         self.d_hydraulic = 26.5e-3
+
+        self._ann = None
+        self._model_path = FOLDER.joinpath("VariableClasses/PipeData/ANN/separatus/separatus.npz")
 
     def calculate_conductive_resistance(self, **kwargs) -> tuple[float, float]:
         """
@@ -117,6 +101,13 @@ class SeparatusNew(_PipeData):
         plate = self.hydraulic_diameter / (nu * fluid_data.k_f(**kwargs) * self.r_in * 2)
         return plate * 2, conv_circle
 
+    def _load_ann(self) -> dict:
+        """Load and cache weights + scalers from the .npz file."""
+        if self._ann is None:
+            with np.load(self._model_path) as data:
+                self._ann = {key: np.asarray(data[key]) for key in data.files}
+        return self._ann
+
     def predict_split_pipe_Rb_Ra_series(self, r_b, R_fp_pipe, R_fp_center, k_b, k_s, **kwargs):
         """
         Vectorized prediction of R_b and R_a for the split-pipe ANN.
@@ -135,20 +126,6 @@ class SeparatusNew(_PipeData):
         R_b, R_a : np.ndarray
             Same shape as broadcasted inputs
         """
-
-        model_path = pathlib.Path(__file__).parent.joinpath(f"./ANN/separatus/separatus.pt")
-        x_scaler_path = pathlib.Path(__file__).parent.joinpath(f"./ANN/separatus/separatus_x.joblib")
-        y_scaler_path = pathlib.Path(__file__).parent.joinpath(f"./ANN/separatus/separatus_y.joblib")
-        model_path = pathlib.Path(__file__).parent.joinpath(f"./ANN/separatus/split_pipe_two_rfp_ann.pt")
-        x_scaler_path = pathlib.Path(__file__).parent.joinpath(f"./ANN/separatus/split_pipe_two_rfp_x_scaler.joblib")
-        y_scaler_path = pathlib.Path(__file__).parent.joinpath(f"./ANN/separatus/split_pipe_two_rfp_y_scaler.joblib")
-        model = SplitPipeANN()
-        model.load_state_dict(torch.load(model_path, map_location="cpu"))
-        model.eval()
-
-        X_scaler = joblib.load(x_scaler_path)
-        y_scaler = joblib.load(y_scaler_path)
-
         # Convert to arrays
         r_b = np.asarray(r_b)
         R_fp_pipe = np.asarray(R_fp_pipe)
@@ -171,14 +148,7 @@ class SeparatusNew(_PipeData):
             k_s.ravel(),
         ])
 
-        # Scale
-        X_s = X_scaler.transform(X)
-
-        # Predict
-        with torch.no_grad():
-            y_s = model(torch.tensor(X_s, dtype=torch.float32)).numpy()
-
-        y = y_scaler.inverse_transform(y_s)
+        y = _predict_rb_ra_numpy(self._load_ann(), X)
 
         # Reshape back
         R_b = y[:, 0].reshape(shape)
