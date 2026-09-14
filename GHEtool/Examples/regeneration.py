@@ -52,7 +52,7 @@ def auditorium():
     borefield.flow_data = flow_data
     borefield.pipe_data = pipe_data
     borefield.calculation_setup(use_constant_Rb=False)
-    borefield.set_max_fluid_temperature(20)
+    borefield.set_max_fluid_temperature(25)
     borefield.set_min_fluid_temperature(5.5)
     hourly_load_building = HourlyBuildingLoad(efficiency_cooling=7, efficiency_heating=6)
     hourly_load_building.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\auditorium.csv"), header=True,
