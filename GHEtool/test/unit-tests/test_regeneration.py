@@ -111,7 +111,7 @@ def test_ensure_max_limit():
     TMY: pd.DataFrame = pd.read_csv(weather_file, sep=",", header=None, skiprows=8)
 
     TMY.drop(columns=TMY.columns[:5], inplace=True)
-    solar: np.ndarray = np.tile(np.array(TMY.iloc[:, 7]), 20)
+    solar: np.ndarray = np.tile(np.array(TMY.iloc[:, 8]), 20)
     temperature: np.ndarray = np.tile(np.array(TMY.iloc[:, 1]), 20)
 
     # initiate regeneration object
