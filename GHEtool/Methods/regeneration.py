@@ -6,9 +6,6 @@ from GHEtool.VariableClasses.LoadData import _LoadDataBuilding
 from scipy.signal import convolve
 
 import numpy as np
-import time
-
-from GHEtool.test.general_tests.test_GHEtool import borefield_custom_data
 
 
 class _RegenerationWindow:
