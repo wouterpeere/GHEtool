@@ -186,7 +186,11 @@ def calculate_convective_resistance(flow_data: _FlowData, fluid_data: _FluidData
     low_re = 2300.0
     high_re = 4000.0
 
-    m_dot = np.atleast_1d(np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
+    if 'mfr_borehole' in kwargs:
+        m_dot = kwargs['mfr_borehole']
+    else:
+        m_dot = np.atleast_1d(
+            np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
 
     # Reynolds number
     re = 4.0 * m_dot / (fluid_data.mu(**kwargs) * np.pi * r_in * 2) / nb_of_pipes

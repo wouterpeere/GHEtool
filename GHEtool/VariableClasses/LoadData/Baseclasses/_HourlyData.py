@@ -16,6 +16,7 @@ class _HourlyData(_LoadData, ABC):
         # initiate variables
         self._hourly_heating_load: np.ndarray = np.zeros(8760)
         self._hourly_cooling_load: np.ndarray = np.zeros(8760)
+        self.hourly_regeneration_load_simulation_period = 0
 
         # delete unnecessary variables
         del self._peak_injection
@@ -68,7 +69,7 @@ class _HourlyData(_LoadData, ABC):
         -------
         resulting hourly load : np.ndarray
         """
-        return self.hourly_injection_load_simulation_period - self.hourly_extraction_load_simulation_period
+        return self.hourly_injection_load_simulation_period - self.hourly_extraction_load_simulation_period + self.hourly_regeneration_load_simulation_period
 
     @property
     def monthly_baseload_injection_simulation_period(self) -> np.ndarray:

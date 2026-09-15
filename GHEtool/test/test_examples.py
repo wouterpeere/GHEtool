@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from GHEtool import *
+from GHEtool.Examples.regeneration import office
 
 
 def test_main_functionalities(monkeypatch):
@@ -145,3 +146,12 @@ def test_groundwater_filled_borehole(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
     from GHEtool.Examples.groundwater_filled_boreholes import graphs
     graphs()
+
+
+def test_regeneration(monkeypatch):
+    monkeypatch.setattr(plt, 'show', lambda: None)
+    from GHEtool.Examples.regeneration import auditorium, auditorium_variation, office, residential
+    auditorium()
+    auditorium_variation()
+    office()
+    residential()
