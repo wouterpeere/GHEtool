@@ -229,7 +229,54 @@ def office():
     borefield.print_temperature_profile(plot_hourly=True)
 
 
+def residential():
+    ground_data = GroundFluxTemperature(2, 10)
+    fluid_data = TemperatureDependentFluidData('MPG', 0, mass_percentage=False)
+    flow_data = ConstantDeltaTFlowRate(delta_temp_extraction=3, delta_temp_injection=3)
+    pipe_data = DoubleUTube(1, 0.013, 0.016, 0.4, 0.035)
+    borefield = Borefield()
+    borefield.create_rectangular_borefield(3, 4, 6, 6, 150, 0.7, 0.07)
+    borefield.ground_data = ground_data
+    borefield.fluid_data = fluid_data
+    borefield.flow_data = flow_data
+    borefield.pipe_data = pipe_data
+    borefield.calculation_setup(use_constant_Rb=False)
+    borefield.set_max_fluid_temperature(25)
+    borefield.set_min_fluid_temperature(0)
+    hourly_load_building = HourlyBuildingLoad(efficiency_cooling=5, efficiency_heating=5, efficiency_dhw=3.5)
+    hourly_load_building.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/residential.csv"), header=True,
+                                             separator=";", col_cooling=1, col_heating=0, col_dhw=2)
+    borefield.load = hourly_load_building
+    borefield.load.simulation_period = 5
+    borefield.print_temperature_profile(plot_hourly=True)
+
+    # get weather data
+    weather_file = open(FOLDER.joinpath("test/unit-tests/data/test_epw.epw"), 'rb')
+    weather_file.seek(0)
+    TMY: pd.DataFrame = pd.read_csv(weather_file, sep=",", header=None, skiprows=8)
+
+    TMY.drop(columns=TMY.columns[:5], inplace=True)
+    solar: np.ndarray = np.tile(np.array(TMY.iloc[:, 8]), 20)
+    temperature: np.ndarray = np.tile(np.array(TMY.iloc[:, 1]), 20)
+
+    # initiate regeneration object
+    a0 = 0.45
+    a1 = 24.76  # W/K/m²
+
+    surface = 200  # m²
+
+    regeneration_object = Regeneration(power=solar * a0 * surface * 2, temperature=temperature, a1=a1 * surface)
+
+    proceeding_my, proceeding = calculate_regeneration(
+        borefield=borefield,
+        regen_obj=regeneration_object,
+        rules=(1, 2, 3),
+        algorithm='proceeding',
+        simulation_horizon=100)
+
+
 if __name__ == '__main__':
     office()
     auditorium()
     auditorium_variation()
+    residential()

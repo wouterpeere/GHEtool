@@ -150,7 +150,8 @@ def test_groundwater_filled_borehole(monkeypatch):
 
 def test_regeneration(monkeypatch):
     monkeypatch.setattr(plt, 'show', lambda: None)
-    from GHEtool.Examples.regeneration import auditorium, auditorium_variation, office
+    from GHEtool.Examples.regeneration import auditorium, auditorium_variation, office, residential
     auditorium()
     auditorium_variation()
     office()
+    residential()
