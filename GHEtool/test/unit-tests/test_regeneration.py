@@ -420,6 +420,7 @@ def test_office():
     hourly_load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/office.csv"), header=True,
                                     separator=";", col_cooling=0, col_heating=1)
     borefield.load = hourly_load
+    borefield.load.simulation_period = 5
 
     # get weather data
     weather_file = open(FOLDER.joinpath("Examples/BEL_Brussels.064510_IWEC.epw"), 'rb')
@@ -438,7 +439,13 @@ def test_office():
 
     regeneration_object = Regeneration(power=solar * a0 * surface, temperature=temperature, a1=a1 * surface)
     load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object)
-    assert np.isclose(np.sum(regen), 0)
+    assert np.isclose(np.sum(regen[:8760]), -47923.77520000006)
+    assert np.isclose(np.sum(regen[:8760]), (-1) * borefield.load.imbalance)
     load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object,
                                          position_regeneration='outlet')
+    # idem since there is more than enough regeneration capacity
+    assert np.isclose(np.sum(regen[:8760]), -47923.77519999997)
+    load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object, algorithm='total')
+    assert np.isclose(np.sum(regen[:8760]), -49775.377701580066)
+
     assert np.isclose(np.sum(regen), 0)

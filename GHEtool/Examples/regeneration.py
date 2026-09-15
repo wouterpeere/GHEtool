@@ -218,10 +218,10 @@ def office():
     a0 = 0.45
     a1 = 24.76  # W/K/m²
 
-    surface = 200  # m²
+    surface = 2000  # m²
 
     regeneration_object = Regeneration(power=solar * a0 * surface, temperature=temperature, a1=a1 * surface)
-    load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object)
+    load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object, algorithm='total')
     plt.figure()
     plt.plot(regen)
     plt.show()
