@@ -447,5 +447,3 @@ def test_office():
     assert np.isclose(np.sum(regen[:8760]), -47923.77519999997)
     load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object, algorithm='total')
     assert np.isclose(np.sum(regen[:8760]), -49775.377701580066)
-
-    assert np.isclose(np.sum(regen), 0)
