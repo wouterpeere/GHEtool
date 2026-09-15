@@ -71,7 +71,8 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                            algorithm: str = 'yearly',
                            position_regeneration: str = "inlet",
                            rules=(1, 2, 3),
-                           simulation_horizon: int = 4380
+                           simulation_horizon: int = 4380,
+                           **kwargs
                            ) -> tuple[HourlyBuildingLoadMultiYear, np.ndarray]:
     """
     This function calculates the possible regeneration for a certain borefield a regeneration object.
