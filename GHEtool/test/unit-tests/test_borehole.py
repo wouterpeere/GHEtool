@@ -450,15 +450,15 @@ def test_borehole_set_interpolator():
 
 def test_borehole_set_interpolator_special_probes():
     borehole = Borehole()
-    borehole.pipe_data = Turbocollector(1, 0.015, 0.02, 0.4, 2)
+    borehole.pipe_data = Turbocollector(1, 0.015, 0.02, 0.04, 2)
     constant_fluid = ConstantFluidData(0.5, 1200, 4000, 0.001)
     variable_fluid = TemperatureDependentFluidData('MEG', 25)
     constant_flow = ConstantFlowRate(mfr=1)
     variable_flow = ConstantDeltaTFlowRate(delta_temp_extraction=3, delta_temp_injection=3)
-    borehole.fluid_data = constant_fluid
+    borehole.fluid_data = variable_fluid
     borehole.flow_data = variable_flow
     borehole.set_interpolator(100, 1, 0.075, 2, 101, 1)
     borehole.pipe_data = MuoviEllipse(2, 37e-3, 26e-3, 3e-3, 0.03)
-    borehole.set_interpolator(100, 1, 0.075, 2, 101, 1)
+    borehole.set_interpolator(100, 1, 0.075, 2, 101, 10)
     borehole.pipe_data = ConicalPipe(1.5, 0.0135, 0.013, 80, 160, 0.016, 0.4, 0.035, 1)
     borehole.set_interpolator(100, 1, 0.075, 2, 101, 1)

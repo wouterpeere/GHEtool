@@ -348,8 +348,7 @@ class MuoviEllipse(SingleUTube):
         if 'mfr_borehole' in kwargs:
             m_dot = kwargs['mfr_borehole']
         else:
-            m_dot = np.atleast_1d(
-                np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
+            m_dot = flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data)
         r_v = borehole.H / (m_dot * fluid_data.cp(**kwargs))
         n = r_v / (R_b * R_a) ** 0.5
         return R_b * n * np.cosh(n) / np.sinh(n)
