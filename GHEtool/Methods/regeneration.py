@@ -146,6 +146,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
 
         # convert to array
         max_power = q_1 * borefield.number_of_boreholes * borefield.H / 1000  # convert to KW
+        print(max_power)
     else:
         raise ValueError('Only constant flow rates or constant Delta T flow rates can be used.')
 
