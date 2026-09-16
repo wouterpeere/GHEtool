@@ -211,11 +211,12 @@ def test_auditorium_inlet_outlet():
 
     borefield.calculation_setup(size_based_on='inlet')
     load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object)
+    assert isinstance(load, HourlyBuildingLoadMultiYear)
     assert np.isclose(np.sum(regen[:8760]), 14807.339373205816)
     # when outlet fluid temperatures, higher
     borefield.calculation_setup(size_based_on='outlet')
     load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object)
-    assert np.isclose(np.sum(regen[:8760]), 16157.52600882144)
+    assert np.isclose(np.sum(regen[:8760]), 15967.159112084273)
 
 
 def test_regeneration_error():
@@ -441,7 +442,7 @@ def test_equal_with_different_horizons():
                                     separator=";", col_cooling=0, col_heating=1, col_dhw=2)
     borefield.load = hourly_load
     borefield.load.simulation_period = 5
-    triple_solar.surface = 200
+    triple_solar.surface = 100
     _, regen_8760 = calculate_regeneration(borefield, triple_solar, algorithm='proceeding',
                                            simulation_horizon=8760)
     _, regen_100 = calculate_regeneration(borefield, triple_solar, algorithm='proceeding',

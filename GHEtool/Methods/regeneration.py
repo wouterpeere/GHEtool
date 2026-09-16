@@ -454,7 +454,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
             if max_reg != 0:
                 window.invalidate(i)
 
-    if isinstance(load, _HourlyDataBuilding):
+    if isinstance(borefield.load, (HourlyBuildingLoadMultiYear, HourlyBuildingLoad)):
         multiyear_load: HourlyBuildingLoadMultiYear = HourlyBuildingLoadMultiYear(
             borefield.load.hourly_heating_load_simulation_period,
             borefield.load.hourly_cooling_load_simulation_period,
