@@ -396,8 +396,8 @@ def test_proceeding_extra():
     #     simulation_horizon=8760)
 
     # more regeneration with proceeding extra
-    assert np.isclose(np.sum(proceeding_extra[proceeding_extra >= 0]), 132872.1369708192)
     print(np.sum(proceeding_extra >= 0))
+    assert np.isclose(np.sum(proceeding_extra[proceeding_extra >= 0]), 132872.1369708192)
     # assert np.isclose(np.sum(proceeding), 130474.37940651324)
 
     assert np.any(proceeding_extra < 0)
