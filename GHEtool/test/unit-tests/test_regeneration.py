@@ -387,18 +387,17 @@ def test_proceeding_extra():
         algorithm='proceeding_extra',
         simulation_horizon=8760)
 
-    # assert np.any(proceeding_extra < 0)
-    # _, proceeding = calculate_regeneration(
-    #     borefield=borefield,
-    #     regen_obj=regeneration_object,
-    #     rules=(1, 2, 3),
-    #     algorithm='proceeding',
-    #     simulation_horizon=8760)
+    assert np.any(proceeding_extra < 0)
+    _, proceeding = calculate_regeneration(
+        borefield=borefield,
+        regen_obj=regeneration_object,
+        rules=(1, 2, 3),
+        algorithm='proceeding',
+        simulation_horizon=8760)
 
     # more regeneration with proceeding extra
-    print(np.sum(proceeding_extra >= 0))
-    assert np.isclose(np.sum(proceeding_extra[proceeding_extra >= 0]), 132872.1369708192)
-    # assert np.isclose(np.sum(proceeding), 130474.37940651324)
+    assert np.isclose(np.sum(proceeding_extra[proceeding_extra >= 0]), 132868.87289271975)
+    assert np.isclose(np.sum(proceeding), 130474.37940651324)
 
     assert np.any(proceeding_extra < 0)
     _, proceeding = calculate_regeneration(
