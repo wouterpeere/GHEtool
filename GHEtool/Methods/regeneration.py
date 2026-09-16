@@ -244,6 +244,12 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                 else:
                     Tf_to_regeneration = borefield.calculate_borefield_inlet_outlet_temperature(load, Tf_avg, Tb)[1]
 
+                # calculate reference temperature
+                if borefield._calculation_setup.size_based_on == 'average':
+                    Tf_ref = Tf_avg
+                else:
+                    Tf_ref = Tf_to_regeneration
+
                 # with variable efficiency, the ground load should be updated as well
                 if variable_efficiency:
                     load = (hourly_load[window.window_start:window.window_end] * 1000 +
@@ -323,7 +329,17 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                     resistance = get_Rb(borefield, power, borefield.Tf_max)[0]
                     Tb_corrected = base_Tb + power * g0_corr
                     max_delta = borefield.Tf_max - Tb_corrected
-
+                    if borefield._calculation_setup.size_based_on != 'average':
+                        debiet = max(min_flow, borefield.flow_data.mfr_borefield(
+                            nb_of_boreholes=borefield.number_of_boreholes,
+                            power=power / 1000, temperature=borefield.Tf_max,
+                            fluid_data=borefield.fluid_data))
+                        cp = borefield.fluid_data.cp(temperature=borefield.Tf_max)
+                        delta = power / (cp * debiet)
+                        if borefield._calculation_setup.size_based_on == 'inlet':
+                            max_delta -= delta / 2
+                        else:
+                            max_delta += delta / 2
                     return max_delta / resistance * borefield.number_of_boreholes * borefield.H - np.abs(load[idx])
 
                 max_power = max_reg
@@ -341,7 +357,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
             # docstring above)
             if 3 in rules:
                 remaining_in_window = window.length - idx
-                diff_array = borefield.Tf_max - Tf_avg[idx:]
+                diff_array = borefield.Tf_max - Tf_ref[idx:]
                 impact_array = diff_array / g_value_differences[:remaining_in_window] * corr
                 max_reg = min(min(impact_array), max_reg)
 
@@ -392,8 +408,13 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                     resistance = get_Rb(borefield, power, borefield.Tf_min)[0]
                     Tb_corrected = base_Tb - power * g0_corr
                     max_delta = max(0, Tb_corrected - borefield.Tf_min)
-                    if max_delta == 0:
-                        return 0
+                    if borefield._calculation_setup.size_based_on == 'inlet':
+                        max_delta += borefield.calculate_borefield_inlet_outlet_temperature((-1) * power, 0,
+                                                                                            Tb_corrected)[0]
+                    elif borefield._calculation_setup.size_based_on == 'outlet':
+                        max_delta += borefield.calculate_borefield_inlet_outlet_temperature((-1) * power, 0,
+                                                                                            Tb_corrected)[1]
+
                     return max_delta / resistance * borefield.number_of_boreholes * borefield.H - np.abs(load[idx])
 
                 max_power = max_reg
@@ -415,7 +436,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
             # 3. Make sure future limits are not crossed (within the current window)
             if 3 in rules:
                 remaining_in_window = window.length - idx
-                diff_array = Tf_avg[idx:] - borefield.Tf_min
+                diff_array = Tf_ref[idx:] - borefield.Tf_min
                 impact_array = diff_array / g_value_differences[:remaining_in_window] * corr
                 max_reg = min(min(impact_array), max_reg)
 
