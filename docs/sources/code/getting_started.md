@@ -2,8 +2,7 @@
 
 ## Requirements
 
-This code is tested with Python 3.11, 3.12, 3.13 and 3.14 and requires the following libraries (the versions
-mentioned are the ones with which the code is tested)
+This code is tested with Python 3.12, 3.13 and 3.14 and requires the following libraries
 
 * matplotlib >= 3.9.2
 * numpy >= 1.26.4
