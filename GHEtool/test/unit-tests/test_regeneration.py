@@ -217,7 +217,7 @@ def test_auditorium_inlet_outlet():
     borefield.calculation_setup(size_based_on='outlet')
     load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object)
     assert np.isclose(np.sum(regen[:8760]), 15967.159112084273)
-    
+
     borefield.flow = ConstantFlowRate(mfr=15, flow_per_borehole=False)
     borefield.calculation_setup(size_based_on='inlet')
     load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object)
