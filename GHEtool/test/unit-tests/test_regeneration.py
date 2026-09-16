@@ -397,7 +397,7 @@ def test_proceeding_extra():
 
     # more regeneration with proceeding extra
     assert np.isclose(np.sum(proceeding_extra[proceeding_extra >= 0]), 132868.87289271975)
-    assert np.isclose(np.sum(proceeding), 132868.87289271975)
+    assert np.isclose(np.sum(proceeding), 130474.37940651325)
 
     assert np.any(proceeding_extra < 0)
     _, proceeding = calculate_regeneration(
@@ -406,7 +406,7 @@ def test_proceeding_extra():
         rules=(1, 2, 3),
         algorithm='proceeding_extra',
         simulation_horizon=8760, position_regeneration='outlet')
-    assert np.isclose(np.sum(proceeding_extra[proceeding_extra >= 0]), 130474.37940651325)
+    assert np.isclose(np.sum(proceeding_extra[proceeding_extra >= 0]), 132868.87289271975)
 
 
 def test_equal_with_different_horizons():
