@@ -742,7 +742,7 @@ class _HourlyDataBuilding(_LoadDataBuilding, _HourlyData, ABC):
         if isinstance(self._results, ResultsMonthly):
             return super(_HourlyData, self).imbalance
         return np.sum(
-            self.hourly_injection_load_simulation_period - self.hourly_extraction_load_simulation_period) / self.simulation_period
+            self.hourly_injection_load_simulation_period_with_regeneration - self.hourly_extraction_load_simulation_period_with_regeneration) / self.simulation_period
 
     @property
     def month_indices(self) -> np.ndarray:
