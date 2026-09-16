@@ -175,7 +175,11 @@ class MuoviEllipse(SingleUTube):
         ----------
         .. [#Niklas] Niklas Hidman. (2026). Thermohydraulic performance evaluation of internally finned elliptical geothermal collector pipes
         """
-        m_dot = np.atleast_1d(np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
+        if 'mfr_borehole' in kwargs:
+            m_dot = kwargs['mfr_borehole']
+        else:
+            m_dot = np.atleast_1d(
+                np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
 
         # Reynolds number
         re = self.hydraulic_diameter_inner * m_dot / (fluid_data.mu(**kwargs) * self.area_inner)
@@ -341,9 +345,11 @@ class MuoviEllipse(SingleUTube):
             R_p = R_cond + R_conv
 
         R_b, R_a = self.predict_Rb_Ra_series(borehole.r_b, self.D_s, R_p, self.k_g, k_s)
-
-        r_v = borehole.H / (flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data) * fluid_data.cp(
-            **kwargs))
+        if 'mfr_borehole' in kwargs:
+            m_dot = kwargs['mfr_borehole']
+        else:
+            m_dot = flow_rate_data.mfr_borehole(**kwargs, fluid_data=fluid_data)
+        r_v = borehole.H / (m_dot * fluid_data.cp(**kwargs))
         n = r_v / (R_b * R_a) ** 0.5
         return R_b * n * np.cosh(n) / np.sinh(n)
 

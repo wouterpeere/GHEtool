@@ -129,7 +129,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
         raise ValueError('Position_regeneration must be either "inlet" or "outlet"')
 
     # calculate the maximum power based on the maximum temperature difference that can be achieved
-    if isinstance(borefield.borehole.flow_data, ConstantDeltaTFlowRate):
+    if isinstance(borefield.borehole.flow_data, (ConstantDeltaTFlowRate, ConstantFlowRate)):
         max_delta = borefield.Tf_max - borefield.Tf_min
         q_0 = 0
         q_1 = 30
