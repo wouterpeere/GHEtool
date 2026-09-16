@@ -43,6 +43,37 @@ def test_set_hourly_load_multi_year():
     assert np.isclose(load.imbalance, 18999345.0 + 8760)
 
 
+def test_regeneration():
+    load = HourlyBuildingLoadMultiYear()
+    load.hourly_heating_load = np.linspace(0, 8759 * 2 + 1, 8760 * 2)
+    load.hourly_cooling_load = np.linspace(0, 8759 * 2 + 1, 8760 * 2)
+    assert np.isclose(load.imbalance, 19183305.0)
+    load_with_regen = HourlyBuildingLoadMultiYear()
+    load_with_regen.hourly_heating_load = np.linspace(0, 8759 * 2 + 1, 8760 * 2)
+    load_with_regen.hourly_cooling_load = np.linspace(0, 8759 * 2 + 1, 8760 * 2)
+
+    load_with_regen.hourly_regeneration_load_simulation_period = np.ones(8760 * 2)
+    assert np.allclose(load_with_regen.hourly_extraction_load_simulation_period,
+                       load.hourly_extraction_load_simulation_period)
+    assert np.allclose(load_with_regen.hourly_injection_load_simulation_period,
+                       load.hourly_injection_load_simulation_period)
+    assert np.allclose(load_with_regen.hourly_extraction_load_simulation_period_with_regeneration,
+                       load.hourly_extraction_load_simulation_period_with_regeneration)
+    assert np.allclose(load_with_regen.hourly_injection_load_simulation_period_with_regeneration,
+                       load.hourly_injection_load_simulation_period_with_regeneration + 1)
+    assert np.isclose(load_with_regen.imbalance, load.imbalance + 8760)
+    load_with_regen.hourly_regeneration_load_simulation_period = np.ones(8760 * 2) * (-1)
+    assert np.allclose(load_with_regen.hourly_extraction_load_simulation_period,
+                       load.hourly_extraction_load_simulation_period)
+    assert np.allclose(load_with_regen.hourly_injection_load_simulation_period,
+                       load.hourly_injection_load_simulation_period)
+    assert np.allclose(load_with_regen.hourly_extraction_load_simulation_period_with_regeneration,
+                       load.hourly_extraction_load_simulation_period_with_regeneration + 1)
+    assert np.allclose(load_with_regen.hourly_injection_load_simulation_period_with_regeneration,
+                       load.hourly_injection_load_simulation_period_with_regeneration)
+    assert np.isclose(load_with_regen.imbalance, load.imbalance - 8760)
+
+
 def test_imbalance_multi_year():
     load = HourlyBuildingLoadMultiYear(np.ones(8760 * 2) * 10, np.ones(8760 * 2))
     assert np.isclose(load.imbalance, -60882)

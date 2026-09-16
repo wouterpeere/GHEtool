@@ -248,24 +248,11 @@ class HourlyBuildingLoadMultiYear(_HourlyDataBuilding):
         """
         self.dhw = load
 
-    @property
-    def imbalance(self) -> float:
-        """
-        This function calculates the average yearly ground imbalance.
-        A positive imbalance means that the field is injection dominated, i.e. it heats up every year.
-
-        Returns
-        -------
-        imbalance : float
-        """
-        return np.sum(
-            self.hourly_injection_load_simulation_period + self.hourly_regeneration_load_simulation_period - self.hourly_extraction_load_simulation_period) / self.simulation_period
-
     def __export__(self):
         return {
             'type': 'Multiyear hourly building load',
             'Efficiency heating': self.cop.__export__(),
             'Efficiency cooling': self.eer.__export__(),
             'Peak cooling duration [hour]': self.peak_injection_duration / 3600,
-            'Peak heating duration [hour]': self.peak_extraction_duration / 3600
+            'Peak heating duration [hour]': self.peak_extraction_duration / 3600,
         }

@@ -36,6 +36,45 @@ class _HourlyData(_LoadData, ABC):
         """
 
     @property
+    def hourly_injection_load_simulation_period_with_regeneration(self) -> np.ndarray:
+        """
+        This function returns the hourly injection load in kWh/h for the whole simulation period including regeneration.
+
+        Returns
+        -------
+        hourly injection : np.ndarray
+            Hourly injection values [kWh/h] for the whole simulation period
+        """
+        regen = np.where(self.hourly_regeneration_load_simulation_period > 0,
+                         self.hourly_regeneration_load_simulation_period, 0)
+        return self.hourly_injection_load_simulation_period + regen
+
+    @abc.abstractmethod
+    def hourly_extraction_load_simulation_period(self) -> np.ndarray:
+        """
+        This function returns the hourly extraction load in kWh/h for the whole simulation period.
+
+        Returns
+        -------
+        hourly injection : np.ndarray
+            Hourly extraction values [kWh/h] for the whole simulation period
+        """
+
+    @property
+    def hourly_extraction_load_simulation_period_with_regeneration(self) -> np.ndarray:
+        """
+        This function returns the hourly extraction load in kWh/h for the whole simulation period including regeneration.
+
+        Returns
+        -------
+        hourly injection : np.ndarray
+            Hourly extraction values [kWh/h] for the whole simulation period
+        """
+        regen = np.where(self.hourly_regeneration_load_simulation_period < 0,
+                         self.hourly_regeneration_load_simulation_period, 0)
+        return self.hourly_extraction_load_simulation_period - regen  # negative so it positive
+
+    @property
     def hourly_injection_load(self) -> np.ndarray:
         """
         This function returns the hourly injection load in kWh/h.
@@ -69,7 +108,7 @@ class _HourlyData(_LoadData, ABC):
         -------
         resulting hourly load : np.ndarray
         """
-        return self.hourly_injection_load_simulation_period - self.hourly_extraction_load_simulation_period + self.hourly_regeneration_load_simulation_period
+        return self.hourly_injection_load_simulation_period_with_regeneration - self.hourly_extraction_load_simulation_period_with_regeneration
 
     @property
     def monthly_baseload_injection_simulation_period(self) -> np.ndarray:
@@ -130,7 +169,7 @@ class _HourlyData(_LoadData, ABC):
         imbalance : float
         """
         return np.sum(
-            self.hourly_injection_load_simulation_period - self.hourly_extraction_load_simulation_period) / self.simulation_period
+            self.hourly_injection_load_simulation_period_with_regeneration - self.hourly_extraction_load_simulation_period_with_regeneration) / self.simulation_period
 
     @property
     def max_peak_injection(self) -> float:
