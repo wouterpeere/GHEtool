@@ -180,8 +180,8 @@ def calculate_convective_resistance(flow_data: _FlowData, fluid_data: _FluidData
     References
     ----------
     .. [#Gnielinksi2013] Gnielinski, V. (2013). On heat transfer in tubes.
-        International Journal of Heat and Mass Transfer, 63, 134–140.
-        https://doi.org/10.1016/j.ijheatmasstransfer.2013.04.015
+            International Journal of Heat and Mass Transfer, 63, 134–140.
+            https://doi.org/10.1016/j.ijheatmasstransfer.2013.04.015
     """
     low_re = 2300.0
     high_re = 4000.0

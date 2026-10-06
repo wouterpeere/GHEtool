@@ -247,6 +247,10 @@ class MuoviEllipse(SingleUTube):
         Returns
         -------
         None
+
+        Raises
+        ------
+        NotImplementedError
         """
 
         raise NotImplementedError('The MuoviELLIPSE can only be simulated with the explicit methods.')

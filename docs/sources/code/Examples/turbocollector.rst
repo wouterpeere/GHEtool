@@ -1,5 +1,5 @@
 ***********************************************************
-Turbocollector
+TurboCollector
 ***********************************************************
 
 .. literalinclude:: ../../../../GHEtool/Examples/turbocollector.py

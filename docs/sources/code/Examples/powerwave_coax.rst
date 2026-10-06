@@ -1,7 +1,7 @@
 ***********************************************************
-Sizing with variable flow rate
+JANSEN powerwave coax
 ***********************************************************
 
-.. literalinclude:: ../../../../GHEtool/Examples/variable_flow_rate.py
+.. literalinclude:: ../../../../GHEtool/Examples/powerwave_coax.py
    :language: python
    :linenos:
