@@ -61,15 +61,14 @@ our [project board](https://github.com/users/wouterpeere/projects/2) to check ou
 
 ## Requirements
 
-This code is tested with Python 3.11, 3.12, 3.13 and 3.14 and requires the following libraries (the versions
-mentioned are the ones with which the code is tested)
+This code is tested with Python 3.12, 3.13 and 3.14 and requires the following libraries
 
 * matplotlib >= 3.9.2
-* numpy >= 1.26.4
+* numpy >= 2.0.0
 * pandas >= 1.4.3
 * pygfunction >= 2.3.1
-* scipy >= 1.8.1
-* secondarycoolantprops >= 1.1
+* scipy >= 1.18.1
+* secondarycoolantprops >= 1.5
 * optuna >= 3.6.1
 
 For the tests
@@ -279,8 +278,7 @@ atol and rtol is chosen when sizing. The options are:
 To show how all the pieces of GHEtool work together, below you can find a step-by-step example of how, traditionally,
 one would work with GHEtool.
 Start by importing all the relevant classes. In this case we are going to work with a ground model which assumes a
-constant ground temperature (e.g. from a TRT-test),
-and we will provide the load with a monthly resolution.
+constant ground temperature (e.g. from a TRT-test), and we will provide the load with a monthly resolution.
 
 ```Python
 from GHEtool import Borefield, GroundConstantTemperature, MonthlyGeothermalLoadAbsolute
@@ -390,7 +388,7 @@ Please do contact us at [info@ghetool.eu](mailto:info@ghetool.eu).
 
 Please cite GHEtool using the JOSS paper.
 
-Peere, W., Blanke, T.(2022). GHEtool: An open-source tool for borefield sizing in Python. _Journal of Open Source
+Peere, W., Blanke, T. (2022). GHEtool: An open-source tool for borefield sizing in Python. _Journal of Open Source
 Software, 7_(76), 4406, https://doi.org/10.21105/joss.04406
 
 For more information on how to cite GHEtool, please visit the ReadTheDocs
@@ -399,6 +397,9 @@ at [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en
 ## References
 
 ### Development of GHEtool
+
+Peere, W. (2027). Validated combined first and last year borefield sizing methodology. In Proceedings of GeoTHERM 2027.
+Offenburg (Germany), 25-26 February 2027. [abstract submitted]
 
 Peere, W. (2025). Integrating Temperature and Part-Load Dependent COP in Shallow Geothermal Borefield Design. In
 _Proceedings of German Geothermal Congress DGK 2025_. Frankfurt (Germany), 18-20 November 2025.

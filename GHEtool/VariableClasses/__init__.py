@@ -8,3 +8,4 @@ from .CalculationSetup import CalculationSetup
 from .Borehole import Borehole
 from .Result import ResultsMonthly, ResultsHourly, _Results
 from .Gfunctions import *
+from .Regeneration import Regeneration

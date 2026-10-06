@@ -59,7 +59,11 @@ class Turbocollector(MultipleUTube):
         ----------
         .. [#Niklas] Niklas Hidman, Daniel Almgren, Kim Johansson, Eskil Nilsson, How internal fins enhance the thermohydraulic performance of geothermal pipes: A direct numerical simulation study, International Journal of Heat and Mass Transfer, Volume 256, Part 3, 2026, 128114, ISSN 0017-9310, https://doi.org/10.1016/j.ijheatmasstransfer.2025.128114.
         """
-        m_dot = np.atleast_1d(np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
+        if 'mfr_borehole' in kwargs:
+            m_dot = kwargs['mfr_borehole']
+        else:
+            m_dot = np.atleast_1d(
+                np.asarray(flow_data.mfr_borehole(**kwargs, fluid_data=fluid_data), dtype=np.float64))
 
         # Reynolds number
         re = 4.0 * m_dot / (fluid_data.mu(**kwargs) * np.pi * self.r_in * 2) / self.number_of_pipes

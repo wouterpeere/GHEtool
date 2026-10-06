@@ -2,15 +2,14 @@
 
 ## Requirements
 
-This code is tested with Python 3.11, 3.12, 3.13 and 3.14 and requires the following libraries (the versions
-mentioned are the ones with which the code is tested)
+This code is tested with Python 3.12, 3.13 and 3.14 and requires the following libraries
 
 * matplotlib >= 3.9.2
-* numpy >= 1.26.4
+* numpy >= 2.0.0
 * pandas >= 1.4.3
 * pygfunction >= 2.3.1
-* scipy >= 1.8.1
-* secondarycoolantprops >= 1.1
+* scipy >= 1.18.1
+* secondarycoolantprops >= 1.5
 * optuna >= 3.6.1
 
 For the tests
