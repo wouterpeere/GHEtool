@@ -355,11 +355,11 @@ class _Efficiency(_EfficiencyBase, BaseClass):
                                            self._get_min_power(primary_temperature, secondary_temperature, ))
         xi = primary_temperature_clipped
         if self._has_part_load and self._has_secondary:
-            xi = list(zip(primary_temperature_clipped, secondary_temperature_clipped, part_load_clipped))
+            xi = np.column_stack((primary_temperature_clipped, secondary_temperature_clipped, part_load_clipped))
         elif self._has_secondary:
-            xi = list(zip(primary_temperature_clipped, secondary_temperature_clipped))
+            xi = np.column_stack((primary_temperature_clipped, secondary_temperature_clipped))
         elif self._has_part_load:
-            xi = list(zip(primary_temperature_clipped, part_load_clipped))
+            xi = np.column_stack((primary_temperature_clipped, part_load_clipped))
 
         xi = np.clip(xi, self._lower, self._upper)
 
@@ -427,7 +427,7 @@ class _Efficiency(_EfficiencyBase, BaseClass):
 
         # interpolate directly on precomputed surface
         if self._has_secondary:
-            xi = list(zip(Tp, Ts))
+            xi = np.column_stack((Tp, Ts))
         else:
             xi = Tp
 
