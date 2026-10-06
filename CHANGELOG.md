@@ -32,7 +32,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Change implementation for conversion volume to weight percentage (issue #481).
 - MuoviELLIPSE borehole resistance ANN now runs in numpy (cached `.npz` weights). Drop torch, scikit-learn and joblib
   from install_requires (issue #483).
-- Fix seed size in optuna TPESampler so results are reproducible.
 
 ### Fixed
 
