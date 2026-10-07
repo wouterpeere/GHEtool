@@ -36,8 +36,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - Fix the paths in the methods test data so the sizing tests also run on macOS and Linux.
-- Fix issue with pyparsing.tools (issue #460, thanks to helgakovacs).
 - Fix problem in optimisation for power/balance.
+- Fix issue with size L4 method and linux systems.
+- Fix issue with pyparsing.tools (issue #460, thanks to helgakovacs).
 - Fix monthly temperature profile and variable flow rate (issue #462).
 - Fix problem with constant temperature difference and unphysical results (issue #466).
 
