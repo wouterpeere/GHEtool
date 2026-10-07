@@ -2108,7 +2108,7 @@ class Borefield(BaseClass):
                 if indices is not None and (not self.borehole.use_constant_Rb and
                                             not isinstance(self.borehole.flow_data, VariableHourlyFlowRate)):
                     if self._temp_results['temperature_result'] is None:
-                        self._temp_results['temperature_result'] = np.empty_like(hourly_load, dtype=float)
+                        self._temp_results['temperature_result'] = Tb.copy()
 
                     if variable_efficiency and not (indices is None or len(indices) == 0):
                         # all indices are important up to the last one
