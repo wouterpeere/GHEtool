@@ -1633,6 +1633,10 @@ class Borefield(BaseClass):
             elif self.ground_data.variable_Tg:
                 # for when the temperature gradient is active and it is injection
                 self.H = self.calculate_next_depth_deep_sizing(H_prev)
+            print(f"q{quadrant} it{i} H_prev={H_prev:.3f} H_new={self.H!r} "
+                  f"Tg={self._Tg(H_prev):.4f} Tmin={Tmin} Tmax={Tmax} "
+                  f"maxinj={np.max(self.results.peak_injection):.4f} minext={np.min(self.results.peak_extraction):.4f}",
+                  flush=True)
             if self.H < 0:
                 return 0, False
 
