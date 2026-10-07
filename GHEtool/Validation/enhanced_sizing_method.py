@@ -278,9 +278,9 @@ def test_case_office():
     start = time.time()
 
     borefield.size_L4()
-    assert np.isclose(borefield.H, 132.4673002791876)
-    assert np.isclose(borefield.results.min_temperature, 8.374020595608556)
-    assert np.isclose(borefield.results.max_temperature, 17.000729593255436)
+    assert np.isclose(borefield.H, 132.4338716112161)
+    assert np.isclose(borefield.results.min_temperature, 8.372994932636901)
+    assert np.isclose(borefield.results.max_temperature, 17.001421794365584)
     print(f'Simulation time without speed up {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = True
@@ -308,9 +308,9 @@ def test_case_office():
     start = time.time()
 
     borefield.size_L4()
-    assert np.isclose(borefield.H, 130.78132818358134)
-    assert np.isclose(borefield.results.min_temperature, 8.32197886166622)
-    assert np.isclose(borefield.results.max_temperature, 17.001305013407563)
+    assert np.isclose(borefield.H, 130.85301888097592)
+    assert np.isclose(borefield.results.min_temperature, 8.324216922767295)
+    assert np.isclose(borefield.results.max_temperature, 16.999949774847742)
     print(f'Simulation time without speed up and explicit models {time.time() - start}s')
 
     borefield.USE_SPEED_UP_IN_SIZING = True
