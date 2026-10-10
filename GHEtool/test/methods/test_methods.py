@@ -115,7 +115,7 @@ def _assert_optimisation(model: Borefield, load, borefield_load, external_load, 
 )
 def test_optimise_power(input, result):
     model = input[0]
-    load, depth, power, hourly, max_peak_extraction, max_peak_injection, dhw_preferential = input[1:]
+    load, depth, power, hourly, max_peak_extraction, max_peak_injection, dhw_preferential, max_peak_dhw = input[1:]
 
     if power != 1:
         pytest.skip("Not a power based optimisation case")
@@ -129,6 +129,7 @@ def test_optimise_power(input, result):
         max_peak_heating=max_peak_extraction,
         max_peak_cooling=max_peak_injection,
         dhw_preferential=dhw_preferential,
+        max_peak_dhw=max_peak_dhw
     )
 
     _assert_optimisation(model, load, borefield_load, external_load, result, 'opt_pow')
@@ -145,7 +146,7 @@ def test_optimise_power(input, result):
 )
 def test_optimise_energy(input, result, test_id):
     model: Borefield = input[0]
-    load, depth, power, _, max_peak_extraction, max_peak_injection, _ = input[1:]
+    load, depth, power, _, max_peak_extraction, max_peak_injection, dhw_preferential, max_peak_dhw = input[1:]
 
     if power != 2:
         pytest.skip("Not an energy based optimisation case")
@@ -157,6 +158,8 @@ def test_optimise_energy(input, result, test_id):
         load,
         max_peak_heating=max_peak_extraction,
         max_peak_cooling=max_peak_injection,
+        max_peak_dhw=max_peak_dhw,
+        dhw_preferential=dhw_preferential,
     )
 
     _assert_optimisation(model, load, borefield_load, external_load, result, 'opt_ene')
@@ -172,7 +175,7 @@ def test_optimise_energy(input, result, test_id):
 )
 def test_optimise_balance(input, result):
     model: Borefield = input[0]
-    load, depth, power, hourly, max_peak_extraction, max_peak_injection, dhw_preferential = input[1:]
+    load, depth, power, hourly, max_peak_extraction, max_peak_injection, dhw_preferential, max_peak_dhw = input[1:]
 
     if power != 3:
         pytest.skip("Not a balance based optimisation case")
@@ -186,6 +189,7 @@ def test_optimise_balance(input, result):
         max_peak_heating=max_peak_extraction,
         max_peak_cooling=max_peak_injection,
         dhw_preferential=dhw_preferential,
+        max_peak_dhw=max_peak_dhw
     )
 
     _assert_optimisation(model, load, borefield_load, external_load, result, 'opt_bal')

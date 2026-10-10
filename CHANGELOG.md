@@ -23,6 +23,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Change the monthly resampling of hourly loads to a reshape when all months are equal (thanks to samuelduchesne).
 - Change the L4 time vector creation to float32, since the float16 attempt always overflows.
 - Change the interpolation query points in the _Efficiency class to be built with np.column_stack.
+- Speed up optimise for balance algorithm (issue #385).
+- Add DHW to optimise for energy (issue #388).
 - MuoviELLIPSE borehole resistance ANN now runs in numpy (cached `.npz` weights). Drop torch, scikit-learn and joblib
   from install_requires (issue #483).
 - Move calculate_borefield_inlet_outlet_temperature to Borehole class (issue #464).
