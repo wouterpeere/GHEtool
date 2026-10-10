@@ -31,6 +31,7 @@ class OptimiseLoadProfileObject:
                  peak_cooling_ext: float, name: str = "", power: int = 1, hourly: bool = True,
                  max_peak_heating: float = None,
                  max_peak_cooling: float = None,
+                 max_peak_dhw: float = None,
                  dhw_preferential: bool = True):
         self.borefield = copy.deepcopy(borefield)
         self.load = copy.deepcopy(load)
@@ -46,6 +47,7 @@ class OptimiseLoadProfileObject:
         self.hourly = hourly
         self.max_peak_heating = max_peak_heating
         self.max_peak_cooling = max_peak_cooling
+        self.max_peak_dhw = max_peak_dhw
         self.dhw_preferential = dhw_preferential
 
     def test(self):  # pragma: no cover
@@ -189,7 +191,7 @@ class TestMethodClass():
             if isinstance(i, SizingObject):
                 continue
             temp.append((copy.deepcopy(i.borefield), copy.deepcopy(i.load), i.depth, i.power, i.hourly,
-                         i.max_peak_heating, i.max_peak_cooling, i.dhw_preferential))
+                         i.max_peak_heating, i.max_peak_cooling, i.dhw_preferential, i.max_peak_dhw))
             temp[-1][0].name = i.name
         return temp
 

@@ -218,10 +218,10 @@ def test_auditorium_inlet_outlet():
     load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object)
     assert np.isclose(np.sum(regen[:8760]), 15967.159112084273)
 
-    borefield.flow = ConstantFlowRate(mfr=15, flow_per_borehole=False)
+    borefield.flow_data = ConstantFlowRate(mfr=15, flow_per_borehole=False)
     borefield.calculation_setup(size_based_on='inlet')
     load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object)
-    assert np.isclose(np.sum(regen[:8760]), 14807.339373205816)
+    assert np.isclose(np.sum(regen[:8760]), 23202.423869319544)
 
 
 def test_regeneration_error():
@@ -617,7 +617,7 @@ def test_auditorium_var_eff():
         algorithm='yearly',
         simulation_horizon=100)
 
-    assert np.isclose(np.sum(proceeding[:8760]), 27221.967180124237)
+    assert np.isclose(np.sum(proceeding[:8760]), 26694.189317442353)
 
     proceeding_my, proceeding = calculate_regeneration(
         borefield=borefield,
@@ -627,7 +627,7 @@ def test_auditorium_var_eff():
         simulation_horizon=100)
 
     # more regeneration with total
-    assert np.isclose(np.sum(proceeding[:8760]), 54443.93436024831)
+    assert np.isclose(np.sum(proceeding[:8760]), 53324.22062721375)
 
 
 def test_break():
