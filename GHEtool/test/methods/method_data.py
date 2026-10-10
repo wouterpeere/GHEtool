@@ -971,11 +971,11 @@ borefield.load.simulation_period = 40
 borefield.borehole = temp_borehole
 borefield.create_rectangular_borefield(6, 6, 6, 6, 146, 4)
 list_of_test_objects.add(
-    OptimiseLoadProfileObject(borefield, load, 146, 74.43056706367204, 19.621426172478312,
-                              120.07568442111474, 52.09610214768002,
-                              516.3153579385137, 492.62271754360006,
+    OptimiseLoadProfileObject(borefield, load, 146, 73.09826888017955, 19.215602145531243,
+                              115.45661216620069, 50.92927436155475,
+                              522.4741209450658, 493.59507403203776,
                               name='Optimise load profile (eer combined) (balance)', power=3,
-                              hourly=False))
+                              hourly=True))
 data = GroundFluxTemperature(1.8, 9.7, flux=0.08)
 borefield = Borefield()
 borefield.ground_data = data
@@ -1157,9 +1157,9 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 100.0, 
                                                    power=3, hourly=True, dhw_preferential=True))
 load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/hourly_profile.csv"), col_dhw=0, col_cooling=1)
 load.hourly_heating_load = np.zeros(8760)
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 55.68216681748953, 82.804154550053,
-                                                   115.66734898717323, 249.7227025532332,
-                                                   0.0, 468.31401837230567,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 54.22428484677548, 82.152561940423,
+                                                   111.87401156930925, 244.49877564991002,
+                                                   0.0, 472.6672907917416,
                                                    name='Optimise balance with EER and dhw preferential and dhw',
                                                    power=3, hourly=True, dhw_preferential=True))
 
