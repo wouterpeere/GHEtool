@@ -398,8 +398,8 @@ at [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en
 
 ### Development of GHEtool
 
-Peere, W. (2027). Towards a more accurate design of borefields: using variable fluid properties, flow rate and heat pump efficiency. In Proceedings of GeoTHERM 2027.
-Offenburg (Germany), 25-26 February 2027. [abstract submitted]
+Peere, W. (2027). Towards a more accurate design of borefields: using variable fluid properties, flow rate and heat pump efficiency. In Proceedings of GeoTHERM 2026.
+Offenburg (Germany), 26-27 February 2026. [paper submitted]
 
 Peere, W. (2025). Integrating Temperature and Part-Load Dependent COP in Shallow Geothermal Borefield Design. In
 _Proceedings of German Geothermal Congress DGK 2025_. Frankfurt (Germany), 18-20 November 2025.
