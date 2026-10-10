@@ -60,6 +60,13 @@ Whenever you use the model of working with modulating heat pumps, please use the
 > Peere, W. (2025). Integrating Temperature and Part-Load Dependent COP in Shallow Geothermal Borefield Design. In
 _Proceedings of German Geothermal Congress DGK 2025_. Frankfurt (Germany), 18-20 November 2025.
 
+## Working with variable fluid properties or variable flow rates
+
+Whenever you use the TemperatureDependentFluidData or ConstantDeltaTFlowRate classes, please use the citation below.
+
+> Peere, W. (2027). Towards a more accurate design of borefields: using variable fluid properties, flow rate and heat pump efficiency. In Proceedings of GeoTHERM 2026.
+Offenburg (Germany), 26-27 February 2026. [paper submitted]
+
 ## Working with the TurboCollector
 
 Whenever you use the model of the TurboCollector, please use the citation below.
