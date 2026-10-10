@@ -17,6 +17,7 @@ def optimise_load_profile_power(
         use_hourly_resolution: bool = True,
         max_peak_heating: float = None,
         max_peak_cooling: float = None,
+        max_peak_dhw: float = None,
         dhw_preferential: bool = None
 ) -> tuple[
     Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear], Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear]]:
@@ -40,6 +41,8 @@ def optimise_load_profile_power(
         The maximum peak power for the heating (building side) [kW]
     max_peak_cooling : float
         The maximum peak power for the cooling (building side) [kW]
+    max_peak_dhw : float
+        The maximum peak power for the domestic hot water (building side) [kW]
     dhw_preferential : bool
         True if heating should first be reduced only after which the dhw share is reduced.
         If it is None, then the dhw profile is not optimised and kept constant.
@@ -90,6 +93,8 @@ def optimise_load_profile_power(
         init_peak_heating = min(init_peak_heating, max_peak_heating)
     if max_peak_cooling is not None:
         init_peak_cooling = min(init_peak_cooling, max_peak_cooling)
+    if max_peak_dhw is not None:
+        init_peak_dhw = min(init_peak_dhw, max_peak_dhw)
 
     # peak loads for iteration
     peak_heat_load: float = init_peak_heating
@@ -459,6 +464,7 @@ def optimise_load_profile_energy(
         return results
 
     for i in range(12 * borefield.load.simulation_period):
+        print(i)
         # set iteration criteria
         borefield._calculate_temperature_profile(length=borefield.H,
                                                  g_values=borefield._temp_results.get('g_values'),  # always the same
@@ -470,7 +476,7 @@ def optimise_load_profile_energy(
         while not cool_ok or not heat_ok:
             # calculate temperature profile, just for the results
             peak_extraction, peak_injection, _ = update_last_month(i, init_load)
-
+            print(peak_extraction, peak_injection, borefield.load._peak_heating[i], borefield.load._peak_cooling[i])
             # deviation from minimum temperature
             if abs(peak_extraction - borefield.Tf_min) > temperature_threshold:
                 # check if it goes below the threshold
