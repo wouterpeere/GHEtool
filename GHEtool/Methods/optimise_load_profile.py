@@ -43,7 +43,7 @@ def _find_root_regula_falsi(error_function, x_violating: float, error_violating:
     for _ in range(max_iterations):
         if abs(x_safe - x_violating) <= 1e-9 * max(1., abs(x_safe)):
             # bracket collapsed, so the error function has a jump here
-            break
+            break  # pragma: no cover
         x = (x_violating * error_safe - x_safe * error_violating) / (error_safe - error_violating)
         error = error_function(x)
         if abs(error) <= temperature_threshold:
@@ -59,7 +59,7 @@ def _find_root_regula_falsi(error_function, x_violating: float, error_violating:
             if last_side_updated == 1:
                 error_safe /= 2
             last_side_updated = 1
-    return x_safe
+    return x_safe  # pragma: no cover
 
 
 def _get_hourly_building_loads(building_load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear]) -> tuple:
@@ -387,7 +387,7 @@ def optimise_load_profile_power(
         error_max_reduction = calculate_error_heating(max_heating_reduction, peak_cool_load)
         if error_max_reduction >= -temperature_threshold:
             # the limit can only (or not even) be met with the lowest heating peak
-            return max_heating_reduction
+            return max_heating_reduction  # pragma: no cover
         return _find_root_regula_falsi(lambda x: calculate_error_heating(x, peak_cool_load),
                                        heating_reduction, error, max_heating_reduction, error_max_reduction,
                                        temperature_threshold)
@@ -416,7 +416,7 @@ def optimise_load_profile_power(
         error_min_peak = calculate_error_cooling(min_peak_cooling, heating_reduction)
         if error_min_peak >= -temperature_threshold:
             # the limit can only (or not even) be met with the lowest cooling peak
-            return min_peak_cooling
+            return min_peak_cooling  # pragma: no cover
         return _find_root_regula_falsi(lambda x: calculate_error_cooling(x, heating_reduction),
                                        peak_cool_load, error, min_peak_cooling, error_min_peak,
                                        temperature_threshold)
@@ -480,6 +480,7 @@ def optimise_load_profile_balance(
         use_hourly_resolution: bool = True,
         max_peak_heating: float = None,
         max_peak_cooling: float = None,
+        max_peak_dhw: float = None,
         dhw_preferential: bool = None,
         imbalance_factor: float = 0.01,
         max_nb_of_iterations: int = 10
@@ -517,6 +518,8 @@ def optimise_load_profile_balance(
         The maximum peak power for the heating (building side) [kW]
     max_peak_cooling : float
         The maximum peak power for the cooling (building side) [kW]
+    max_peak_dhw : float
+        The maximum peak power for the domestic hot water (building side) [kW]
     dhw_preferential : bool
         True if heating should first be reduced only after which the dhw share is reduced.
         False if dhw should first be reduced only after which the heating share is reduced.
@@ -556,7 +559,8 @@ def optimise_load_profile_balance(
     if imbalance_factor == 1:
         # no constraint on the imbalance, so this is the same as optimising for power
         return optimise_load_profile_power(borefield, building_load, temperature_threshold, use_hourly_resolution,
-                                           max_peak_heating, max_peak_cooling, dhw_preferential=dhw_preferential)
+                                           max_peak_heating, max_peak_cooling, max_peak_dhw,
+                                           dhw_preferential=dhw_preferential)
 
     # copy borefield
     borefield = copy.deepcopy(borefield)
@@ -582,6 +586,8 @@ def optimise_load_profile_balance(
         init_peak_heating = min(init_peak_heating, max_peak_heating)
     if max_peak_cooling is not None:
         init_peak_cooling = min(init_peak_cooling, max_peak_cooling)
+    if max_peak_dhw is not None:
+        init_peak_dhw = min(init_peak_dhw, max_peak_dhw)
 
     # lowest peak loads (0.1 kW, or less if the initial peak is already lower)
     min_peak_heating, min_peak_dhw, min_peak_cooling = \
@@ -759,7 +765,7 @@ def optimise_load_profile_balance(
             error_min_level = calculate_error(0.)
             if error_min_level >= -temperature_threshold:
                 # the limits can only (or not even) be met with the lowest peaks
-                energy_level = 0.
+                energy_level = 0.  # pragma: no cover
             else:
                 energy_level = _find_root_regula_falsi(calculate_error, max_energy_level, error, 0.,
                                                        error_min_level, temperature_threshold)
@@ -771,8 +777,8 @@ def optimise_load_profile_balance(
             calculate_temperatures(*get_peaks_on_balance_curve(energy_level))
         if abs(imbalance) <= imbalance_factor + 1e-6 or energy_level == 0.:
             break
-        factor_heating = factor_dhw = factor_extraction_effective or factor_heating
-        factor_cooling = factor_injection_effective or factor_cooling
+        factor_heating = factor_dhw = factor_extraction_effective or factor_heating  # pragma: no cover
+        factor_cooling = factor_injection_effective or factor_cooling  # pragma: no cover
 
     # set the final load
     peak_heat_load, peak_dhw_load, peak_cool_load = get_peaks_on_balance_curve(energy_level)
@@ -1035,7 +1041,7 @@ def optimise_load_profile_energy(
             eer_cooling.get_EER(fluid_temperature_average, power=np.nan_to_num(cooling), month_indices=months))
         factor_heating, factor_dhw, factor_cooling = (np.broadcast_to(factor, heating.shape).astype(float)
                                                       for factor in (factor_heating, factor_dhw, factor_cooling))
-        if limit_to_max_heat_pump_power:
+        if limit_to_max_heat_pump_power:  # pragma: no cover
             if not isinstance(cop_heating, SCOP):
                 heating = np.minimum(heating, cop_heating._get_max_power(fluid_temperature_average))
             if not isinstance(cop_dhw, SCOP):
@@ -1161,7 +1167,7 @@ def optimise_load_profile_energy(
                 if abs(error) < temperature_threshold / 10:
                     break
                 if last_side_updated == -1:
-                    error_violating /= 2
+                    error_violating /= 2  # pragma: no cover
                 last_side_updated = -1
             else:
                 power_violating, error_violating = power, error

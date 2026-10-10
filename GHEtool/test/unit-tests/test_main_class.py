@@ -1116,6 +1116,30 @@ def test_optimise_equal():
     assert borefield_load_bal == borefield_load
 
 
+def test_optimise_error():
+    load = HourlyBuildingLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.simulation_period = 10
+    borefield = Borefield(load=load)
+    borefield.set_min_fluid_temperature(2)
+    borefield.set_max_fluid_temperature(17)
+    borefield.borefield = gt.borefield.Borefield.rectangle_field(20, 4, 6, 6, 150, 1, 0.07)
+    borefield.Rb = 0.1699
+    ground_data = GroundFluxTemperature(2, 9.6, flux=0.07)
+    borefield.ground_data = ground_data
+
+    borefield.calculation_setup(size_based_on="inlet")
+    with pytest.raises(ValueError):
+        borefield_load_bal, external_load = optimise_load_profile_energy(borefield, load)
+    borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    borefield.fluid_data = TemperatureDependentFluidData('MPG', 30).create_constant(2)
+    borefield.flow_data = VariableHourlyFlowRate(mfr=np.ones(8760))
+    assert not borefield.borehole.use_constant_Rb
+
+    with pytest.raises(ValueError):
+        borefield_load_bal, external_load = optimise_load_profile_energy(borefield, load)
+
+
 def test_repr_():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
