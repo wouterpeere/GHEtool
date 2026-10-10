@@ -542,16 +542,19 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 2
                                                    567.7176931583529,
                                                    name='Optimise load profile 3 (balance, hourly)', power=3,
                                                    hourly=True))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 93.2198, 99.574,
-                                                   536.0356, 663.3017, 233.541, 287.717,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 94.71874758593957, 99.61418184090991,
+                                                   536.035599963864, 673.684458993794, 209.51411978433754,
+                                                   298.19863625473664,
                                                    name='Optimise load profile 1 (energy)', power=2))
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 77.5255, 96.316,
-                                                   385.309, 417.43548, 316.3463, 420.1286,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 79.26537043636431, 96.80038419642045,
+                                                   531.7630737363945, 468.0016563011883, 300.20920660323685,
+                                                   423.969460923839,
                                                    name='Optimise load profile 2 (energy)', power=2))
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 50.7546, 75.436,
-                                                   181.2417, 209.5633, 402.086, 553.3226,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 52.517079533661416, 77.60187603103539,
+                                                   268.8156054361622, 239.89969037483152, 390.3299545839425,
+                                                   551.8504717910687,
                                                    name='Optimise load profile 3 (energy)', power=2))
 temp_borehole = copy.deepcopy(borefield.borehole)
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
@@ -560,24 +563,24 @@ borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
 
 borefield.borehole.use_constant_Rb = False
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 96.1540221389599, 99.97630462269117,
-                                                   536.035599963864, 676.4169469162705, 203.92278914006522,
-                                                   131.6986123224434,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 97.5918078816849, 99.97708241629543,
+                                                   536.035599963864, 676.4169469162705, 173.10714970652015,
+                                                   149.7220503430118,
                                                    name='Optimise load profile 1 (energy, var temp)', power=2))
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 82.9755217143683, 99.60094773028997,
-                                                   483.9284713852666, 641.4257995380445, 295.9887617378088,
-                                                   297.0987453047386,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 84.72690125386208, 99.67067780119245,
+                                                   536.035599963864, 665.7761682755024, 272.83557499555667,
+                                                   312.6283879506591,
                                                    name='Optimise load profile 2 (energy, var temp)', power=2))
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 58.02437331095561, 88.57009290098247,
-                                                   220.17137008203977, 329.9396352393053, 380.20837162454677,
-                                                   491.5654638491661,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 60.04290903722156, 90.24461282113019,
+                                                   363.6612104245367, 341.30984770950636, 363.5175103633432,
+                                                   495.0006934523831,
                                                    name='Optimise load profile 3 (energy, var temp)', power=2))
 borefield.USE_SPEED_UP_IN_SIZING = False
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 58.01591259956766, 88.56438962647391,
-                                                   220.11115719855272, 329.9396352393053, 380.24030999388145,
-                                                   492.1516583455272,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 50, 60.04290903722156, 90.24461282113019,
+                                                   363.6612104245367, 341.30984770950636, 363.5175103633432,
+                                                   495.0006934523831,
                                                    name='Optimise load profile 3 (energy, var temp, no speed up)',
                                                    power=2))
 borefield.USE_SPEED_UP_IN_SIZING = True
@@ -678,8 +681,9 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    427.7028439849075,
                                                    name='Optimise load profile 1, reversed (balance, hourly)', power=3,
                                                    hourly=True))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.999, 72.193,
-                                                   676.415, 345.694, 23.00968, 342.182,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.99940708216474, 73.57736516569348,
+                                                   676.4155940837295, 483.8312541717402, 27.132862523716426,
+                                                   329.33896937575713,
                                                    name='Optimise load profile 1, reversed (energy)', power=2))
 temp_borehole = copy.deepcopy(borefield.borehole)
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
@@ -688,8 +692,8 @@ borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
 
 borefield.borehole.use_constant_Rb = False
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 100, 78.77543633712409,
-                                                   676.4155940837295, 482.53616652170643, 0, 323.3435205436101,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 100, 80.34618612539653,
+                                                   676.4155940837295, 536.036672036136, 0, 302.95742307616104,
                                                    name='Optimise load profile 1, reversed (energy, var temp)',
                                                    power=2))
 borefield.borehole = temp_borehole
@@ -738,12 +742,14 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 
                                                    447.0654606062546,
                                                    name='Optimise load profile 3, reversed (balance, hourly)', power=3,
                                                    hourly=True))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.5744, 93.2196,
-                                                   663.3017, 536.037, 287.716, 233.54241,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.61419014079208, 94.71863227032236,
+                                                   673.6857354975243, 536.036672036136, 298.19769219583554,
+                                                   209.51544203461776,
                                                    name='Optimise load profile 2, reversed (energy)', power=2))
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 96.316, 77.5254,
-                                                   417.4359, 385.3091, 420.12788, 316.34701,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 96.80042094108062, 79.26522526772645,
+                                                   468.0007202988117, 531.7641372636054, 423.96883812064647,
+                                                   300.2099900773207,
                                                    name='Optimise load profile 3, reversed (energy)', power=2))
 temp_borehole = copy.deepcopy(borefield.borehole)
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
@@ -752,15 +758,15 @@ borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
 
 borefield.borehole.use_constant_Rb = False
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.89155556718799, 98.0626617349599,
-                                                   676.4155940837295, 536.036672036136, 208.20377899385238,
-                                                   169.9507409925883,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.89659107091336, 99.22439328287719,
+                                                   676.4155940837295, 536.036672036136, 223.1749427285772,
+                                                   127.66202276900788,
                                                    name='Optimise load profile 2, reversed (energy, var temp)',
                                                    power=2))
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 98.94111436429822, 86.94227824049044,
-                                                   577.7335841407081, 536.036672036136, 357.5914083494824,
-                                                   279.10040469718695,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 100, 99.0944012608283, 88.79523111739012,
+                                                   612.45587754351, 536.036672036136, 367.12472876854804,
+                                                   247.40527747959175,
                                                    name='Optimise load profile 3, reversed (energy, var temp)',
                                                    power=2))
 borefield.borehole = temp_borehole
@@ -796,8 +802,9 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 28.7926
                                                    5.5742, 31.582, 77.583, 66.033,
                                                    name='Optimise load profile (stuck in loop) (balance, hourly)',
                                                    power=3, hourly=True))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 89.7131, 98.2914,
-                                                   57.1473, 74.1744, 54.511, 57.455,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 90.0735675672204, 98.42105305544519,
+                                                   58.265826982499995, 80.73466864976513, 56.1379457303727,
+                                                   62.33784403553506,
                                                    name='Optimise load profile (stuck in loop) (energy)', power=2))
 
 ground_data = GroundFluxTemperature(3, 10)
@@ -919,9 +926,9 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 45.9781
                                                    512.9266,
                                                    name='Optimise load profile (eer combined) (power)', power=1,
                                                    hourly=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 50.20552887448856, 12.775993964027224,
-                                                   96.0348641865927, 66.16134683885466, 602.987477171566,
-                                                   509.995718403938,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 53.28456608002084, 13.765776909145428,
+                                                   128.589968025, 87.797931432, 601.7667152391606,
+                                                   505.7854874461028,
                                                    name='Optimise load profile (eer combined) (energy)', power=2,
                                                    hourly=False))
 temp_borehole = copy.deepcopy(borefield.borehole)
@@ -932,9 +939,9 @@ borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
 borefield.borehole.use_constant_Rb = False
 borefield.load.simulation_period = 20
 borefield.create_rectangular_borefield(12, 10, 6, 6, 146, 4)
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 100, 45.079323926836295,
-                                                   507.312202875, 253.7291394414518, 0,
-                                                   434.3630433153413,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 100, 45.8928906040306,
+                                                   507.312202875, 537.3063482445762, 0,
+                                                   419.99201166026506,
                                                    name='Optimise load profile (eer combined) (energy, var temp)',
                                                    power=2, hourly=False))
 borefield.load.simulation_period = 40
@@ -953,8 +960,8 @@ borefield.create_rectangular_borefield(3, 5, 6, 6, 100, 1, 0.07)
 load = HourlyBuildingLoad(efficiency_heating=4.5, efficiency_cooling=20)
 load.load_hourly_profile(FOLDER.joinpath("test/methods/hourly_data/auditorium.csv"), header=True, separator=";",
                          col_cooling=0, col_heating=1)
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 100, 100.0, 92.62620369846371,
-                                                   25.315, 42.119132843891755, 0.0, 64.4014083207306,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 100, 100.0, 95.38314800513896,
+                                                   25.31511111111111, 53.00085, 0.0, 64.12244064037692,
                                                    name='Optimise load profile (auditorium) (energy)', power=2,
                                                    hourly=False))
 temp_borehole = copy.deepcopy(borefield.borehole)
@@ -964,8 +971,8 @@ borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
 
 borefield.borehole.use_constant_Rb = False
 
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 100, 100.0, 94.80628824030241,
-                                                   25.31511111111111, 48.03581237085217, 0.0, 60.78054654545362,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 100, 100.0, 96.8077143579668,
+                                                   25.31511111111111, 62.948073105081136, 0.0, 60.134611891055705,
                                                    name='Optimise load profile (auditorium) (energy, var temp)',
                                                    power=2,
                                                    hourly=False))
@@ -1057,8 +1064,8 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    name='Optimise load profile 1, reversed (power, dhw load, include DHW)',
                                                    power=1,
                                                    hourly=False, dhw_preferential=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.93439, 88.668155,
-                                                   1276.9398, 382.37345, 97.32781, 228.14127,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 94.44301735665431, 88.8386753208907,
+                                                   741.8152666270826, 483.8312541717402, 676.4162705, 219.1280259001462,
                                                    name='Optimise load profile 1, reversed (energy, dhw load, include DHW)',
                                                    power=2,
                                                    hourly=False, dhw_preferential=False))
@@ -1075,8 +1082,8 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 
                                                    name='Optimise load profile 1, reversed (power, dhw load, exclude DHW)',
                                                    power=1,
                                                    hourly=False, dhw_preferential=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 99.5636, 88.5654,
-                                                   1171.5038, 382.0792, 203.4107, 229.096,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 94.44301735665431, 88.8386753208907,
+                                                   741.8152666270826, 483.8312541717402, 676.4162705, 219.1280259001462,
                                                    name='Optimise load profile 1, reversed (energy, dhw load, exclude DHW)',
                                                    power=2,
                                                    hourly=False, dhw_preferential=False))
@@ -1118,9 +1125,9 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 55.7643
                                                    power=3, hourly=True, dhw_preferential=True))
 
 borefield.fluid_data = TemperatureDependentFluidData('MEG', 25)
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 94.95210661177441, 74.6170878426171,
-                                                   948.6394614304118, 267.3447332061888, 427.4144088146583,
-                                                   316.31082225678745,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, hourly_load, 150, 85.55229382218657, 73.25634091547855,
+                                                   676.4155940837295, 339.4569351303427, 676.4162705,
+                                                   298.4514049601871,
                                                    name='Optimise load profile 1, reversed (energy, dhw load, '
                                                         'include DHW, variable fluid)',
                                                    power=2, hourly=False, dhw_preferential=False))
@@ -1145,9 +1152,9 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 27.7852
                                                    634.99238764,
                                                    name='Optimise load profile (power, average)', power=1,
                                                    hourly=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 32.27763398561526, 39.67386235382791,
-                                                   73.164942825, 119.44092184298522, 459.6749311427051,
-                                                   633.706023990708,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 34.191772874135694, 42.63245808591089,
+                                                   140.17664334661987, 167.889049335, 444.38799494827526,
+                                                   633.0972769002127,
                                                    name='Optimise load profile (energy, average)', power=2,
                                                    hourly=False))
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 7.768105140052284, 13.420760194380177,
@@ -1160,9 +1167,9 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 22.5947
                                                    38.04006508498196, 31.743722234593672, 485.3160492200241,
                                                    646.1841540861012,
                                                    name='Optimise load profile (power, inlet)', power=1, hourly=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 32.70976476793236, 38.08447935043446,
-                                                   86.14281622401376, 87.60597379779806, 463.93210633039513,
-                                                   635.3069768762657,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 27.169457431246215, 32.71578516121564,
+                                                   97.23498547259602, 122.8919262307197, 470.75440920872757,
+                                                   644.7091554483359,
                                                    name='Optimise load profile (energy, inlet)', power=2, hourly=False))
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 0.06548981639194959, 0.11216807805095827,
                                                    0.07500000000000001, 0.1103560552605, 535.936136,
@@ -1174,9 +1181,9 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 36.7586
                                                    68.82277631200198, 69.09594393913034, 444.2724342506641,
                                                    610.6106096055902,
                                                    name='Optimise load profile (power, outlet)', power=1, hourly=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 30.016482290954972, 39.69813586531677,
-                                                   72.49814402681608, 105.90664907765058, 466.8507088517479,
-                                                   632.7359917557757,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 47.2078669546172, 61.240833259624935,
+                                                   398.82270412500003, 250.92255027000002, 389.921515765419,
+                                                   612.23469802635,
                                                    name='Optimise load profile (energy, outlet)', power=2,
                                                    hourly=False))
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 24.35487121997234, 41.447031654987214,
@@ -1190,9 +1197,9 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 36.7586
                                                    610.6106096055902,
                                                    name='Optimise load profile (power, outlet, flow borefield)',
                                                    power=1, hourly=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 30.016482290954972, 39.69813586531677,
-                                                   72.49814402681608, 105.90664907765058, 466.8507088517479,
-                                                   632.7359917557757,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 47.2078669546172, 61.240833259624935,
+                                                   398.82270412500003, 250.92255027000002, 389.921515765419,
+                                                   612.23469802635,
                                                    name='Optimise load profile (energy, outlet, flow borefield)',
                                                    power=2,
                                                    hourly=False))
@@ -1210,9 +1217,9 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 24.2120
                                                    643.28161087124,
                                                    name='Optimise load profile (power, average, var flow)', power=1,
                                                    hourly=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 29.469091502295186, 38.59024834792813,
-                                                   72.4912758786131, 132.5027583421366, 467.0171279798075,
-                                                   642.3540174513246,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 32.01879872296366, 43.00279892704973,
+                                                   180.32708178246241, 180.025955235, 459.5327837794823,
+                                                   631.2794676440247,
                                                    name='Optimise load profile (energy, average, var flow)', power=2,
                                                    hourly=False))
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 13.696484501705566, 23.474869195054694,
@@ -1226,9 +1233,9 @@ list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 17.4779
                                                    658.3323818531115,
                                                    name='Optimise load profile (power, inlet, var flow)', power=1,
                                                    hourly=False))
-list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 28.4206346064365, 29.7813899030333,
-                                                   87.06652734865688, 119.28044772886693, 477.6699388905299,
-                                                   654.9042157277862,
+list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 27.559448916839845, 36.10225507929293,
+                                                   139.14743198167048, 150.3403161252108, 468.9909539436819,
+                                                   639.5980379181033,
                                                    name='Optimise load profile (energy, inlet, var flow)', power=2,
                                                    hourly=False))
 list_of_test_objects.add(OptimiseLoadProfileObject(borefield, load, 146, 0.10201576191504061, 0.17673320915080462,

@@ -152,9 +152,9 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
     # calculate the maximum and minimum flow rate
     max_flow = max(
         borefield.flow_data.mfr_borehole(power=max_power, fluid_data=borefield.fluid_data,
-                                         nb_of_boreholes=borefield.number_of_boreholes, temperature=25),
+                                         nb_of_boreholes=borefield.number_of_boreholes, temperature=borefield.Tf_max),
         borefield.flow_data.mfr_borehole(power=(-1) * max_power, fluid_data=borefield.fluid_data,
-                                         nb_of_boreholes=borefield.number_of_boreholes, temperature=25))
+                                         nb_of_boreholes=borefield.number_of_boreholes, temperature=borefield.Tf_max))
     min_flow = max_flow * (
         borefield.flow_data._min_flow_percentage / 100 if isinstance(borefield.flow_data,
                                                                      ConstantDeltaTFlowRate) else 1)
@@ -330,12 +330,12 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                     Tb_corrected = base_Tb + power * g0_corr
                     max_delta = borefield.Tf_max - Tb_corrected
                     if borefield._calculation_setup.size_based_on != 'average':
-                        debiet = max(min_flow, borefield.flow_data.mfr_borefield(
+                        flow_rate = max(min_flow, borefield.flow_data.mfr_borefield(
                             nb_of_boreholes=borefield.number_of_boreholes,
                             power=power / 1000, temperature=borefield.Tf_max,
                             fluid_data=borefield.fluid_data))
                         cp = borefield.fluid_data.cp(temperature=borefield.Tf_max)
-                        delta = power / (cp * debiet)
+                        delta = power / (cp * flow_rate)
                         if borefield._calculation_setup.size_based_on == 'inlet':
                             max_delta -= delta / 2
                         else:
