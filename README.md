@@ -398,7 +398,7 @@ at [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en
 
 ### Development of GHEtool
 
-Peere, W. (2027). Validated combined first and last year borefield sizing methodology. In Proceedings of GeoTHERM 2027.
+Peere, W. (2027). Towards a more accurate design of borefields: using variable fluid properties, flow rate and heat pump efficiency. In Proceedings of GeoTHERM 2027.
 Offenburg (Germany), 25-26 February 2027. [abstract submitted]
 
 Peere, W. (2025). Integrating Temperature and Part-Load Dependent COP in Shallow Geothermal Borefield Design. In
