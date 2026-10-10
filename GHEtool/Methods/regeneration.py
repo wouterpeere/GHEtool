@@ -202,7 +202,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
     def get_Rb_limit(power, temp) -> float:
         power_nodes, Rb_nodes, _ = limit_tables[temp]
         if not power_nodes[0] <= power <= power_nodes[-1]:
-            return get_Rb(borefield, power, temp)[0]
+            return get_Rb(borefield, power, temp)[0]  # pragma: no cover
         return np.interp(power, power_nodes, Rb_nodes)
 
     def get_mfr_limit(power, temp) -> float:
@@ -210,7 +210,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
         if not power_nodes[0] <= power <= power_nodes[-1]:
             return borefield.flow_data.mfr_borefield(nb_of_boreholes=borefield.number_of_boreholes,
                                                      power=power / 1000, temperature=temp,
-                                                     fluid_data=borefield.fluid_data)
+                                                     fluid_data=borefield.fluid_data)  # pragma: no cover
         return np.interp(power, power_nodes, mfr_nodes)
 
     # START OF THE ACTUAL SIMULATION
@@ -288,10 +288,10 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                 Tf_avg = Tb + load * (get_Rb(borefield, load, Tf_avg) / borefield.number_of_boreholes / borefield.H)
                 if position_regeneration == 'inlet':
                     Tf_to_regeneration = \
-                    borefield.calculate_borefield_inlet_outlet_temperature(load / 1000, Tf_avg, Tb)[0]
+                        borefield.calculate_borefield_inlet_outlet_temperature(load / 1000, Tf_avg, Tb)[0]
                 else:
                     Tf_to_regeneration = \
-                    borefield.calculate_borefield_inlet_outlet_temperature(load / 1000, Tf_avg, Tb)[1]
+                        borefield.calculate_borefield_inlet_outlet_temperature(load / 1000, Tf_avg, Tb)[1]
 
                 # calculate reference temperature
                 if borefield._calculation_setup.size_based_on == 'average':

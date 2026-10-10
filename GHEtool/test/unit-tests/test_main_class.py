@@ -1099,6 +1099,23 @@ def test_optimise_load_borefield():
     assert np.isclose(borefield_load_.peak_extraction_duration, 3600 * 10)
 
 
+def test_optimise_equal():
+    load = HourlyBuildingLoad()
+    load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"))
+    load.simulation_period = 10
+    borefield = Borefield(load=load)
+    borefield.set_min_fluid_temperature(2)
+    borefield.set_max_fluid_temperature(17)
+    borefield.borefield = gt.borefield.Borefield.rectangle_field(20, 4, 6, 6, 150, 1, 0.07)
+    borefield.Rb = 0.1699
+    ground_data = GroundFluxTemperature(2, 9.6, flux=0.07)
+    borefield.ground_data = ground_data
+    borefield_load, external_load = optimise_load_profile_power(borefield, load)
+
+    borefield_load_bal, external_load = optimise_load_profile_balance(borefield, load, imbalance_factor=1)
+    assert borefield_load_bal == borefield_load
+
+
 def test_repr_():
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
