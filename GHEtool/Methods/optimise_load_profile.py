@@ -914,8 +914,6 @@ def optimise_load_profile_energy(
     borehole_length, number_of_boreholes = borefield.H, borefield.number_of_boreholes
     conductivity = borefield.ground_data.k_s(borefield.calculate_depth(borehole_length, borefield.D), borefield.D)
     if not borefield.borehole.use_constant_Rb:
-        if not isinstance(borefield.borehole.flow_data, (ConstantFlowRate, ConstantDeltaTFlowRate)):
-            raise ValueError('Only constant flow rates or constant Delta T flow rates can be used.')
         borefield.borehole.set_interpolator(borehole_length, borefield.D, borefield.r_b,
                                             borefield.ground_data.k_s(borefield.depth, borefield.D),
                                             borefield.depth, nb_of_boreholes=number_of_boreholes)

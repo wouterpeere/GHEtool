@@ -1131,6 +1131,11 @@ def test_optimise_error():
     borefield.calculation_setup(size_based_on="inlet")
     with pytest.raises(ValueError):
         borefield_load_bal, external_load = optimise_load_profile_energy(borefield, load)
+    borefield.calculation_setup(size_based_on="average")
+    with pytest.raises(ValueError):
+        borefield_load_bal, external_load = optimise_load_profile_energy(borefield, load, temperature_threshold=-2)
+    with pytest.raises(ValueError):
+        borefield_load_bal, external_load = optimise_load_profile_energy(borefield, load_case(2))
     borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
     borefield.fluid_data = TemperatureDependentFluidData('MPG', 30).create_constant(2)
     borefield.flow_data = VariableHourlyFlowRate(mfr=np.ones(8760))
