@@ -1519,7 +1519,6 @@ class Borefield(BaseClass):
         Sized : bool
             True if the required borehole length also satisfies the other temperature constraint [m]
         """
-        # initiate iteration
         H_prev = 0
         H_prev2 = 0
 
@@ -1527,11 +1526,8 @@ class Borefield(BaseClass):
             self.H = 50
 
         if deep_sizing:
-            # set borefield to minimal borehole length
             self.H = 20
 
-        # Iterates as long as there is no convergence
-        # (convergence if difference between borehole length in iterations is smaller than THRESHOLD_BOREHOLE_LENGTH)
         i = 0
         Tmin = self.Tf_min
         Tmax = self.Tf_max
@@ -1549,15 +1545,19 @@ class Borefield(BaseClass):
 
             return tmin, tmax
 
+        # root-finding state: residual r > 0 means 'too short', r <= 0 means 'long enough'
+        last = None  # (H, r) of the previous evaluation
+        lo = None  # [H, r] largest length known to be too short
+        hi = None  # [H, r] smallest length known to be long enough
+        last_side = None  # which bracket side was updated last ('lo'/'hi'), for Illinois
+
         while not self._check_convergence(self.H, H_prev, i):
-            if H_prev != 0:
+            if deep_sizing and H_prev != 0:
+                # keep the original relaxation for the (robust, slow) deep sizing path
                 self.H = self.H * .5 + H_prev * 0.5
-            if hourly:
-                self._calculate_temperature_profile(self.H, hourly=True, sizing=True, Tmin=Tmin, Tmax=Tmax,
-                                                    first_last_year=True)
-            else:
-                self._calculate_temperature_profile(self.H, hourly=False, sizing=True, Tmin=Tmin, Tmax=Tmax,
-                                                    first_last_year=True)
+
+            self._calculate_temperature_profile(self.H, hourly=hourly, sizing=True, Tmin=Tmin, Tmax=Tmax,
+                                                first_last_year=True)
 
             if np.isclose(H_prev2, self.H):
                 self.H = max(H_prev, self.H)
@@ -1567,78 +1567,104 @@ class Borefield(BaseClass):
             H_prev = self.H
 
             if not deep_sizing:
-                if quadrant == 1:
+                if quadrant in (1, 2, 10):
                     # maximum temperature
-                    # convert back to required length
-                    slice = self.results.peak_injection[: 8760 if hourly else 12]
-                    idx = np.argmax(slice)
-                    max_val = slice[idx]
-                    Tmin, Tmax = correct_limits(
-                        self.load.hourly_net_resulting_injection_power[:8760][idx] if hourly else
-                        self.load.monthly_peak_injection_simulation_period[:12][idx], Tmin, Tmax, 'max')
-                    self.H = (max_val - self._Tg()) / (Tmax - self._Tg()) * H_prev
-                elif quadrant == 2:
-                    # maximum temperature
-                    # convert back to required length
-                    slice = self.results.peak_injection[-8760 if hourly else -12:]
-                    idx = np.argmax(slice)
-                    max_val = slice[idx]
-                    Tmin, Tmax = correct_limits(
-                        self.load.hourly_net_resulting_injection_power[-8760:][idx] if hourly else
-                        self.load.monthly_peak_injection_simulation_period[-12:][idx], Tmin, Tmax, 'max')
-                    self.H = (max_val - self._Tg()) / (Tmax - self._Tg()) * H_prev
-                elif quadrant == 3:
+                    if quadrant == 1:
+                        slice_ = self.results.peak_injection[: 8760 if hourly else 12]
+                        powers = self.load.hourly_net_resulting_injection_power[:8760] if hourly else \
+                            self.load.monthly_peak_injection_simulation_period[:12]
+                    elif quadrant == 2:
+                        slice_ = self.results.peak_injection[-8760 if hourly else -12:]
+                        powers = self.load.hourly_net_resulting_injection_power[-8760:] if hourly else \
+                            self.load.monthly_peak_injection_simulation_period[-12:]
+                    else:
+                        slice_ = self.results.peak_injection
+                        powers = self.load.hourly_net_resulting_injection_power if hourly else \
+                            self.load.monthly_peak_injection_simulation_period
+                    idx = np.argmax(slice_)
+                    val = slice_[idx]
+                    Tmin, Tmax = correct_limits(powers[idx], Tmin, Tmax, 'max')
+                    limit = Tmax
+                    r = val - limit
+                else:
                     # minimum temperature
-                    # convert back to required length
-                    slice = self.results.peak_extraction[: 8760 if hourly else 12]
-                    idx = np.argmin(slice)
-                    min_val = slice[idx]
-                    Tmin, Tmax = correct_limits(
-                        self.load.hourly_net_resulting_injection_power[:8760][idx] if hourly else
-                        (-1) * self.load.monthly_peak_extraction_simulation_period[:12][idx], Tmin, Tmax, 'min')
-                    self.H = (min_val - self._Tg()) / (Tmin - self._Tg()) * H_prev
-                elif quadrant == 4:
-                    # minimum temperature
-                    # convert back to required length
-                    slice = self.results.peak_extraction[-8760 if hourly else -12:]
-                    idx = np.argmin(slice)
-                    min_val = slice[idx]
-                    Tmin, Tmax = correct_limits(
-                        self.load.hourly_net_resulting_injection_power[-8760:][idx] if hourly else
-                        (-1) * self.load.monthly_peak_extraction_simulation_period[-12:][idx], Tmin, Tmax, 'min')
-                    self.H = (min_val - self._Tg()) / (Tmin - self._Tg()) * H_prev
-                elif quadrant == 10:
-                    # over all years
-                    # maximum temperature
-                    # convert back to required length
-                    slice = self.results.peak_injection
-                    idx = np.argmax(slice)
-                    max_val = slice[idx]
-                    Tmin, Tmax = correct_limits(
-                        self.load.hourly_net_resulting_injection_power[idx] if hourly else
-                        self.load.monthly_peak_injection_simulation_period[idx], Tmin, Tmax, 'max')
-                    self.H = (max_val - self._Tg()) / (Tmax - self._Tg()) * H_prev
-                elif quadrant == 20:
-                    # over all years
-                    # minimum temperature
-                    # convert back to required length
-                    slice = self.results.peak_extraction
-                    idx = np.argmin(slice)
-                    min_val = slice[idx]
-                    Tmin, Tmax = correct_limits(self.load.hourly_net_resulting_injection_power[idx] if hourly else
-                                                (-1) * self.load.monthly_peak_extraction_simulation_period[idx], Tmin,
-                                                Tmax,
-                                                'min')
-                    self.H = (min_val - self._Tg()) / (Tmin - self._Tg()) * H_prev
+                    if quadrant == 3:
+                        slice_ = self.results.peak_extraction[: 8760 if hourly else 12]
+                        powers = self.load.hourly_net_resulting_injection_power[:8760] if hourly else \
+                            (-1) * self.load.monthly_peak_extraction_simulation_period[:12]
+                    elif quadrant == 4:
+                        slice_ = self.results.peak_extraction[-8760 if hourly else -12:]
+                        powers = self.load.hourly_net_resulting_injection_power[-8760:] if hourly else \
+                            (-1) * self.load.monthly_peak_extraction_simulation_period[-12:]
+                    else:
+                        slice_ = self.results.peak_extraction
+                        powers = self.load.hourly_net_resulting_injection_power if hourly else \
+                            (-1) * self.load.monthly_peak_extraction_simulation_period
+                    idx = np.argmin(slice_)
+                    val = slice_[idx]
+                    Tmin, Tmax = correct_limits(powers[idx], Tmin, Tmax, 'min')
+                    limit = Tmin
+                    r = limit - val
+
+                Tg = self._Tg()
+                # proportional (model-based) update: (T - Tg) ~ 1/H
+                H_prop = (val - Tg) / (limit - Tg) * H_prev
+
+                # with a temperature gradient, the residual can have a minimum that never crosses zero.
+                # If it rises again while the field is still too short, there is no solution on this branch.
+                if self.ground_data.variable_Tg and hi is None and lo is not None and r > 0 \
+                        and H_prev > lo[0] and r >= lo[1]:
+                    return 0, False
+
+                # update bracket
+                if r > 0:
+                    if lo is None or H_prev > lo[0]:
+                        lo = [H_prev, r]
+                        side = 'lo'
+                    else:
+                        side = None
+                else:
+                    if hi is None or H_prev < hi[0]:
+                        hi = [H_prev, r]
+                        side = 'hi'
+                    else:
+                        side = None
+
+                if last is None or r == last[1]:
+                    H_new = H_prop
+                else:
+                    # secant step in x = 1/H
+                    x0, x1 = 1 / last[0], 1 / H_prev
+                    x_new = x1 - r * (x1 - x0) / (r - last[1])
+                    H_new = 1 / x_new if x_new > 0 else H_prop
+                    if lo is None or hi is None:
+                        # no bracket yet: limit the secant step to a factor 2 (a flat residual gives huge jumps)
+                        H_new = min(max(H_new, 0.5 * H_prev), 2 * H_prev)
+
+                if lo is not None and hi is not None and not (lo[0] < H_new < hi[0]):
+                    # Illinois: if the same side was replaced twice in a row, halve the other side's residual
+                    if side is not None and side == last_side:
+                        if side == 'lo':
+                            hi[1] *= 0.5
+                        else:
+                            lo[1] *= 0.5
+                    xl, xh = 1 / lo[0], 1 / hi[0]
+                    H_new = 1 / (xh - hi[1] * (xh - xl) / (hi[1] - lo[1]))
+                if side is not None:
+                    last_side = side
+
+                last = (H_prev, r)
+                self.H = H_new
+                if 0 <= H_new < 1 and r <= 0:
+                    # this limit is not restrictive for any realistic borehole length; stop iterating
+                    break
             elif self.ground_data.variable_Tg:
-                # for when the temperature gradient is active and it is injection
                 self.H = self.calculate_next_depth_deep_sizing(H_prev)
-            if self.H < 0:
+            if not np.isfinite(self.H) or self.H < 0:
                 return 0, False
 
             i += 1
 
-        # calculate the relevant parameters for the sizing check
         if self._calculation_setup.size_based_on == 'average':
             min_temperatures = self.results.peak_extraction
             max_temperatures = self.results.peak_injection
