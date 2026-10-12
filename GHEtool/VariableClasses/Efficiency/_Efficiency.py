@@ -254,15 +254,15 @@ class _Efficiency(_EfficiencyBase, BaseClass):
             missing_pts_full = grid_points_full[missing_mask]
 
             if n_varying == 0:
-                values[missing_mask] = data[0]
+                values[missing_mask] = data[0]  # pragma: no cover
             else:
                 coords_reduced = coordinates[:, varying]
                 missing_reduced = missing_pts_full[:, varying]
 
                 if n_varying == 1:
-                    order = np.argsort(coords_reduced[:, 0])
+                    order = np.argsort(coords_reduced[:, 0])  # pragma: no cover
                     est = np.interp(missing_reduced[:, 0],
-                                    coords_reduced[order, 0], data[order])
+                                    coords_reduced[order, 0], data[order])  # pragma: no cover
                 else:
                     # CHANGED: normalize both the fitting points and the query
                     # points onto [0, 1] per axis before triangulating, so

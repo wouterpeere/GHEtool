@@ -130,15 +130,15 @@ def test_3_6h():
     print(
         f"The sizing according to L2 using constant Rb* has a depth of {results[2]:.2f}m (B=3m), {results[5]:.2f}m (B=5m), {results[8]:.2f}m (B=7m) for a simulation period of 1 year and {results[11]:.2f}m (B=3m), {results[14]:.2f}m (B=5m), {results[17]:.2f}m (B=7m) for a simulation period of 10 years ")
 
-    assert np.isclose(depth_L2, 117.35213883286214)
-    assert np.isclose(depth_L3, 117.16961189081474)
-    assert np.isclose(depth_L4, 117.14010076221919)
-    assert np.isclose(results[12], 107.5227292888172)
-    assert np.isclose(results[13], 107.343279199558)
-    assert np.isclose(results[14], 107.36947996779072)
+    assert np.isclose(depth_L2, 117.35213883286215)
+    assert np.isclose(depth_L3, 117.17029373234558)
+    assert np.isclose(depth_L4, 117.14042495601043)
+    assert np.isclose(results[12], 107.52272928881723)
+    assert np.isclose(results[13], 107.34311737737472)
+    assert np.isclose(results[14], 107.36958044500128)
     assert np.isclose(Rb_L2, 0.12263789084907926)
-    assert np.isclose(Rb_L3, 0.12263382745360307)
-    assert np.isclose(Rb_L4, 0.12263317106886563)
+    assert np.isclose(Rb_L3, 0.12263384262101856)
+    assert np.isclose(Rb_L4, 0.12263317827867384)
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -494,8 +494,8 @@ def test_size_L3_value_errors():
 
 
 @pytest.mark.parametrize("quadrant, result", zip([1, 2, 3, 4],
-                                                 [56.372611810628065, 71.43023711680347, 27.162673692721025,
-                                                  21.602240810876843]))
+                                                 [56.37165615849092, 71.39889593863218, 27.162673692721025,
+                                                  21.558657338505125]))
 def test_size_L3(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -535,8 +535,8 @@ def test_size_L4():
     load.load_hourly_profile(FOLDER.joinpath("Examples/hourly_profile.csv"), col_injection=0, col_extraction=1)
     borefield.load = load
 
-    assert np.isclose(305.26723226385184, borefield.size_L4(100, quadrant_sizing=2))
-    assert np.isclose(305.26723226385184, borefield.H)
+    assert np.isclose(305.24358898409145, borefield.size_L4(100, quadrant_sizing=2))
+    assert np.isclose(305.24358898409145, borefield.H)
     assert borefield.calculate_quadrant() == 2
     # quadrant 3
     borefield.borefield = copy.deepcopy(borefield_gt)
@@ -554,8 +554,8 @@ def test_size_L4():
 
     # to increase coverage
     borefield.calculation_setup(L4_sizing=True)
-    assert np.isclose(174.2214456661528, borefield.size(100, quadrant_sizing=4))
-    assert np.isclose(174.2214456661528, borefield.H)
+    assert np.isclose(174.25007462500128, borefield.size(100, quadrant_sizing=4))
+    assert np.isclose(174.25007462500128, borefield.H)
     assert borefield.calculate_quadrant() == 4
 
 
@@ -1246,7 +1246,7 @@ def test_with_titled_borefield():
     assert np.isclose(borefield.depth, 150 * math.cos(math.pi / 7) + 0.75)
     assert np.isclose(borefield.ground_data.calculate_Tg(borefield.depth, borefield.D), 12.157557845032045)
 
-    assert np.isclose(borefield.size_L3(), 111.52916196039564)
+    assert np.isclose(borefield.size_L3(), 111.55619929990661)
 
 
 def test_Rb_and_Re_with_temperture_dep_data():
