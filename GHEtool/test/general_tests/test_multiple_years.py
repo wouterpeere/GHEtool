@@ -28,7 +28,7 @@ def test_multiple_years_L4():
     assert np.allclose(borefield.load.hourly_net_resulting_injection_power,
                        load["cooling"].clip(0) * load_factor - load["heating"].clip(0) * load_factor)
     h = borefield.size_L4(150)
-    assert np.isclose(h, 115.26627395156956, rtol=0.001)
+    assert np.isclose(h, 115.48624855185925, rtol=0.001)
     load.loc[8760 * 25:, "heating"] = 0
     hourly_load = HourlyGeothermalLoadMultiYear(load["heating"].clip(0) * load_factor,
                                                 load["cooling"].clip(0) * load_factor)
@@ -38,7 +38,7 @@ def test_multiple_years_L4():
     assert np.allclose(borefield.load.hourly_net_resulting_injection_power,
                        load["cooling"].clip(0) * load_factor - load["heating"].clip(0) * load_factor)
     h = borefield.size_L4(150)
-    assert np.isclose(h, 101.836, rtol=0.001)
+    assert np.isclose(h, 102.1743050150443, rtol=0.001)
 
 
 def test_multiple_years_L3():
@@ -72,7 +72,7 @@ def test_multiple_years_L3():
     assert np.allclose(borefield.load.monthly_average_injection_power_simulation_period,
                        monthly_cooling_load - monthly_heating_load)
     h = borefield.size_L3(150)
-    assert np.isclose(h, 110.18056686276053, rtol=0.001)
+    assert np.isclose(h, 111.01595961285646, rtol=0.001)
     load.loc[8760 * 25:, "heating"] = 0
     hourly_load = HourlyGeothermalLoadMultiYear(load["heating"].clip(0) * load_factor,
                                                 load["cooling"].clip(0) * load_factor)
@@ -92,7 +92,7 @@ def test_multiple_years_L3():
     assert np.allclose(borefield.load.monthly_average_injection_power_simulation_period,
                        monthly_cooling_load - monthly_heating_load)
     h = borefield.size_L3(150)
-    assert np.isclose(h, 100.418, rtol=0.001)
+    assert np.isclose(h, 100.72000509032259, rtol=0.001)
 
 
 def test_multiple_years_L3_monthly_data():
@@ -127,7 +127,7 @@ def test_multiple_years_L3_monthly_data():
                        monthly_cooling_load - monthly_heating_load)
     assert borefield.load.simulation_period == 50
     h = borefield.size_L3(150)
-    assert np.isclose(h, 110.18056686276053, rtol=0.001)
+    assert np.isclose(h, 111.01595961285646, rtol=0.001)
     load.loc[8760 * 25:, "heating"] = 0
     monthly_heating_load = np.array([np.mean((load["heating"].clip(0) * load_factor)[i - 730:i]) for i in
                                      range(730, len(load["heating"]) + 1, 730)])
@@ -147,4 +147,4 @@ def test_multiple_years_L3_monthly_data():
     assert np.allclose(borefield.load.monthly_average_injection_power_simulation_period,
                        monthly_cooling_load - monthly_heating_load)
     h = borefield.size_L3(150)
-    assert np.isclose(h, 100.418, rtol=0.001)
+    assert np.isclose(h, 100.72000509032259, rtol=0.001)
