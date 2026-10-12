@@ -864,7 +864,8 @@ hourly_load_building.hourly_cooling_load = hourly_load_building.hourly_cooling_l
 hourly_load_building.hourly_heating_load = hourly_load_building.hourly_heating_load * 5 / 4
 borefield.load = hourly_load_building
 list_of_test_objects.add(
-    SizingObject(borefield, L2_output=141.453, L3_output=141.53727058992786, L4_output=103.79328067666373, quadrant=1,
+    SizingObject(borefield, L2_output=141.53727058992786, L3_output=141.53727058992786, L4_output=103.79328067666373,
+                 quadrant=1,
                  name='BS2023 Auditorium (1)'))
 borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
 borefield.flow_data = ConstantDeltaTFlowRate(extraction=4, injection=4)
@@ -922,7 +923,7 @@ hourly_load_building.hourly_cooling_load = hourly_load_building.hourly_cooling_l
 hourly_load_building.hourly_heating_load = hourly_load_building.hourly_heating_load * 5 / 4
 borefield.load = hourly_load_building
 list_of_test_objects.add(
-    SizingObject(borefield, L2_output=115.98849525499037, L3_output=116.02271232340414, L4_output=109.51063673791634,
+    SizingObject(borefield, L2_output=116.02271232340414, L3_output=116.02271232340414, L4_output=109.51063673791634,
                  quadrant=2,
                  name='BS2023 Office (1)'))
 
@@ -941,7 +942,8 @@ hourly_load_building.hourly_cooling_load = hourly_load_building.hourly_cooling_l
 hourly_load_building.hourly_heating_load = hourly_load_building.hourly_heating_load * 5 / 4
 borefield.load = hourly_load_building
 list_of_test_objects.add(
-    SizingObject(borefield, L2_output=308.303, L3_output=308.4302417410043, L4_output=305.99675276692346, quadrant=4,
+    SizingObject(borefield, L2_output=308.4302417410043, L3_output=308.4302417410043, L4_output=305.99675276692346,
+                 quadrant=4,
                  name='BS2023 Swimming pool (1)'))
 
 eer_combined = EERCombined(20, 5, 10)
