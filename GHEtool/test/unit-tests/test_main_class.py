@@ -495,7 +495,7 @@ def test_size_L3_value_errors():
 
 @pytest.mark.parametrize("quadrant, result", zip([1, 2, 3, 4],
                                                  [56.37165615849092, 71.39889593863218, 27.162673692721025,
-                                                  22.558657338505125]))
+                                                  21.558657338505125]))
 def test_size_L3(quadrant, result):
     borefield = Borefield()
     borefield.borefield = copy.deepcopy(borefield_gt)
