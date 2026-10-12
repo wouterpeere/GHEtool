@@ -1627,7 +1627,7 @@ class Borefield(BaseClass):
                     if hi is None or H_prev < hi[0]:
                         hi = [H_prev, r]
                         side = 'hi'
-                    else:
+                    else:  # pragma: no cover
                         side = None
 
                 if last is None or r == last[1]:
