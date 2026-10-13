@@ -166,7 +166,7 @@ def _calculate_external_load(building_load: Union[HourlyBuildingLoad, HourlyBuil
     HourlyBuildingLoad | HourlyBuildingLoadMultiYear
         External load
     """
-    if isinstance(building_load, HourlyBuildingLoad):
+    if isinstance(building_load, HourlyBuildingLoad) and isinstance(borefield_load, HourlyBuildingLoad):
         external_load = HourlyBuildingLoad(simulation_period=building_load.simulation_period)
         external_load.start_month = building_load.start_month
 
@@ -189,6 +189,82 @@ def _calculate_external_load(building_load: Union[HourlyBuildingLoad, HourlyBuil
         np.maximum(0,
                    building_load.hourly_dhw_load_simulation_period - borefield_load.hourly_dhw_load_simulation_period))
     return external_load
+
+
+def _create_multiyear_load(building_load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
+                           heating: np.ndarray, cooling: np.ndarray, dhw: np.ndarray) -> HourlyBuildingLoadMultiYear:
+    """
+    This function creates a multi-year hourly building load with the same settings (efficiencies, peak durations ...)
+    as the given building load.
+
+    Parameters
+    ----------
+    building_load : HourlyBuildingLoad | HourlyBuildingLoadMultiYear
+        Load data from which the settings are copied
+    heating : np.ndarray
+        Hourly heating load for the whole simulation period [kW]
+    cooling : np.ndarray
+        Hourly cooling load for the whole simulation period [kW]
+    dhw : np.ndarray
+        Hourly domestic hot water load for the whole simulation period [kW]
+
+    Returns
+    -------
+    HourlyBuildingLoadMultiYear
+        Multi-year hourly building load
+    """
+    multiyear_load = HourlyBuildingLoadMultiYear(heating, cooling, building_load._cop, building_load._eer, dhw,
+                                                 building_load._cop_dhw)
+    multiyear_load.exclude_DHW_from_peak = building_load.exclude_DHW_from_peak
+    multiyear_load.peak_extraction_duration = building_load.peak_extraction_duration / 3600
+    multiyear_load.peak_injection_duration = building_load.peak_injection_duration / 3600
+    multiyear_load._limit_to_max_heat_pump_power = building_load._limit_to_max_heat_pump_power
+    return multiyear_load
+
+
+def _limit_to_max_heat_pump_power(borefield, building_load: Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear],
+                                  use_hourly_resolution: bool) \
+        -> Union[HourlyBuildingLoad, HourlyBuildingLoadMultiYear]:
+    """
+    This function limits the building load that is covered by the borefield to the maximum power of the heat pump
+    at the fluid temperatures of the final load.
+
+    During the optimisation, the ground load is already calculated with this limit (inside the load class), so the
+    temperatures and the optimal peaks do not change. Only the part of the building load that cannot be delivered by
+    the heat pump is moved from the borefield load to the external load.
+
+    The maximum power of the heat pump depends on the fluid temperature, which differs from year to year. Therefore,
+    the borefield load is returned as an HourlyBuildingLoadMultiYear whenever the limit is active.
+
+    Parameters
+    ----------
+    borefield : Borefield
+        Borefield object with the final load
+    building_load : HourlyBuildingLoad | HourlyBuildingLoadMultiYear
+        Original load data
+    use_hourly_resolution : bool
+        True if the hourly temperature profile was used in the optimisation (only used to reuse the g-values)
+
+    Returns
+    -------
+    HourlyBuildingLoad | HourlyBuildingLoadMultiYear
+        Borefield load, limited to the maximum heat pump power
+    """
+    load = borefield.load
+    if not load._limit_to_max_heat_pump_power or \
+            (isinstance(load.cop, SCOP) and isinstance(load.cop_dhw, SCOP) and isinstance(load.eer, SEER)):
+        return load
+
+    # hourly temperature profile over the whole simulation period (not only the first and last year)
+    borefield._calculate_temperature_profile(
+        hourly=True,
+        g_values=borefield._temp_results.get('g_values') if use_hourly_resolution else None,
+        g_value_differences=borefield._temp_results.get('g_value_differences') if use_hourly_resolution else None)
+    heating = np.array(load._get_max_power_heating, dtype=float)
+    dhw = np.array(load._get_max_power_dhw, dtype=float)
+    cooling = np.array(load._get_max_power_cooling, dtype=float)
+
+    return _create_multiyear_load(building_load, heating, cooling, dhw)
 
 
 def optimise_load_profile_power(
@@ -435,8 +511,21 @@ def optimise_load_profile_power(
     # set the final load
     peak_heat_load, peak_dhw_load = get_heating_peaks(heating_reduction)
     _set_peak_loads(borefield, building_load, peak_heat_load, peak_dhw_load, peak_cool_load)
+    borefield.load = _limit_to_max_heat_pump_power(borefield, building_load, use_hourly_resolution)
 
-    return borefield.load, _calculate_external_load(building_load, borefield.load)
+    external_load = _calculate_external_load(building_load, borefield.load)
+    # final check
+    assert np.allclose(
+        borefield.load.hourly_heating_load_simulation_period + external_load.hourly_heating_load_simulation_period,
+        building_load.hourly_heating_load_simulation_period)
+    assert np.allclose(
+        borefield.load.hourly_cooling_load_simulation_period + external_load.hourly_cooling_load_simulation_period,
+        building_load.hourly_cooling_load_simulation_period)
+    assert np.allclose(
+        borefield.load.hourly_dhw_load_simulation_period + external_load.hourly_dhw_load_simulation_period,
+        building_load.hourly_dhw_load_simulation_period)
+
+    return borefield.load, external_load
 
 
 def _create_load_duration_curve(hourly_load: np.ndarray) -> tuple:
@@ -783,8 +872,20 @@ def optimise_load_profile_balance(
     # set the final load
     peak_heat_load, peak_dhw_load, peak_cool_load = get_peaks_on_balance_curve(energy_level)
     _set_peak_loads(borefield, building_load, peak_heat_load, peak_dhw_load, peak_cool_load)
+    borefield.load = _limit_to_max_heat_pump_power(borefield, building_load, use_hourly_resolution)
 
-    return borefield.load, _calculate_external_load(building_load, borefield.load)
+    external_load = _calculate_external_load(building_load, borefield.load)
+    # final check
+    assert np.allclose(
+        borefield.load.hourly_heating_load_simulation_period + external_load.hourly_heating_load_simulation_period,
+        building_load.hourly_heating_load_simulation_period)
+    assert np.allclose(
+        borefield.load.hourly_cooling_load_simulation_period + external_load.hourly_cooling_load_simulation_period,
+        building_load.hourly_cooling_load_simulation_period)
+    assert np.allclose(
+        borefield.load.hourly_dhw_load_simulation_period + external_load.hourly_dhw_load_simulation_period,
+        building_load.hourly_dhw_load_simulation_period)
+    return borefield.load, external_load
 
 
 def optimise_load_profile_energy(
@@ -1281,5 +1382,16 @@ def optimise_load_profile_energy(
     external_load.set_hourly_heating_load(np.maximum(0, heating_load_original - heating_load))
     external_load.set_hourly_cooling_load(np.maximum(0, cooling_load_original - cooling_load))
     external_load.set_hourly_dhw_load(np.maximum(0, dhw_load_original - dhw_load))
+
+    # final check
+    assert np.allclose(
+        borefield_load.hourly_heating_load_simulation_period + external_load.hourly_heating_load_simulation_period,
+        building_load.hourly_heating_load_simulation_period)
+    assert np.allclose(
+        borefield_load.hourly_cooling_load_simulation_period + external_load.hourly_cooling_load_simulation_period,
+        building_load.hourly_cooling_load_simulation_period)
+    assert np.allclose(
+        borefield_load.hourly_dhw_load_simulation_period + external_load.hourly_dhw_load_simulation_period,
+        building_load.hourly_dhw_load_simulation_period)
 
     return borefield_load, external_load
