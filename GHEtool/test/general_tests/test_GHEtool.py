@@ -500,3 +500,61 @@ def test_case_issue_390():
     borefield.borehole = borehole
     borefield.size_L3()
     assert np.isclose(borefield.H, 84.55227345573282)
+
+
+def test_optimisation_correct_max_power():
+    data = GroundFluxTemperature(2, 9.6, flux=0.07)
+    borefield = Borefield()
+    borefield.ground_data = data
+    borefield.pipe_data = DoubleUTube(1.5, 0.013, 0.016, 0.4, 0.035)
+    borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+    borefield.flow_data = ConstantFlowRate(mfr=0.3)
+    borefield.borehole.use_constant_Rb = False
+    borefield.create_rectangular_borefield(15, 4, 6, 6, 150, 1, 0.07)
+    load = HourlyBuildingLoad(efficiency_heating=5, efficiency_cooling=20)
+    load.load_hourly_profile(FOLDER.joinpath("test\methods\hourly_data\\hourly_profile.csv"), header=True,
+                             separator=";", col_cooling=1, col_heating=0)
+    load.simulation_period = 20
+    borefield.set_min_fluid_temperature(3)
+
+    points_HP300 = np.array([
+        [-4.5, 32.5, 53.6],
+        [-4.5, 32.5, 39.8],
+        [-4.5, 32.5, 23.2],
+        [-1.5, 32.5, 58.7],
+        [-1.5, 32.5, 43.7],
+        [-1.5, 32.5, 25.5],
+        [3.5, 32.5, 67.9],
+        [3.5, 32.5, 50.7],
+        [3.5, 32.5, 29.6],
+        [8.5, 32.5, 77.6],
+        [8.5, 32.5, 58.3],
+        [8.5, 32.5, 33.9],
+        [11.5, 32.5, 83.9],
+        [11.5, 32.5, 62.9],
+        [11.5, 32.5, 36.6],
+    ])
+    points_HP3 = np.array([[i[0], i[2]] for i in points_HP300])
+    eff_HP300 = np.array([
+        3.86, 4.28, 3.93,
+        4.08, 4.60, 4.18,
+        4.53, 5.12, 4.70,
+        5.04, 5.72, 5.30,
+        5.41, 6.17, 5.63,
+    ])
+
+    load.cop = COP(eff_HP300, points_HP3, part_load=True)
+    load._limit_to_max_heat_pump_power = True
+
+    borefield.USE_SPEED_UP_IN_SIZING = False
+
+    # first optimise with the speed
+    building_load, _ = optimise_load_profile_power(borefield, load)
+    borefield.load = building_load
+    assert np.isclose(building_load.max_peak_heating, 83.6056825583104)
+    building_load, _ = optimise_load_profile_balance(borefield, load)
+    borefield.load = building_load
+    assert np.isclose(building_load.max_peak_heating, 83.6056825583104)
+    building_load, _ = optimise_load_profile_energy(borefield, load)
+    borefield.load = building_load
+    assert np.isclose(building_load.max_peak_heating, 83.9)
