@@ -221,7 +221,8 @@ def thermal_response_factors(self, time, alpha, kind='linear'):
                 r_b = self.boreholes[i].r_b
                 ii_segment = j_segment[j_segment == i_segment]
                 h_ils = infinite_line_source(time, alpha, dis)
-                h_chs = cylindrical_heat_source(time, alpha, r_b, r_b)
+                # evaluate CHS 1 cm away from borehole wall to ensure numeric stability
+                h_chs = cylindrical_heat_source(time, alpha, r_b+0.01, r_b)
                 h_ij[ii_segment, ii_segment, 1:] = (
                         h_ij[ii_segment, ii_segment, 1:] + 2 * np.pi * h_chs - 0.5 * h_ils)
 
