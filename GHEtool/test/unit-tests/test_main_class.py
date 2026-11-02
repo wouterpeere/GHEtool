@@ -1527,3 +1527,50 @@ def test_reset_borehole_interp():
     assert temp([1, 5]) != borefield.borehole._interp([1, 5])
     borefield.H = 100
     assert temp([1, 5]) == borefield.borehole._interp([1, 5])
+
+
+def test_hourly_variable_cop_partial_update_consistent():
+    # With a variable COP, the iterations only recalculate the hours up to the last changed one. The returned
+    # profile must still be consistent with the converged load over the whole simulation period.
+    simulation_period = 25
+    hours = np.arange(8760)
+    winter = 0.5 * (1 + np.cos(2 * np.pi * hours / 8760))
+    daily = 0.75 + 0.25 * np.cos(2 * np.pi * (hours % 24 - 7) / 24)
+    heating = 14 * winter * daily
+    cooling = 4 * (1 - winter) ** 3 * daily
+    # heating (variable COP) until two years before the end, then cooling only (constant EER): the last iterations
+    # only change hours before the end of the simulation period
+    heating_load = np.concatenate([np.tile(heating, simulation_period - 2), np.zeros(2 * 8760)])
+    cooling_load = np.tile(cooling, simulation_period)
+
+    def create_borefield():
+        borefield = Borefield()
+        borefield.set_min_fluid_temperature(3)
+        borefield.set_max_fluid_temperature(36)
+        borefield.ground_data = GroundFluxTemperature(2, 12.5, volumetric_heat_capacity=2.4e6, flux=0.06)
+        borefield.set_borefield(gt.borefield.Borefield.rectangle_field(2, 2, 6, 6, 100, 1, 0.07))
+        borefield.pipe_data = SingleUTube(r_in=0.013, r_out=0.016, k_p=0.4, D_s=0.04, k_g=1.5)
+        borefield.fluid_data = TemperatureDependentFluidData('MPG', 25)
+        borefield.flow_data = ConstantFlowRate(mfr=0.3)
+        return borefield
+
+    borefield = create_borefield()
+    borefield.load = HourlyBuildingLoadMultiYear(heating_load, cooling_load,
+                                                 efficiency_heating=COP(np.array([3, 4, 5, 6]),
+                                                                        np.array([-5, 0, 5, 15])),
+                                                 efficiency_cooling=20)
+    borefield.calculate_temperatures(100, hourly=True)
+    net_injection = borefield.load.hourly_net_resulting_injection_power
+
+    # the fluid temperature only equals the borehole wall temperature when there is no load
+    assert not np.any(np.isclose(borefield.results.Tf, borefield.results.Tb, rtol=0, atol=1e-9)
+                      & (np.abs(net_injection) > 1e-6))
+
+    # same profile as a direct calculation with the converged load (no iterations, hence no partial updates)
+    reference = create_borefield()
+    reference.load = HourlyGeothermalLoadMultiYear(extraction_load=np.maximum(-net_injection, 0),
+                                                   injection_load=np.maximum(net_injection, 0))
+    reference.calculate_temperatures(100, hourly=True)
+    # (the incremental convolution updates accumulate some rounding error)
+    assert np.allclose(borefield.results.Tb, reference.results.Tb, rtol=0, atol=5e-4)
+    assert np.allclose(borefield.results.Tf, reference.results.Tf, rtol=0, atol=1e-2)
