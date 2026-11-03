@@ -45,7 +45,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fix monthly temperature profile and variable flow rate (issue #462).
 - Fix problem with constant temperature difference and unphysical results (issue #466).
 - Fix hourly temperature profile with temperature-dependent efficiency or fluid properties: after a partial
-  convolution update, the fluid temperature fell back to the borehole wall temperature after the last changed hour.
+  convolution update, the fluid temperature fell back to the borehole wall temperature after the last changed hour
+  (thanks to Hermi941).
 
 ## [2.4.1] - 2026-06-15
 
