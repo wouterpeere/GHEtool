@@ -5,7 +5,7 @@ our [project board](https://github.com/users/wouterpeere/projects/2) on GitHub.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [2.4.2] - Unpublished
+## [2.4.2] - 2026-11-06
 
 ### Added
 
@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added default secondary temperature to EER and COP class (issue #476).
 - Added _get_min_power to _Efficiency class (issue #476).
 - JANSEN powerwave coax (issue #485).
+- Ground temperature profile (issue #517).
 
 ### Changed
 
@@ -558,6 +559,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - fixed bug in interpolation
+
+[2.4.2]: https://github.com/wouterpeere/GHEtool/compare/v2.4.1...v2.4.2
 
 [2.4.1]: https://github.com/wouterpeere/GHEtool/compare/v2.4.0...v2.4.1
 
