@@ -138,6 +138,7 @@ Within GHEtool, there are multiple ways of setting the ground data. Currently, y
   geothermal heat flux.
 * _GroundTemperatureGradient_: if you want to model your ground with a varying ground temperature due to a geothermal
   gradient.
+* _GroundLayeredTemperature_: if you want to work with a non-linear ground temperature.
 * You can also use multiple ground layers to define your ground model. Please take a look
   at [our example](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/multiple_ground_layers.html).
 
@@ -398,7 +399,8 @@ at [https://ghetool.readthedocs.io/en/latest/](https://ghetool.readthedocs.io/en
 
 ### Development of GHEtool
 
-Peere, W. (2027). Towards a more accurate design of borefields: using variable fluid properties, flow rate and heat pump efficiency. In Proceedings of GeoTHERM 2026.
+Peere, W. (2027). Towards a more accurate design of borefields: using variable fluid properties, flow rate and heat pump
+efficiency. In Proceedings of GeoTHERM 2026.
 Offenburg (Germany), 26-27 February 2026. [paper submitted]
 
 Peere, W. (2025). Integrating Temperature and Part-Load Dependent COP in Shallow Geothermal Borefield Design. In

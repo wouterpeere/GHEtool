@@ -1,10 +1,11 @@
+import warnings
+
 import pytest
 
 import numpy as np
 
 from GHEtool.VariableClasses import GroundFluxTemperature, GroundConstantTemperature, GroundTemperatureGradient, \
-    GroundLayer, ConstantFluidData
-from GHEtool.VariableClasses import FluidData
+    GroundLayer, ConstantFluidData, GroundLayeredTemperature
 
 
 def test_ground_layer_class():
@@ -316,3 +317,314 @@ def test_repr_():
                            'Thickness [m]': None,
                            'Volumetric heat capacity [MJ/(m³·K)]': 2.4}},
             'type': 'Constant ground temperature'} == constant.__export__()
+
+
+#
+#   depth [m]   T [°C]   layer
+#   0  - 10     10 -> 11   k = 1, gradient 0.1 K/m
+#   10 - 20     11 -> 13   k = 2, gradient 0.2 K/m
+#   20 - 40     13 -> 15   k = 4, flux from layer 2: q = 2 * (13 - 11) / 10 = 0.4 W/m²
+#                                 gradient = q / k = 0.4 / 4 = 0.1 K/m
+#   > 40        15 + 0.1 * (z - 40)
+#
+# Integrals of T(z): 0-10: 105, 10-20: 120, 20-40: 280 (total 0-40: 505)
+
+def _reference_ground(last_thickness=20):
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom([GroundLayer(k_s=1, thickness=10, temperature=10),
+                                GroundLayer(k_s=2, thickness=10, temperature=11),
+                                GroundLayer(k_s=4, thickness=last_thickness, temperature=13)])
+    return ground
+
+
+def test_layered_init():
+    ground = GroundLayeredTemperature()
+    assert ground.variable_Tg
+    assert ground.layers == []
+    ground = GroundLayeredTemperature(2, 2.4 * 10 ** 6)
+    assert ground.layers[0] == GroundLayer(2, 2.4 * 10 ** 6)
+    assert ground.layers[0].temperature is None
+
+
+def test_layered_Tg_follows_top_layer():
+    ground = _reference_ground()
+    assert ground.Tg == 10
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom(GroundLayer(k_s=1, thickness=10, temperature=10))
+    ground.add_layer_on_bottom(GroundLayer(k_s=2, thickness=None, temperature=11))
+    assert ground.Tg == 10
+    # adding a layer on top changes the surface temperature
+    ground.add_layer_on_top(GroundLayer(k_s=1, thickness=5, temperature=8))
+    assert ground.Tg == 8
+    assert np.array_equal(ground.layer_depths, [0, 5, 15])
+    # adding a list on top
+    ground.add_layer_on_top([GroundLayer(k_s=1, thickness=5, temperature=7),
+                             GroundLayer(k_s=1, thickness=5, temperature=6)])
+    assert ground.Tg == 6
+    assert np.array_equal(ground.layer_depths, [0, 5, 10, 15, 25])
+
+
+def test_layered_heat_flux_and_gradient():
+    ground = _reference_ground()
+    assert np.isclose(ground.geothermal_heat_flux, 0.4)
+    assert np.isclose(ground.gradient_last_layer, 0.1)
+
+    # the flux uses the conductivity of the second-to-last layer, the gradient that of the last layer
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom([GroundLayer(k_s=1, thickness=10, temperature=10),
+                                GroundLayer(k_s=2, thickness=10, temperature=11),
+                                GroundLayer(k_s=2, thickness=None, temperature=13)])
+    assert np.isclose(ground.geothermal_heat_flux, 0.4)
+    assert np.isclose(ground.gradient_last_layer, 0.2)
+
+    # negative flux (temperature decreasing with depth)
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom([GroundLayer(k_s=2, thickness=10, temperature=12),
+                                GroundLayer(k_s=1, thickness=None, temperature=11)])
+    with pytest.warns(UserWarning, match='heat flux is negative'):
+        assert np.isclose(ground.geothermal_heat_flux, -0.2)
+    with pytest.warns(UserWarning, match='heat flux is negative'):
+        assert np.isclose(ground.gradient_last_layer, -0.2)
+
+
+def test_layered_temperature_at_depth():
+    ground = _reference_ground()
+    assert ground.temperature_at_depth(0) == 10
+    assert np.isclose(ground.temperature_at_depth(5), 10.5)
+    assert np.isclose(ground.temperature_at_depth(10), 11)  # layer boundary
+    assert np.isclose(ground.temperature_at_depth(15), 12)
+    assert np.isclose(ground.temperature_at_depth(20), 13)  # top of last layer
+    assert np.isclose(ground.temperature_at_depth(30), 14)
+    assert np.isclose(ground.temperature_at_depth(40), 15)  # bottom of last layer
+    assert np.isclose(ground.temperature_at_depth(50), 16)  # below the profile
+    assert isinstance(ground.temperature_at_depth(5), float)
+    assert np.allclose(ground.temperature_at_depth(np.array([0, 5, 15, 30, 50])), [10, 10.5, 12, 14, 16])
+    assert np.allclose(ground.temperature_at_depth([0, 5, 15, 30, 50]), [10, 10.5, 12, 14, 16])
+
+
+def test_layered_calculate_Tg():
+    ground = _reference_ground()
+    # from the surface
+    assert np.isclose(ground.calculate_Tg(10), 10.5)  # 105 / 10
+    assert np.isclose(ground.calculate_Tg(20), 11.25)  # (105 + 120) / 20
+    assert np.isclose(ground.calculate_Tg(30), 12)  # (105 + 120 + 135) / 30
+    assert np.isclose(ground.calculate_Tg(40), 12.625)  # 505 / 40
+    # with a start depth
+    assert np.isclose(ground.calculate_Tg(20, 10), 12)  # exactly one layer
+    assert np.isclose(ground.calculate_Tg(15, 5), 11.125)  # (5 * 10.75 + 5 * 11.5) / 10
+    assert np.isclose(ground.calculate_Tg(14, 12), 11.6)  # within a single layer: (11.4 + 11.8) / 2
+    assert np.isclose(ground.calculate_Tg(40, 20), 14)  # only the last layer
+    assert np.isclose(ground.calculate_Tg(35, 5), (10.75 * 5 + 120 + 13.75 * 15) / 30)  # over all layers
+    # zero length or start below end: point temperature
+    assert ground.calculate_Tg(0) == 10
+    assert np.isclose(ground.calculate_Tg(15, 15), 12)
+    assert np.isclose(ground.calculate_Tg(10, 15), 11)
+    # default arguments: borehole 0 - 100 m
+    with pytest.warns():
+        assert np.isclose(ground.calculate_Tg(), (505 + 60 * 18) / 100)
+
+
+def test_layered_calculate_Tg_beyond_last_layer():
+    # finite last layer: warning and the heat-flux gradient is continued
+    ground = _reference_ground(last_thickness=20)
+    with pytest.warns():
+        assert np.isclose(ground.calculate_Tg(50, 40), 15.5)
+    with pytest.warns():
+        assert np.isclose(ground.calculate_Tg(60), 13.75)  # (505 + 20 * 16) / 60
+
+    # infinite last layer: same results, no warning
+    ground_inf = _reference_ground(last_thickness=None)
+    assert np.isclose(ground_inf.calculate_Tg(50, 40), 15.5)
+    assert np.isclose(ground_inf.calculate_Tg(60), 13.75)
+    assert np.isclose(ground_inf.calculate_Tg(40), ground.calculate_Tg(40))
+    assert np.isclose(ground_inf.calculate_Tg(15, 5), ground.calculate_Tg(15, 5))
+
+    # last layer not infinite: error
+    ground.last_layer_infinite = False
+    assert np.isclose(ground.calculate_Tg(40), 12.625)
+    with pytest.raises(ValueError):
+        ground.calculate_Tg(50)
+
+
+def test_layered_no_warning_for_non_negative_flux():
+    # positive flux
+    ground = _reference_ground(last_thickness=None)
+    with warnings.catch_warnings():
+        warnings.simplefilter('error')
+        assert np.isclose(ground.geothermal_heat_flux, 0.4)
+        ground.calculate_Tg(100)
+        ground.max_depth(12)
+
+    # zero flux (equal temperatures)
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom([GroundLayer(k_s=2, thickness=10, temperature=10),
+                                GroundLayer(k_s=1, thickness=None, temperature=10)])
+    with warnings.catch_warnings():
+        warnings.simplefilter('error')
+        assert ground.geothermal_heat_flux == 0
+        assert ground.calculate_Tg(100) == 10
+
+    # single layer
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom(GroundLayer(k_s=2, thickness=None, temperature=10))
+    with warnings.catch_warnings():
+        warnings.simplefilter('error')
+        assert ground.geothermal_heat_flux == 0
+
+
+def test_layered_negative_gradient():
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom([GroundLayer(k_s=2, thickness=10, temperature=12),
+                                GroundLayer(k_s=1, thickness=None, temperature=11)])
+    assert np.isclose(ground.temperature_at_depth(20), 9)
+    assert np.isclose(ground.calculate_Tg(20), 10.75)  # (10 * 11.5 + 10 * 10) / 20
+
+
+def test_layered_single_layer():
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom(GroundLayer(k_s=2, thickness=None, temperature=10))
+    assert ground.Tg == 10
+    assert ground.geothermal_heat_flux == 0
+    assert ground.gradient_last_layer == 0
+    assert ground.calculate_Tg(0) == 10
+    assert ground.calculate_Tg(100) == 10
+    assert ground.calculate_Tg(100, 50) == 10
+    assert ground.temperature_at_depth(1000) == 10
+    assert ground.calculate_delta_H(1) == np.inf
+    assert ground.max_depth(15) == np.inf
+    assert ground.max_depth(10) == 0
+    assert ground.max_depth(5) == 0
+
+    # single layer with finite thickness: still constant, also below the layer
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom(GroundLayer(k_s=2, thickness=50, temperature=10))
+    with pytest.warns():
+        assert ground.calculate_Tg(100) == 10
+
+
+def test_layered_equals_flux_temperature():
+    # equal conductivities and a constant gradient = GroundFluxTemperature
+    # gradient = 1 / 50 = 0.02 K/m, flux = 2 * 0.02 = 0.04 W/m²
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom([GroundLayer(k_s=2, thickness=50, temperature=10),
+                                GroundLayer(k_s=2, thickness=None, temperature=11)])
+    flux = GroundFluxTemperature(2, 10, flux=0.04)
+    assert np.isclose(ground.geothermal_heat_flux, 0.04)
+    for depth, start_depth in [(0, 0), (10, 0), (50, 0), (100, 0), (100, 10), (300, 50)]:
+        assert np.isclose(ground.calculate_Tg(depth, start_depth), flux.calculate_Tg(depth, start_depth))
+    assert np.isclose(ground.calculate_Tg(100), 11)
+    assert np.isclose(ground.calculate_Tg(100, 10), 11.1)
+
+
+def test_layered_delta_H():
+    # constant gradient: average temperature rises 0.01 K/m -> 1 K per 100 m (cf. test_delta_H)
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom([GroundLayer(k_s=2, thickness=50, temperature=10),
+                                GroundLayer(k_s=2, thickness=None, temperature=11)])
+    assert np.isclose(ground.calculate_delta_H(1), 100)
+    assert np.isclose(ground.calculate_delta_H(1, 300), 100)
+    assert np.isclose(ground.calculate_delta_H(-1), -100)
+    assert ground.calculate_delta_H(0) == 0
+
+    # reference profile at H = 20: d(Tavg)/dH = (T(20) - Tavg(20)) / 20 = (13 - 11.25) / 20 = 0.0875
+    ground = _reference_ground()
+    assert np.isclose(ground.calculate_delta_H(1, 20), 1 / 0.0875)
+    assert np.isclose(ground.calculate_delta_H(0.0875, 20), 1)
+
+
+def test_layered_max_depth():
+    # constant gradient: Tavg = 10 + 0.01 * H -> 15 °C at 500 m (cf. test_delta_H)
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom([GroundLayer(k_s=2, thickness=50, temperature=10),
+                                GroundLayer(k_s=2, thickness=None, temperature=11)])
+    assert np.isclose(ground.max_depth(15), 500)
+    assert np.isclose(ground.max_depth(11), 100)
+
+    # reference profile: Tavg(30) = 12
+    ground = _reference_ground(last_thickness=None)
+    assert np.isclose(ground.max_depth(12), 30)
+    assert np.isclose(ground.max_depth(12.625), 40)
+    assert np.isclose(ground.max_depth(10.5), 10)
+    # limit at or below the surface temperature
+    assert ground.max_depth(10) == 0
+    assert ground.max_depth(5) == 0
+
+    # temperature decreasing with depth: limit never reached
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom([GroundLayer(k_s=2, thickness=10, temperature=12),
+                                GroundLayer(k_s=1, thickness=None, temperature=11)])
+    assert ground.max_depth(13) == np.inf
+    assert ground.max_depth(12) == 0
+
+
+def test_layered_errors():
+    # no layers
+    ground = GroundLayeredTemperature()
+    with pytest.raises(ValueError):
+        ground.calculate_Tg(100)
+    with pytest.raises(ValueError):
+        ground.temperature_at_depth(10)
+    with pytest.raises(ValueError):
+        ground.geothermal_heat_flux
+
+    # layer without temperature (via k_s in the constructor)
+    ground = GroundLayeredTemperature(2)
+    with pytest.raises(ValueError):
+        ground.calculate_Tg(100)
+
+    # one layer without temperature
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom([GroundLayer(k_s=1, thickness=10, temperature=10),
+                                GroundLayer(k_s=2, thickness=10),
+                                GroundLayer(k_s=4, thickness=None, temperature=13)])
+    with pytest.raises(ValueError):
+        ground.calculate_Tg(100)
+    with pytest.raises(ValueError):
+        ground.geothermal_heat_flux
+
+    # invalid layer properties are caught by GroundLayer
+    with pytest.raises(ValueError):
+        GroundLayer(k_s=0, thickness=10, temperature=10)
+    with pytest.raises(ValueError):
+        GroundLayer(k_s=1, thickness=-10, temperature=10)
+
+    # a layer without thickness cannot get a layer below it
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom(GroundLayer(k_s=1, thickness=None, temperature=10))
+    with pytest.raises(ValueError):
+        ground.add_layer_on_bottom(GroundLayer(k_s=1, thickness=10, temperature=11))
+
+
+def test_layered_equal():
+    assert _reference_ground() == _reference_ground()
+    assert _reference_ground(20) != _reference_ground(None)
+    ground = _reference_ground()
+    ground.layers[1].temperature = 12
+    assert ground != _reference_ground()
+    assert _reference_ground() != GroundFluxTemperature(2, 10, flux=0.04)
+
+
+def test_layered_export():
+    ground = _reference_ground()
+    assert {'type': 'Ground layered temperature',
+            'layers': {1: {'Thickness [m]': 10,
+                           'Conductivity [W/(m·K)]': 1,
+                           'Volumetric heat capacity [MJ/(m³·K)]': 2.4,
+                           'Temperature [°C]': 10},
+                       2: {'Thickness [m]': 10,
+                           'Conductivity [W/(m·K)]': 2,
+                           'Volumetric heat capacity [MJ/(m³·K)]': 2.4,
+                           'Temperature [°C]': 11},
+                       3: {'Thickness [m]': 20,
+                           'Conductivity [W/(m·K)]': 4,
+                           'Volumetric heat capacity [MJ/(m³·K)]': 2.4,
+                           'Temperature [°C]': 13}}
+            } == ground.__export__()
+
+    ground = GroundLayeredTemperature()
+    ground.add_layer_on_bottom(GroundLayer(k_s=2, thickness=None, temperature=10))
+    assert {'type': 'Ground layered temperature',
+            'Conductivity [W/(m·K)]': 2,
+            'Volumetric heat capacity [MJ/(m³·K)]': 2.4,
+            'Temperature [°C]': 10
+            } == ground.__export__()

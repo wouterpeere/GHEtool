@@ -78,7 +78,7 @@ Within GHEtool, there are multiple ways of setting the ground data. Currently, y
   geothermal heat flux.
 * _GroundTemperatureGradient_: if you want to model your ground with a varying ground temperature due to a geothermal
   gradient.
-
+* _GroundLayeredTemperature_: if you want to work with a non-linear ground temperature.
 * You can also use multiple ground layers to define your ground model. Please take a look
   at [our example](https://ghetool.readthedocs.io/en/latest/sources/code/Examples/multiple_ground_layers.html).
 

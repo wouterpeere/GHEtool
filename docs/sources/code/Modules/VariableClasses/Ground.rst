@@ -27,3 +27,7 @@ All of these three classes are children of the abstract class _GroundData.
 .. automodule:: GHEtool.VariableClasses.GroundData.GroundTemperatureGradient
     :members:
     :show-inheritance:
+
+.. automodule:: GHEtool.VariableClasses.GroundData.GroundLayeredTemperature
+    :members:
+    :show-inheritance:

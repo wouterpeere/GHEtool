@@ -12,11 +12,12 @@ class GroundLayer(BaseClass):
     Contains the information about a certain ground layer.
     """
 
-    __slots__ = "k_s", "volumetric_heat_capacity", "thickness"
+    __slots__ = "k_s", "volumetric_heat_capacity", "thickness", "temperature"
 
     def __init__(self, k_s: float = None,
                  volumetric_heat_capacity: float = 2.4 * 10 ** 6,
-                 thickness: float = None):
+                 thickness: float = None,
+                 temperature: float = None):
         """
 
         Parameters
@@ -27,10 +28,13 @@ class GroundLayer(BaseClass):
             Layer volumetric heat capacity [J/(m³·K)]
         thickness : float
             Layer thickness [m]. None is assumed infinite depth
+        temperature : float
+            Temperature of this ground layer at the beginning [°C]
         """
         self.k_s: float = self.non_negative(k_s)
         self.volumetric_heat_capacity: float = self.non_negative(volumetric_heat_capacity)
         self.thickness: float = self.non_negative(thickness)
+        self.temperature: float = temperature
 
     def non_negative(self, value: float) -> float:
         """
@@ -65,9 +69,15 @@ class GroundLayer(BaseClass):
         return True
 
     def __export__(self):
+        if self.temperature is None:
+            return {'Thickness [m]': self.thickness,
+                    'Conductivity [W/(m·K)]': self.k_s,
+                    'Volumetric heat capacity [MJ/(m³·K)]': self.volumetric_heat_capacity / 10 ** 6
+                    }
         return {'Thickness [m]': self.thickness,
                 'Conductivity [W/(m·K)]': self.k_s,
-                'Volumetric heat capacity [MJ/(m³·K)]': self.volumetric_heat_capacity / 10 ** 6
+                'Volumetric heat capacity [MJ/(m³·K)]': self.volumetric_heat_capacity / 10 ** 6,
+                'Temperature [°C]': self.temperature
                 }
 
 
