@@ -2107,17 +2107,17 @@ class Borefield(BaseClass):
                         first_idx = np.argmax(mask)
 
                     if first_idx < max_idx:
-                        # update only after this first index, since the first values do not change
-                        delta = (hourly_load[first_idx:max_idx + 1] - self._temp_results['hourly_load_prev'][
-                            first_idx:max_idx + 1]) * 1000
-                        if len(delta) == 0:  # pragma: no cover
-                            pass
-                        update = convolve(delta, g_value_differences)
+                        # update only after this first index, since the first values do not change.
+                        # The update must cover the whole tail: a load change at hour i affects the borehole
+                        # wall temperature of every later hour, also after max_idx. Truncating it at max_idx
+                        # while storing the full new load as hourly_load_prev loses these changes for good.
+                        delta = (hourly_load[first_idx:] - self._temp_results['hourly_load_prev'][first_idx:]) * 1000
+                        update = convolve(delta, g_value_differences[:len(delta)])
 
-                        self._temp_results['result_convolution'][first_idx:max_idx + 1] += update[
-                            :max_idx - first_idx + 1]
+                        self._temp_results['result_convolution'][first_idx:] += update[:len(delta)]
                         self._temp_results['hourly_load_prev'] = hourly_load
-                        self._temp_results['temperature_result'] = None
+                        # temperature_result is kept: only the hours in idx are recalculated below, the other
+                        # hours keep their previous fluid temperature instead of falling back to Tb (no Rb term).
 
                 # calculation the borehole wall temperature for every month i
                 Tb = (self._temp_results['result_convolution'] + kwargs.get('offset_convolution', 0)) / (
@@ -2220,6 +2220,12 @@ class Borefield(BaseClass):
             else:
                 pass
                 # results = results_old.__avg__(results)
+            if hourly and i > 0 and not self.borehole.use_constant_Rb:
+                # The iterations above only recalculate the fluid temperature up to the last hour that changed.
+                # One final pass over all hours makes the returned profile consistent with the converged load.
+                self.load.set_results(results)
+                results, hourly_load = calculate_temperatures(H, hourly=hourly, results_temperature=results,
+                                                              indices=index_mask)
             self.results = results
             self.load.set_results(results)
             self.results = update_results(self.results, hourly_load)
