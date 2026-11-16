@@ -140,7 +140,7 @@ def test_ensure_max_limit():
         simulation_horizon=8760 * 2)
 
     # without rule three, the simulation horizon is of no importance
-    assert np.isclose(np.sum(proceeding[:8760]), 20631.30922781232)
+    assert np.isclose(np.sum(proceeding[:8760]), 21709.358233488485)
 
     # one year simulation horizon
     proceeding_my, proceeding = calculate_regeneration(
@@ -149,7 +149,7 @@ def test_ensure_max_limit():
         rules=(1, 2, 3),
         algorithm='proceeding', simulation_horizon=8760)
     # there is regeneration right after the peak so it ignores the peak in 8760 hours
-    assert np.isclose(np.sum(proceeding[:8760]), 20.348125439922516)
+    assert np.isclose(np.sum(proceeding[:8760]), 2.5421862824001944)
 
     # 100 hours simulation horizon
     proceeding_my, proceeding = calculate_regeneration(
@@ -158,7 +158,7 @@ def test_ensure_max_limit():
         rules=(1, 2, 3),
         algorithm='proceeding', simulation_horizon=100)
     # way more regeneration due to smaller time horizon
-    assert np.isclose(np.sum(proceeding[:8760]), 20340.29952379073)
+    assert np.isclose(np.sum(proceeding[:8760]), 21795.760992449872)
 
     # 100 hours simulation horizon
     proceeding_my, proceeding = calculate_regeneration(
@@ -167,8 +167,7 @@ def test_ensure_max_limit():
         rules=(1, 2, 3),
         algorithm='proceeding', simulation_horizon=100, position_regeneration='outlet')
 
-    # way more regeneration due to smaller time horizon, slightly larger due to colder fluid temperatures in summer
-    assert np.isclose(np.sum(proceeding[:8760]), 20551.722531465664)
+    assert np.isclose(np.sum(proceeding[:8760]), 20785.272218076767)
 
 
 def test_auditorium_inlet_outlet():
@@ -212,16 +211,16 @@ def test_auditorium_inlet_outlet():
     borefield.calculation_setup(size_based_on='inlet')
     load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object)
     assert isinstance(load, HourlyBuildingLoadMultiYear)
-    assert np.isclose(np.sum(regen[:8760]), 14807.339373205816)
+    assert np.isclose(np.sum(regen[:8760]), 17208.331305582047)
     # when outlet fluid temperatures, higher
     borefield.calculation_setup(size_based_on='outlet')
     load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object)
-    assert np.isclose(np.sum(regen[:8760]), 15967.159112084273)
+    assert np.isclose(np.sum(regen[:8760]), 18343.651420896138)
 
     borefield.flow_data = ConstantFlowRate(mfr=15, flow_per_borehole=False)
     borefield.calculation_setup(size_based_on='inlet')
     load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object)
-    assert np.isclose(np.sum(regen[:8760]), 23202.423869319544)
+    assert np.isclose(np.sum(regen[:8760]), 27499.445238095213)
 
 
 def test_regeneration_error():
@@ -402,7 +401,7 @@ def test_proceeding_extra():
 
     # more regeneration with proceeding extra
     # assert np.isclose(np.sum(proceeding_extra[proceeding_extra >= 0]), 132868.87289271975)
-    assert np.isclose(np.sum(proceeding), 130474.37940651325)
+    assert np.isclose(np.sum(proceeding), 131815.53091459358)
 
     assert np.any(proceeding_extra < 0)
     _, proceeding = calculate_regeneration(

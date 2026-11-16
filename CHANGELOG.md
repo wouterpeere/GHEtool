@@ -5,6 +5,12 @@ our [project board](https://github.com/users/wouterpeere/projects/2) on GitHub.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2.4.3] - unpublished
+
+### Fixed
+
+- Add overshoot correction to regeneration method.
+
 ## [2.4.2] - 2026-11-06
 
 ### Added
