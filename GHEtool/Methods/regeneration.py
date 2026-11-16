@@ -368,6 +368,11 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                     fluid_data=borefield.fluid_data)),
                 borefield.fluid_data.cp(temperature=Tf_avg_new))
 
+            q1 = possible_regen_power
+            q2 = max_reg
+            if q2 < q1:  # inlet temperature rises with power -> overshoot correction
+                max_reg = q1 * q1 / (2 * q1 - q2)  # secant fixed point, always in (0, q1)
+
             ## RULES TO LIMIT THE REGENERATION
             # 1. Do not allow more regeneration than the imbalance
             if 1 in rules:
