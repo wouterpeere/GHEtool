@@ -66,6 +66,40 @@ class _RegenerationWindow:
         self._next_recalculation = self.window_end
 
 
+def _correct_overshoot(predicted_power: float, corrected_power: float) -> float:
+    """
+    Self-consistent regeneration power from the predictor/corrector pair.
+
+    The regeneration power is first evaluated at the fluid temperature without regeneration (`predicted_power`, Q1)
+    and then at the fluid temperature that would result from injecting/extracting Q1 (`corrected_power`, Q2).
+    Using Q2 directly overshoots when the regeneration is 'stiff' compared to the borefield (large a1 and/or flow rate):
+    injecting Q1 can push the fluid temperature past the reference temperature of the regeneration object, so Q2
+    changes sign and the regeneration is lost entirely.
+
+    Since the regeneration power is (close to) linear in the fluid temperature and the fluid temperature is (close to)
+    linear in the power, a single secant step through (0, Q1) and (Q1, Q2) gives the power Q* for which
+    Q* = f(T(Q*)), namely Q* = Q1² / (2 Q1 - Q2). This is exact for a linear system and requires no extra evaluations.
+    The correction is only applied when the power decreases in magnitude (Q2/Q1 < 1). The result then always lies
+    between 0 and Q1 and has the same sign as Q1.
+
+    Parameters
+    ----------
+    predicted_power : float
+        Regeneration power at the fluid temperature without regeneration (Q1) [W]
+    corrected_power : float
+        Regeneration power at the fluid temperature with Q1 regeneration (Q2) [W]
+
+    Returns
+    -------
+    float
+        Self-consistent regeneration power [W]
+    """
+    if predicted_power == 0 or corrected_power / predicted_power >= 1:
+        # power does not decrease with the fluid temperature change, so there is no overshoot to correct
+        return corrected_power
+    return predicted_power ** 2 / (2 * predicted_power - corrected_power)
+
+
 def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                            algorithm: str = 'yearly',
                            position_regeneration: str = "inlet",
@@ -367,11 +401,8 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                     power=new_load / 1000, temperature=Tf_avg_new,
                     fluid_data=borefield.fluid_data)),
                 borefield.fluid_data.cp(temperature=Tf_avg_new))
-
-            q1 = possible_regen_power
-            q2 = max_reg
-            if q2 < q1:  # inlet temperature rises with power -> overshoot correction
-                max_reg = q1 * q1 / (2 * q1 - q2)  # secant fixed point, always in (0, q1)
+            # avoid overshoot when the regeneration is stiff compared to the borefield
+            max_reg = _correct_overshoot(possible_regen_power, max_reg)
 
             ## RULES TO LIMIT THE REGENERATION
             # 1. Do not allow more regeneration than the imbalance
@@ -382,7 +413,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
             if 2 in rules:
                 def calculate_max_power(power):
                     resistance = get_Rb_limit(power, borefield.Tf_max)
-                    Tb_corrected = base_Tb + power * g0_corr
+                    Tb_corrected = base_Tb + (load[idx] + power) * g0_corr
                     max_delta = borefield.Tf_max - Tb_corrected
                     if borefield._calculation_setup.size_based_on != 'average':
                         debiet = max(min_flow, get_mfr_limit(power, borefield.Tf_max))
@@ -447,6 +478,8 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
                     power=new_load / 1000, temperature=Tf_avg_new,
                     fluid_data=borefield.fluid_data)),
                 borefield.fluid_data.cp(temperature=Tf_avg_new))
+            # avoid overshoot when the regeneration is stiff compared to the borefield
+            max_reg = _correct_overshoot(possible_regen_power, max_reg)
 
             max_reg = (-1) * max_reg
             ## RULES TO LIMIT THE REGENERATION
@@ -458,7 +491,7 @@ def calculate_regeneration(borefield: Borefield, regen_obj: Regeneration,
             if 2 in rules:
                 def calculate_max_power(power):
                     resistance = get_Rb_limit(power, borefield.Tf_min)
-                    Tb_corrected = base_Tb - power * g0_corr
+                    Tb_corrected = base_Tb + (load[idx] - power) * g0_corr
                     max_delta = max(0, Tb_corrected - borefield.Tf_min)
                     # difference between the inlet/outlet and the average fluid temperature at Tf_min
                     if borefield._calculation_setup.size_based_on == 'inlet':
