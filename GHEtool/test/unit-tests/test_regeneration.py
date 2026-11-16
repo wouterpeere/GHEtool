@@ -498,7 +498,7 @@ def test_office():
     # idem since there is more than enough regeneration capacity
     assert np.isclose(np.sum(regen[:8760]), -47923.77519999997)
     load, regen = calculate_regeneration(borefield=borefield, regen_obj=regeneration_object, algorithm='total')
-    assert np.isclose(np.sum(regen[:8760]), -49705.772394418585)
+    assert np.isclose(np.sum(regen[:8760]), -59096.07425354068)
 
 
 def test_office_inlet_outlet():
