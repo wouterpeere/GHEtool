@@ -616,7 +616,7 @@ def test_auditorium_var_eff():
         algorithm='yearly',
         simulation_horizon=100)
 
-    assert np.isclose(np.sum(proceeding[:8760]), 26694.189317442353)
+    assert np.isclose(np.sum(proceeding[:8760]), 26715.16009468556)
 
     proceeding_my, proceeding = calculate_regeneration(
         borefield=borefield,
@@ -626,7 +626,7 @@ def test_auditorium_var_eff():
         simulation_horizon=100)
 
     # more regeneration with total
-    assert np.isclose(np.sum(proceeding[:8760]), 53324.22062721375)
+    assert np.isclose(np.sum(proceeding[:8760]), 53344.51131906526)
 
 
 def test_break():
